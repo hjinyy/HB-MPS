@@ -607,7 +607,7 @@ def _resolve_story_alpha(available_alphas: Sequence[float], preferred: Sequence[
 
 def resolve_story_alphas(available_alphas: Sequence[float]) -> dict[str, float]:
     return {
-        "low": _resolve_story_alpha(available_alphas, [1.20, 1.30),
+        "low": _resolve_story_alpha(available_alphas, [1.20, 1.30]),
         "transition": _resolve_story_alpha(available_alphas, 1.50),
         "high": _resolve_story_alpha(available_alphas, 1.80),
     }
