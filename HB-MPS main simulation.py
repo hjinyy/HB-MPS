@@ -21,7 +21,7 @@ class Config:
     FILE_PATH = "data_file.csv"
 
     # Figure save path
-    FIGURE_DIR = r"C:\Users\user\PycharmProjects\HB-MPS\figures"
+    FIGURE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 
     # Scenario multipliers
     SCENARIO_MULTIPLIERS = [1.3, 1.5, 1.8]
