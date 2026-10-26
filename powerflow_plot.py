@@ -14,10 +14,13 @@ import matplotlib.pyplot as plt
 plt.rcParams.update(
     {
         "font.family": "Times New Roman",
+        "font.weight": "bold",
         "axes.titlesize": 18,
-        "axes.labelsize": 15,
-        "xtick.labelsize": 15,
-        "ytick.labelsize": 15,
+        "axes.titleweight": "bold",
+        "axes.labelsize": 18,
+        "axes.labelweight": "bold",
+        "xtick.labelsize": 18,
+        "ytick.labelsize": 18,
         "legend.fontsize": 12,
     }
 )
