@@ -56,6 +56,10 @@ def save_figure(
         left.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
         left.set_title(f"Minimum bus voltage (α={result.alpha})", fontweight="bold")
         left.set_ylabel("Voltage (pu)")
+        left.set_yticks(
+            (0.93, 0.94, 0.95, 0.96),
+            labels=("0.93", "0.94", "0.95", "0.96"),
+        )
         left.xaxis.set_major_locator(mdates.DayLocator())
         left.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
         left.grid(alpha=0.3)
@@ -72,6 +76,10 @@ def save_figure(
             fontweight="bold",
         )
         right.set_ylabel("Voltage (pu)")
+        right.set_yticks(
+            (0.92, 0.94, 0.96, 0.98, 1.00),
+            labels=("0.92", "0.94", "0.96", "0.98", "1.00"),
+        )
         right.grid(alpha=0.3)
         right.legend(loc="best")
 
