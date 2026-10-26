@@ -1,7 +1,11 @@
+"""IEEE 33-bus HB-MPS power-flow validation and publication figures.
 
+Figure (a): minimum node voltage by hour; Mode 2 markers refer to the BASELINE.
+Figure (b): nodal voltage profile at the actual peak of normalized benchmark load.
+"""
 from pathlib import Path
-import math
 import logging
+import math
 import warnings
 
 import numpy as np
@@ -11,13 +15,10 @@ import pandapower.networks as nw
 import matplotlib
 
 matplotlib.use("Agg")
-
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 
 warnings.filterwarnings("ignore")
 logging.getLogger("pandapower").setLevel(logging.ERROR)
-
 
 # ---------------------------------------------------------
 # 1. Configuration
@@ -31,21 +32,20 @@ PF = 0.9
 TANP = math.tan(math.acos(PF))
 VMIN = 0.95
 VSLACK = 1.03
-P_HFC = 0.5
+P_HFC = 0.5  # MW per truck
 
 IND_B = [17, 16, 15, 14, 13, 32, 31, 30, 29]
 RES_B = [8, 9, 10, 11, 12, 24, 25, 21, 22]
 PV_B = 6
 HB_B = 17
 
-# Figure style
 PAPER_DPI = 300
-
-FONT_TITLE = 33
-FONT_LABEL = 32
-FONT_TICK = 33
-FONT_LEGEND = 22
-LINE_WIDTH = 3.2
+FONT_TITLE = 22
+FONT_LABEL = 19
+FONT_TICK = 15
+FONT_LEGEND = 12
+LINE_WIDTH = 2.4
+MARKER_SIZE = 4
 
 plt.rcParams.update({
     "font.family": "Times New Roman",
@@ -57,363 +57,151 @@ plt.rcParams.update({
     "xtick.labelsize": FONT_TICK,
     "ytick.labelsize": FONT_TICK,
     "legend.fontsize": FONT_LEGEND,
+    "pdf.fonttype": 42,
 })
 
-
 # ---------------------------------------------------------
-# 2. Load Data and Normalize
+# 2. Load and normalize input profiles
 # ---------------------------------------------------------
-df = pd.read_csv(FILE_PATH).dropna(
-    subset=["산업용 전력사용량(kWh)"]
-).reset_index(drop=True)
+df = pd.read_csv(FILE_PATH)
+cols = ["산업용 전력사용량(kWh)", "주택용 전력사용량(kWh)", "E: 태양광 발전량(kWh)"]
+for col in cols:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
+df = df.dropna(subset=cols).reset_index(drop=True)
+if df.empty:
+    raise ValueError("No valid industrial/residential/PV input rows.")
 
-ind = df["산업용 전력사용량(kWh)"].to_numpy()
-res = df["주택용 전력사용량(kWh)"].to_numpy()
-pv = df["E: 태양광 발전량(kWh)"].to_numpy()
+ind = df[cols[0]].to_numpy(dtype=float)
+res = df[cols[1]].to_numpy(dtype=float)
+pv = df[cols[2]].to_numpy(dtype=float)
+T = len(df)
 
-T = len(ind)
 base = nw.case33bw()
-
-P_IND = base.load.loc[
-    base.load.bus.isin(IND_B), "p_mw"
-].sum()
-
-P_RES = base.load.loc[
-    base.load.bus.isin(RES_B), "p_mw"
-].sum()
+P_IND = base.load.loc[base.load.bus.isin(IND_B), "p_mw"].sum()
+P_RES = base.load.loc[base.load.bus.isin(RES_B), "p_mw"].sum()
 
 
 def norm(x, lo=0.6, hi=1.1):
-    if x.max() == x.min():
-        raise ValueError("Cannot normalize constant load data.")
-
-    return lo + (x - x.min()) / (
-        x.max() - x.min()
-    ) * (hi - lo)
+    if np.max(x) == np.min(x):
+        raise ValueError("Constant load profile cannot be min-max normalized.")
+    return lo + (x - np.min(x)) / (np.max(x) - np.min(x)) * (hi - lo)
 
 
 ind_pu = norm(ind)
 res_pu = norm(res)
-
 ind_mw = ind_pu * P_IND
 res_mw = res_pu * P_RES
-
-pv_mw = (
-    (pv / pv.max()) * P_IND
-    if pv.max() > 0 else pv * 0
-)
-
+pv_mw = (pv / pv.max()) * P_IND if pv.max() > 0 else np.zeros_like(pv)
 E_th_pu = 1.3 * ind_pu.mean()
 
+# AUTO selection: peak of normalized total IEEE 33-bus load (NOT a fixed t=107).
+PEAK_T = int(np.argmax(ind_mw + res_mw))
 
 # ---------------------------------------------------------
-# 3. Build IEEE 33-bus Network
+# 3. IEEE 33-bus network model
 # ---------------------------------------------------------
-def build(imw, rmw, pmw, hbmw):
+def build_network(imw, rmw, pmw, hbmw):
     net = nw.case33bw()
-
-    net.ext_grid.vm_pu = VSLACK
-    net.load = net.load.iloc[0:0]
+    net.ext_grid.loc[:, "vm_pu"] = VSLACK
+    net.load = net.load.iloc[0:0].copy()
 
     pi = imw / len(IND_B)
-
     for b in IND_B:
-        pp.create_load(
-            net, b,
-            p_mw=pi,
-            q_mvar=pi * TANP
-        )
+        pp.create_load(net, b, p_mw=pi, q_mvar=pi * TANP)
 
     pr = rmw / len(RES_B)
-
     for b in RES_B:
-        pp.create_load(
-            net, b,
-            p_mw=pr,
-            q_mvar=pr * TANP
-        )
+        pp.create_load(net, b, p_mw=pr, q_mvar=pr * TANP)
 
     if pmw > 0:
-        pp.create_sgen(
-            net, PV_B,
-            p_mw=pmw,
-            q_mvar=0
-        )
-
+        pp.create_sgen(net, PV_B, p_mw=pmw, q_mvar=0)
     if hbmw > 0:
-        pp.create_sgen(
-            net, HB_B,
-            p_mw=hbmw,
-            q_mvar=0
-        )
-
+        pp.create_sgen(net, HB_B, p_mw=hbmw, q_mvar=0)
     return net
 
 
 # ---------------------------------------------------------
-# 4. Power Flow Validation
+# 4. Time-series power flow
 # ---------------------------------------------------------
 rows = []
+peak_profiles = {}
 
 for t in range(T):
-    ex = max(ind_pu[t] - E_th_pu, 0) * P_IND
+    excess_mw = max(ind_pu[t] - E_th_pu, 0) * P_IND
+    ntr = math.ceil(excess_mw / P_HFC) if excess_mw > 0 else 0
+    hbmw = ntr * P_HFC  # Original full-truck injection assumption retained
 
-    ntr = math.ceil(ex / P_HFC) if ex > 0 else 0
-    hbmw = ntr * P_HFC
-
-    r = {
-        "t": t,
-        "mode2": int(ex > 0),
-        "ntruck": ntr
-    }
-
-    for tag, hb in [("base", 0.0), ("hbmps", hbmw)]:
-        net = build(
-            ind_mw[t],
-            res_mw[t],
-            pv_mw[t],
-            hb
-        )
-
+    result = {"t": t, "mode2": int(excess_mw > 0), "ntruck": ntr}
+    for tag, hb in (("base", 0.0), ("hbmps", hbmw)):
+        net = build_network(ind_mw[t], res_mw[t], pv_mw[t], hb)
         pp.runpp(net, algorithm="nr")
-
-        r[f"vmin_{tag}"] = net.res_bus.vm_pu.min()
-        r[f"vminbus_{tag}"] = int(
-            net.res_bus.vm_pu.idxmin()
-        )
-        r[f"ploss_{tag}"] = net.res_line.pl_mw.sum()
-        r[f"viol_{tag}"] = int(
-            net.res_bus.vm_pu.min() < VMIN
-        )
-
-    rows.append(r)
+        voltages = net.res_bus.vm_pu
+        result[f"vmin_{tag}"] = float(voltages.min())
+        result[f"vminbus_{tag}"] = int(voltages.idxmin())
+        result[f"ploss_{tag}"] = float(net.res_line.pl_mw.sum())
+        result[f"viol_{tag}"] = int(voltages.min() < VMIN)
+        if t == PEAK_T:
+            peak_profiles[tag] = voltages.sort_index().copy()
+    rows.append(result)
 
 R = pd.DataFrame(rows)
+R.to_csv(OUTPUT_DIR / "pf_results.csv", index=False)
 
-R.to_csv(
-    OUTPUT_DIR / "pf_results.csv",
-    index=False
-)
-
-
-# ---------------------------------------------------------
-# 5. Summary
-# ---------------------------------------------------------
-m2 = R[R.mode2 == 1]
-nm2 = R[R.mode2 == 0]
-
-print("=" * 64)
-print(
-    f"IEEE 33-bus | slack={VSLACK}pu | PF={PF} | "
-    f"산업정격{P_IND:.2f}MW 주거{P_RES:.2f}MW"
-)
-print("=" * 64)
-
-print(
-    f"Mode2 발동 : {R.mode2.sum()}/{T} 시점 "
-    f"(최대 {R.ntruck.max()}트럭)"
-)
-
-print(
-    f"Baseline 전압범위 : "
-    f"[{R.vmin_base.min():.4f}, "
-    f"{R.vmin_base.max():.4f}] pu"
-)
-
-print(
-    f"HB-MPS 전압범위 : "
-    f"[{R.vmin_hbmps.min():.4f}, "
-    f"{R.vmin_hbmps.max():.4f}] pu"
-)
-
-print(
-    f"전압위반(<0.95pu) : "
-    f"base {R.viol_base.sum()} "
-    f"-> hbmps {R.viol_hbmps.sum()} 시점"
-)
-
-if len(m2):
-    vbase = m2.vmin_base.mean()
-    vhbmps = m2.vmin_hbmps.mean()
-
-    print(
-        f"\nMode2 시점({len(m2)}): "
-        f"최저V {vbase:.4f} -> {vhbmps:.4f} pu "
-        f"(+{(vhbmps - vbase) * 100:.2f}%p)"
-    )
-
-    print(
-        f"위반해소: base {m2.viol_base.sum()}/{len(m2)} "
-        f"-> hbmps {m2.viol_hbmps.sum()}/{len(m2)}"
-    )
-
-else:
-    print("\nMode2 발동 시점 없음")
-
-print(
-    f"비-Mode2 시점({len(nm2)}): "
-    f"최저V {nm2.vmin_base.mean():.4f} pu, "
-    f"위반 {nm2.viol_base.sum()}"
-)
-
-tp = len(R[(R.mode2 == 1) & (R.viol_base == 1)])
-fp = len(R[(R.mode2 == 1) & (R.viol_base == 0)])
-fn = len(R[(R.mode2 == 0) & (R.viol_base == 1)])
-tn = len(R[(R.mode2 == 0) & (R.viol_base == 0)])
-
-precision = tp / (tp + fp) * 100 if tp + fp else 0
-recall = tp / (tp + fn) * 100 if tp + fn else 0
-
-print(
-    f"\nMode2 판단 vs 전압위반: "
-    f"정밀도 {precision:.0f}% "
-    f"재현율 {recall:.0f}%"
-)
-
-print(
-    f"M2&위반={tp} M2&정상={fp} "
-    f"정상판단&위반={fn} 정상&정상={tn}"
-)
-
-w = R.loc[R.vmin_base.idxmin()]
-
-print(
-    f"\n최악부하 t={int(w.t)}: "
-    f"최저V {w.vmin_base:.4f}"
-    f"->{w.vmin_hbmps:.4f}pu, "
-    f"{int(w.ntruck)}트럭, "
-    f"손실 {w.ploss_base * 1000:.1f}"
-    f"->{w.ploss_hbmps * 1000:.1f}kW"
-)
-
-print(
-    f"최저전압 최빈 노드: "
-    f"bus {int(R.vminbus_base.mode().iloc[0])} "
-    f"(HB-MPS 접속 노드: bus {HB_B})"
-)
-
+print(f"IEEE 33-bus | Vslack={VSLACK} pu | PF={PF}")
+print(f"Normalized load peak: t={PEAK_T}; total={ind_mw[PEAK_T]+res_mw[PEAK_T]:.4f} MW")
+print(f"Mode 2 triggered: {int(R.mode2.sum())}/{T}; maximum trucks={R.ntruck.max()}")
+print(f"Minimum voltage, Base: {R.vmin_base.min():.4f} pu; HB-MPS: {R.vmin_hbmps.min():.4f} pu")
+print(f"Hours below {VMIN:.2f} pu: {R.viol_base.sum()} -> {R.viol_hbmps.sum()}")
 
 # ---------------------------------------------------------
-# 6. Plot Power Flow Validation Results
+# 5. Two-panel figure: same composition as reference
 # ---------------------------------------------------------
-fig, axes = plt.subplots(
-    2, 1,
-    figsize=(13, 11),
-    dpi=PAPER_DPI,
-    sharex=True
-)
+fig, axes = plt.subplots(2, 1, figsize=(10.5, 9.5), dpi=PAPER_DPI)
+red, blue, orange = "#c6382b", "#2574ac", "#e68127"
 
-# (a) Minimum Bus Voltage
-axes[0].plot(
-    R.t,
-    R.vmin_base,
-    linewidth=LINE_WIDTH,
-    label="Baseline",
-    color="dimgray"
-)
+# (a) Voltage time series: orange markers are on *BASE* red profile.
+ax = axes[0]
+ax.plot(R.t, R.vmin_base, color=red, lw=LINE_WIDTH, label="Base (no HB-MPS)")
+ax.plot(R.t, R.vmin_hbmps, color=blue, lw=LINE_WIDTH, label="With HB-MPS")
+ax.axhline(VMIN, color="black", lw=1.8, ls="--", label="0.95 pu limit")
+m2 = R.mode2.eq(1)
+ax.scatter(R.loc[m2, "t"], R.loc[m2, "vmin_base"],
+           color=orange, s=42, zorder=6, label="Mode 2 triggered")
+ax.set_title("(a) Minimum node voltage over the operation horizon", pad=10)
+ax.set_xlabel("Time (h)")
+ax.set_ylabel("Min. bus voltage (pu)")
+ax.set_xlim(0, T - 1)
+ax.set_ylim(min(VMIN, R.vmin_base.min(), R.vmin_hbmps.min()) - 0.012,
+            max(R.vmin_base.max(), R.vmin_hbmps.max()) + 0.008)
+ax.legend(loc="lower left", ncol=2, prop={"weight": "bold", "size": FONT_LEGEND})
 
-axes[0].plot(
-    R.t,
-    R.vmin_hbmps,
-    linewidth=LINE_WIDTH,
-    label="HB-MPS",
-    color="royalblue"
-)
+# (b) All bus voltages at peak normalized total IEEE 33-bus demand.
+ax = axes[1]
+base_v, hbmps_v = peak_profiles["base"], peak_profiles["hbmps"]
+ax.plot(base_v.index, base_v.values, color=red, lw=1.8,
+        marker="o", markersize=MARKER_SIZE, label="Base (no HB-MPS)")
+ax.plot(hbmps_v.index, hbmps_v.values, color=blue, lw=1.8,
+        marker="s", markersize=MARKER_SIZE, label="With HB-MPS")
+ax.axhline(VMIN, color="black", lw=1.6, ls="--")
+ax.axvline(HB_B, color="#32b16d", lw=1.8, ls=":",
+           label=f"HB-MPS node (bus {HB_B})")
+ax.set_title(f"(b) Nodal voltage profile at peak-load hour (t={PEAK_T})", pad=10)
+ax.set_xlabel("Bus index")
+ax.set_ylabel("Voltage (pu)")
+ax.set_xlim(int(base_v.index.min()), int(base_v.index.max()))
+ax.set_ylim(min(VMIN, base_v.min(), hbmps_v.min()) - 0.006,
+            max(base_v.max(), hbmps_v.max()) + 0.005)
+ax.legend(loc="lower left", prop={"weight": "bold", "size": FONT_LEGEND})
 
-axes[0].axhline(
-    VMIN,
-    linestyle="--",
-    linewidth=2.2,
-    color="red",
-    label="Lower Voltage Limit"
-)
-
-axes[0].set_title(
-    "(a) Minimum Bus Voltage",
-    pad=14
-)
-
-axes[0].set_ylabel("Voltage (pu)")
-
-
-# (b) Network Line Loss
-axes[1].plot(
-    R.t,
-    R.ploss_base * 1000,
-    linewidth=LINE_WIDTH,
-    label="Baseline",
-    color="dimgray"
-)
-
-axes[1].plot(
-    R.t,
-    R.ploss_hbmps * 1000,
-    linewidth=LINE_WIDTH,
-    label="HB-MPS",
-    color="royalblue"
-)
-
-axes[1].set_title(
-    "(b) Network Line Loss",
-    pad=14
-)
-
-axes[1].set_ylabel("Line Loss (kW)")
-axes[1].set_xlabel("Time Step")
-
-
-# ---------------------------------------------------------
-# 7. Figure Formatting
-# ---------------------------------------------------------
 for ax in axes:
-    ax.grid(
-        True,
-        linestyle="--",
-        alpha=0.35
-    )
-
-    ax.yaxis.set_major_locator(
-        MaxNLocator(nbins=5)
-    )
-
-    ax.tick_params(
-        axis="both",
-        labelsize=FONT_TICK
-    )
-
-    ax.legend(
-        loc="best",
-        prop={
-            "weight": "bold",
-            "size": FONT_LEGEND
-        }
-    )
-
+    ax.grid(True, color="0.75", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis="both", labelsize=FONT_TICK)
     for tick in ax.get_xticklabels() + ax.get_yticklabels():
         tick.set_fontweight("bold")
 
-    ax.yaxis.get_offset_text().set_fontweight("bold")
-
-fig.tight_layout(
-    pad=2.0,
-    h_pad=2.0
-)
-
-
-# ---------------------------------------------------------
-# 8. Save Figure
-# ---------------------------------------------------------
-fig.savefig(
-    OUTPUT_DIR / "figure_powerflow_voltage_loss.png",
-    dpi=PAPER_DPI,
-    bbox_inches="tight"
-)
-
-fig.savefig(
-    OUTPUT_DIR / "figure_powerflow_voltage_loss.pdf",
-    bbox_inches="tight"
-)
-
+fig.tight_layout(h_pad=1.5)
+fig.savefig(OUTPUT_DIR / "figure_powerflow_voltage_profile.png", dpi=PAPER_DPI, bbox_inches="tight")
+fig.savefig(OUTPUT_DIR / "figure_powerflow_voltage_profile.pdf", bbox_inches="tight")
 plt.close(fig)
-
-print(f"\nResults and figures saved to: {OUTPUT_DIR}")
+print(f"Saved: {OUTPUT_DIR / 'figure_powerflow_voltage_profile.png'}")
