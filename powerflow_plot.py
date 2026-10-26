@@ -4,13 +4,23 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib
+import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({"font.family": "Times New Roman"})
+plt.rcParams.update(
+    {
+        "font.family": "Times New Roman",
+        "axes.titlesize": 18,
+        "axes.labelsize": 15,
+        "xtick.labelsize": 15,
+        "ytick.labelsize": 15,
+        "legend.fontsize": 12,
+    }
+)
 
 if TYPE_CHECKING:
     from powerflow_validation import ScenarioResult
@@ -23,7 +33,7 @@ def save_figure(
     hb_bus_number: int,
 ) -> None:
     """Save time-series and nodal-voltage comparisons for all scenarios."""
-    fig, axes = plt.subplots(3, 2, figsize=(15, 14), dpi=220)
+    fig, axes = plt.subplots(3, 2, figsize=(15, 9), dpi=220)
     bus_numbers = np.arange(1, 34)
     for row, result in enumerate(results):
         records = result.records
@@ -43,6 +53,8 @@ def save_figure(
         left.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
         left.set_title(f"Minimum bus voltage (α={result.alpha})", fontweight="bold")
         left.set_ylabel("Voltage (pu)")
+        left.xaxis.set_major_locator(mdates.DayLocator())
+        left.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
         left.grid(alpha=0.3)
         left.legend(loc="best")
 
