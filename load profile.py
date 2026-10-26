@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
+plt.rcParams["font.family"] = "Times New Roman"
+
 
 # ---------------------------------------------------------
 # 1. Configuration

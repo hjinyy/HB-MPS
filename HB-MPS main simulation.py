@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
 
-plt.rcParams["font.weight"] = "bold"
+plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "bold"})
 plt.rcParams["axes.labelweight"] = "bold"
 plt.rcParams["axes.titleweight"] = "bold"
 
