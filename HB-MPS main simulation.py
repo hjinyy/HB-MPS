@@ -18,7 +18,7 @@ plt.rcParams["axes.titleweight"] = "bold"
 # 1. Configuration & Constants
 # ---------------------------------------------------------
 class Config:
-    FILE_PATH = "data_file.csv"
+    FILE_PATH = "Data file/data_file.csv"
 
     # Figure save path
     FIGURE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
@@ -27,13 +27,12 @@ class Config:
     SCENARIO_MULTIPLIERS = [1.3, 1.5, 1.8]
 
     # Font sizes: 기존 대비 약 2배 확대
-    FONT_TITLE = 28
-    FONT_SUBTITLE = 22
-    FONT_LABEL = 25
-    FONT_TICK = 25
-    FONT_LEGEND = 20
-    FONT_TEXT = 20
-    FONT_PIE = 23
+    FONT_SUBTITLE = 33
+    FONT_LABEL = 32
+    FONT_TICK = 33
+    FONT_LEGEND = 22
+    FONT_TEXT = 25
+    FONT_PIE = 27
 
     # System Capacities
     ESS_CAPACITY = 1500.0
@@ -51,12 +50,12 @@ class Config:
     ESS_MAX_SOC = 0.9
 
     # Initial States
-    INIT_ESS_SOC = 0.6
+    INIT_ESS_SOC = 0.4
     INIT_HFC_LOH = 0.8
 
     # Thresholds
     PHASE1_SOC_LIMIT = 0.3
-    PHASE1_LCOE_PERCENTILE = 0.4
+    PHASE1_LCOE_PERCENTILE = 0.6
 
     # Maintenance & Charging Logic
     H2_REFUEL_THRESHOLD = 0.6
@@ -516,7 +515,8 @@ def draw_asset_status(ax, res, alpha):
 
     ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
     ax.set_ylabel("State (%)", fontsize=Config.FONT_LABEL)
-    ax.set_ylim(0, 105)
+    ax.set_ylim(0, 100)
+    ax.set_yticks([0, 25, 50, 75, 100])
     ax.grid(True, linestyle="--", alpha=0.35)
     ax.legend(
         loc="lower left",
@@ -712,7 +712,7 @@ def draw_mode_distribution(ax, res, alpha):
 def create_grid_resilience_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 16),
+        figsize=(13, 15),
         dpi=300,
         sharex=True
     )
@@ -720,11 +720,13 @@ def create_grid_resilience_figure(scenario_results):
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_grid_resilience(ax, scenario_results[alpha], alpha)
 
-    fig.suptitle(
-        "Grid Resilience & HB-MPS Fleet Deployment",
-        fontsize=Config.FONT_TITLE,
-        fontweight="bold"
-    )
+    # Y축 통일
+    for ax in axes:
+        ax.set_ylim(7000, 19000)
+        ax.set_yticks([7500, 10000, 12500, 15000, 17500])
+
+    axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
+
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
@@ -735,7 +737,7 @@ def create_grid_resilience_figure(scenario_results):
 def create_asset_status_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 16),
+        figsize=(13, 15),
         dpi=300,
         sharex=True
     )
@@ -743,11 +745,6 @@ def create_asset_status_figure(scenario_results):
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_asset_status(ax, scenario_results[alpha], alpha)
 
-    fig.suptitle(
-        "Asset Status (Main Truck)",
-        fontsize=Config.FONT_TITLE,
-        fontweight="bold"
-    )
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
@@ -758,19 +755,13 @@ def create_asset_status_figure(scenario_results):
 def create_financial_flow_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 16),
+        figsize=(13, 15),
         dpi=300,
         sharex=True
     )
 
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_financial_flow(ax, scenario_results[alpha], alpha)
-
-    fig.suptitle(
-        "Financial Flow",
-        fontsize=Config.FONT_TITLE,
-        fontweight="bold"
-    )
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
@@ -788,35 +779,46 @@ def create_economic_value_figure(scenario_results):
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_economic_value(ax, scenario_results[alpha], alpha)
 
-    fig.suptitle(
-        "Total Economic Value",
-        fontsize=Config.FONT_TITLE,
-        fontweight="bold"
-    )
-
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.subplots_adjust(hspace=0.55)
     save_figure(fig, "figure_economic_value_all_cases")
 
 
 def create_mode_distribution_figure(scenario_results):
-    fig, axes = plt.subplots(
-        3, 1,
-        figsize=(12, 18),
-        dpi=300
-    )
+    from matplotlib.patches import Patch
+
+    colors = {
+        "STANDBY": "lightgray",
+        "GRID_CHARGE": "mediumseagreen",
+        "SOLAR_CHARGE": "cyan",
+        "PHASE 1": "gold",
+        "PHASE 2": "red",
+        "H2_MAINTENANCE": "orange"
+    }
+
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6), dpi=300)
 
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_mode_distribution(ax, scenario_results[alpha], alpha)
+        ax.get_legend().remove()
+        ax.set_xlim(-1.4, 1.6)
 
-    fig.suptitle(
-        "Operational Mode Distribution",
-        fontsize=Config.FONT_TITLE,
-        fontweight="bold"
+    fig.legend(
+        [Patch(facecolor=c) for c in colors.values()],
+        list(colors.keys()),
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.06),
+        ncol=6,
+        prop={"weight": "bold", "size": 16},
+        frameon=False
     )
 
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.subplots_adjust(hspace=0.55)
+    fig.subplots_adjust(
+        left=0.03, right=0.97,
+        top=0.85, bottom=0.14,
+        wspace=0.00
+    )
+
     save_figure(fig, "figure_9_operational_mode_distribution_all_cases")
 
 
