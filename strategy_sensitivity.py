@@ -48,7 +48,9 @@ def main() -> None:
     with (OUT / "dual_mode_policy_sensitivity.csv").open(
         "w", newline="", encoding="utf-8"
     ) as target:
-        writer = csv.DictWriter(target, fieldnames=list(records[0]), lineterminator="\n")
+        writer = csv.DictWriter(
+            target, fieldnames=list(records[0]), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(records)
 

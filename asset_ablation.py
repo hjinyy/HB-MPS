@@ -210,7 +210,9 @@ def main() -> None:
         ("asset_ablation_summary.csv", [summary for _, summary in outcomes]),
     ):
         with (OUT / filename).open("w", encoding="utf-8", newline="") as target:
-            writer = csv.DictWriter(target, fieldnames=list(rows[0]), lineterminator="\n")
+            writer = csv.DictWriter(
+                target, fieldnames=list(rows[0]), lineterminator="\n"
+            )
             writer.writeheader()
             writer.writerows(rows)
     summaries = [summary for _, summary in outcomes]
