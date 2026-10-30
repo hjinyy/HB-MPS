@@ -7,26 +7,17 @@ Outputs are prefixed ``emergency_`` so Figures 5–13 are untouched.
 from __future__ import annotations
 
 import csv
-import math
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Final
 
-from asset_ablation import INPUT, load_hours
 from emergency_dispatch import (
-    ESS_CAPACITY,
-    ESS_EFFICIENCY,
-    ESS_MAX_SOC,
-    ESS_MIN_SOC,
-    ESS_WEAR_KRW_PER_KWH,
-    ESS_WITHDRAWAL_KWH,
-    H2_CAPACITY_KG,
-    HFC_OUTPUT_KWH,
-    P2G_KWH_PER_KG,
     run_scenario,
 )
 from emergency_dispatch_model import Run, Scenario, Strategy
 from emergency_dispatch_plot import make_figures
+from emergency_validation import validate_run
+from hb_inputs import INPUT, load_hours
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 RESERVES: Final = (0.2, 0.3, 0.4, 0.5)
@@ -105,117 +96,6 @@ def summarize(run: Run) -> Summary:
         run.terminal_inventory_change_krw,
         societal + run.terminal_inventory_change_krw,
     )
-
-
-def validate_run(run: Run) -> None:
-    """Reject energy, output, inventory, and accounting inconsistencies."""
-    tolerance = 1e-6
-    for step in run.steps:
-        if not math.isclose(
-            step.demand_kwh,
-            step.hfc_kwh + step.ess_emergency_kwh + step.unserved_kwh,
-            abs_tol=tolerance,
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "supply balance"))
-        if not ESS_MIN_SOC - tolerance <= step.soc_end <= ESS_MAX_SOC + tolerance:
-            raise AssertionError((run.scenario, step.timestamp, "SOC bound"))
-        if (
-            not -tolerance
-            <= step.h2_end_kg
-            <= run.scenario.trucks * H2_CAPACITY_KG + tolerance
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "H2 inventory bound"))
-        if not (
-            -tolerance
-            <= step.h2_min_truck_kg
-            <= step.h2_max_truck_kg
-            <= H2_CAPACITY_KG + tolerance
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "per-truck H2 bound"))
-        if (
-            not 0
-            <= step.hfc_kwh
-            <= step.hfc_trucks_dispatched * HFC_OUTPUT_KWH + tolerance
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "HFC rating"))
-        if (
-            not 0
-            <= step.ess_emergency_kwh
-            <= ESS_WITHDRAWAL_KWH * ESS_EFFICIENCY + tolerance
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "ESS rating"))
-        if step.hfc_trucks_dispatched > run.scenario.trucks:
-            raise AssertionError((run.scenario, step.timestamp, "truck availability"))
-        expected_h2_end = (
-            step.h2_start_kg
-            + step.external_h2_kg
-            + step.pv_p2g_kwh / P2G_KWH_PER_KG
-            - step.consumed_h2_kg
-        )
-        if not math.isclose(step.h2_end_kg, expected_h2_end, abs_tol=tolerance):
-            raise AssertionError((run.scenario, step.timestamp, "H2 balance"))
-        expected_soc_end = (
-            step.soc_start
-            + (
-                (step.pv_ess_charge_kwh + step.grid_ess_charge_kwh) * ESS_EFFICIENCY
-                - (step.ess_emergency_kwh + step.phase1_ess_kwh) / ESS_EFFICIENCY
-            )
-            / ESS_CAPACITY
-        )
-        if not math.isclose(step.soc_end, expected_soc_end, abs_tol=tolerance):
-            raise AssertionError((run.scenario, step.timestamp, "ESS balance"))
-        if (
-            step.h2_purchase_krw < 0
-            or step.grid_purchase_krw < 0
-            or step.ess_wear_krw < 0
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "negative cost"))
-        if not math.isclose(
-            step.h2_purchase_krw,
-            step.external_h2_kg * step.h2_price_krw_per_kg,
-            abs_tol=tolerance,
-        ):
-            raise AssertionError(
-                (run.scenario, step.timestamp, "H2 purchase accounting")
-            )
-        if not math.isclose(
-            step.grid_purchase_krw,
-            step.grid_ess_charge_kwh * step.smp_krw_per_kwh,
-            abs_tol=tolerance,
-        ):
-            raise AssertionError(
-                (run.scenario, step.timestamp, "grid purchase accounting")
-            )
-        if not math.isclose(
-            step.revenue_krw,
-            step.phase1_ess_kwh * step.lcoe_krw_per_kwh,
-            abs_tol=tolerance,
-        ):
-            raise AssertionError(
-                (run.scenario, step.timestamp, "Mode 1 revenue accounting")
-            )
-        wear_throughput = (
-            (step.ess_emergency_kwh + step.phase1_ess_kwh) / ESS_EFFICIENCY
-            + step.pv_ess_charge_kwh
-            + step.grid_ess_charge_kwh
-        )
-        if not math.isclose(
-            step.ess_wear_krw, wear_throughput * ESS_WEAR_KRW_PER_KWH, abs_tol=tolerance
-        ):
-            raise AssertionError((run.scenario, step.timestamp, "ESS wear accounting"))
-    if run.scenario.strategy is Strategy.P0 and run.total("ess_emergency_kwh") != 0:
-        raise AssertionError((run.scenario, "P0 ESS emergency supply"))
-    if run.scenario.strategy is Strategy.P2 and run.terminal_soc < ESS_MIN_SOC:
-        raise AssertionError((run.scenario, "P2 terminal SOC"))
-    if run.scenario.strategy is Strategy.P2:
-        for step in run.steps:
-            if (
-                step.ess_emergency_kwh > 0
-                and step.soc_end < (run.scenario.reserve_soc or 0.0) - tolerance
-            ):
-                raise AssertionError(
-                    (run.scenario, step.timestamp, "emergency reserve")
-                )
 
 
 def write_csv(

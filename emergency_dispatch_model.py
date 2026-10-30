@@ -20,9 +20,26 @@ class Scenario:
     trucks: int
     strategy: Strategy
     reserve_soc: float | None = None
+    phase1_soc_gate: float = 0.3
+    phase1_lcoe_quantile: float = 0.6
+    ess_capacity_kwh: float = 1500.0
+    hfc_capacity_kwh: float = 1500.0
 
     def __post_init__(self) -> None:
-        if self.alpha not in (1.3, 1.5) or self.trucks not in (1, 2, 5):
+        if self.alpha not in (1.3, 1.5, 1.8) or self.trucks not in (1, 2, 5):
+            raise InvalidScenario(self)
+        if (
+            not 0.1 <= self.phase1_soc_gate <= 0.9
+            or not 0 <= self.phase1_lcoe_quantile <= 1
+        ):
+            raise InvalidScenario(self)
+        if self.ess_capacity_kwh not in (
+            0.0,
+            1500.0,
+            3000.0,
+        ) or self.hfc_capacity_kwh not in (0.0, 1500.0, 3000.0):
+            raise InvalidScenario(self)
+        if self.ess_capacity_kwh + self.hfc_capacity_kwh == 0:
             raise InvalidScenario(self)
         if self.strategy is Strategy.P2:
             if self.reserve_soc not in (0.2, 0.3, 0.4, 0.5):
@@ -64,11 +81,14 @@ class Step:
     pv_p2g_kwh: float
     external_h2_kg: float
     consumed_h2_kg: float
+    main_h2_refill_kg: float
     hfc_trucks_dispatched: int
+    required_hfc_trucks: int
     soc_start: float
     soc_end: float
     h2_start_kg: float
     h2_end_kg: float
+    main_h2_end_kg: float
     h2_min_truck_kg: float
     h2_max_truck_kg: float
     revenue_krw: float

@@ -25,6 +25,7 @@ class Config:
 
     # Scenario multipliers
     SCENARIO_MULTIPLIERS = [1.3, 1.5, 1.8]
+    AVAILABLE_TRUCKS = 5  # Main HB-MPS plus at most four auxiliary HFC vehicles.
 
     # Font sizes: 기존 대비 약 2배 확대
     FONT_SUBTITLE = 33
@@ -318,7 +319,7 @@ def load_input_data():
     return df
 
 
-def run_simulation_for_alpha(df, alpha):
+def run_legacy_simulation_for_alpha(df, alpha):
     b_load_mean = df["load_B"].mean()
     LCOE_high_threshold = df["LCOE"].quantile(Config.PHASE1_LCOE_PERCENTILE)
     SMP_low_threshold = df["SMP"].quantile(Config.CHARGE_SMP_PERCENTILE)
@@ -356,6 +357,13 @@ def run_simulation_for_alpha(df, alpha):
     }
 
     return res, summary
+
+
+def run_simulation_for_alpha(df, alpha):
+    """Run the validated finite-fleet HFC-first/ESS-backup main strategy."""
+    from main_p1_adapter import simulate_main_p1
+
+    return simulate_main_p1(df, alpha, Config.AVAILABLE_TRUCKS)
 
 
 def run_all_scenarios():
@@ -827,6 +835,14 @@ def create_mode_distribution_figure(scenario_results):
 # ---------------------------------------------------------
 def main():
     scenario_results, scenario_summaries = run_all_scenarios()
+
+    os.makedirs(Config.FIGURE_DIR, exist_ok=True)
+    pd.concat(scenario_results.values(), ignore_index=True).to_csv(
+        os.path.join(Config.FIGURE_DIR, "p1_main_hourly.csv"), index=False
+    )
+    pd.DataFrame.from_dict(scenario_summaries, orient="index").to_csv(
+        os.path.join(Config.FIGURE_DIR, "p1_main_summary.csv"), index=False
+    )
 
     create_grid_resilience_figure(scenario_results)
     create_asset_status_figure(scenario_results)

@@ -1,7 +1,7 @@
-"""Bus-by-hour voltage maps for the existing alpha=1.3 IEEE 33-bus model.
+"""Bus-by-hour voltage maps for P1 at alpha=1.3 on the IEEE 33-bus model.
 
-This reproduces powerflow_validation.py's equivalent HB-MPS injection and does
-not impose the single-vehicle fuel limits used by asset_ablation.py.
+The original feeder scaling and visual design remain; injection now uses the
+actual five-truck P1 hourly HFC plus ESS supply.
 """
 
 from __future__ import annotations
@@ -16,6 +16,9 @@ import pandapower.networks as nw
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from emergency_dispatch import run_scenario
+from emergency_dispatch_model import Scenario, Strategy
+from hb_inputs import INPUT, load_hours
 from powerflow_validation import (
     HB_BUS_NUMBER,
     INDUSTRIAL_BUS_NUMBERS,
@@ -45,6 +48,9 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
     residential = profile_fraction(frame[RESIDENTIAL_COLUMN])
     pv = profile_fraction(frame[PV_COLUMN])
     raw_industrial = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
+    operational = run_scenario(load_hours(INPUT), Scenario(ALPHA, 5, Strategy.P1))
+    if len(operational.steps) != len(frame):
+        raise ValueError("Operational and power-flow hours must align.")
     benchmark = nw.case33bw()
     industrial_buses = {bus - 1 for bus in INDUSTRIAL_BUS_NUMBERS}
     residential_buses = {bus - 1 for bus in RESIDENTIAL_BUS_NUMBERS}
@@ -55,7 +61,6 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
         benchmark.load.loc[benchmark.load.bus.isin(residential_buses), "p_mw"].sum()
     )
     pv_rating = float(benchmark.load.p_mw.sum()) * PV_PENETRATION
-    threshold = ALPHA * float(raw_industrial.mean())
     raw_peak = float(raw_industrial.max())
     base_net = build_network()
     hb_net = build_network()
@@ -67,9 +72,10 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
             industrial_rating * industrial[hour]
             + residential_rating * residential[hour]
         ) / (industrial_rating + residential_rating)
-        hb_mw = (
-            max(raw_industrial[hour] - threshold, 0.0) / raw_peak * industrial_rating
+        supplied_raw_kwh = (
+            operational.steps[hour].hfc_kwh + operational.steps[hour].ess_emergency_kwh
         )
+        hb_mw = supplied_raw_kwh / raw_peak * industrial_rating
         pv_mw = pv[hour] * pv_rating
         set_operating_point(
             base_net, industrial[hour], residential[hour], mixed, pv_mw, 0.0

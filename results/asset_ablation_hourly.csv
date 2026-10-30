@@ -2,22 +2,22 @@ configuration,comparison,timestamp,demand_kwh,ess_supply_kwh,hfc_supply_kwh,unse
 ESS-only,Original component ratings,20250801-01,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-02,0.0,0.0,0.0,0.0,-48930.0,0.0
 ESS-only,Original component ratings,20250801-03,0.0,0.0,0.0,0.0,-48930.0,0.0
-ESS-only,Original component ratings,20250801-04,0.0,0.0,0.0,0.0,-30205.89473684211,0.0
-ESS-only,Original component ratings,20250801-05,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250801-06,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250801-04,0.0,0.0,0.0,0.0,-28695.6,0.0
+ESS-only,Original component ratings,20250801-05,0.0,0.0,0.0,0.0,-1451.3400000000001,0.0
+ESS-only,Original component ratings,20250801-06,0.0,0.0,0.0,0.0,-73.39500000000741,0.0
 ESS-only,Original component ratings,20250801-07,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-09,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-10,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-11,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-12,0.0,0.0,0.0,0.0,95453.10500000001,0.0
-ESS-only,Original component ratings,20250801-13,0.0,0.0,0.0,0.0,67776.67499999999,0.0
+ESS-only,Original component ratings,20250801-13,0.0,0.0,0.0,0.0,67773.561401625,0.0
 ESS-only,Original component ratings,20250801-14,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250801-15,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250801-16,0.0,0.0,0.0,0.0,82683.48550000001,0.0
 ESS-only,Original component ratings,20250801-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250801-18,0.0,0.0,0.0,0.0,-15000.0,0.0
-ESS-only,Original component ratings,20250801-19,0.0,0.0,0.0,0.0,79856.8555,0.0
+ESS-only,Original component ratings,20250801-19,0.0,0.0,0.0,0.0,79856.85550000002,0.0
 ESS-only,Original component ratings,20250801-20,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-21,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -25,19 +25,19 @@ ESS-only,Original component ratings,20250801-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250801-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250802-01,0.0,0.0,0.0,0.0,-49650.0,0.0
 ESS-only,Original component ratings,20250802-02,0.0,0.0,0.0,0.0,-49650.0,0.0
-ESS-only,Original component ratings,20250802-03,0.0,0.0,0.0,0.0,-49044.00000000001,0.0
-ESS-only,Original component ratings,20250802-04,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-ESS-only,Original component ratings,20250802-05,0.0,0.0,0.0,0.0,-10208.842105263158,0.0
-ESS-only,Original component ratings,20250802-06,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250802-07,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250802-03,0.0,0.0,0.0,0.0,-49044.0,0.0
+ESS-only,Original component ratings,20250802-04,0.0,0.0,0.0,0.0,-48492.0,0.0
+ESS-only,Original component ratings,20250802-05,0.0,0.0,0.0,0.0,-9698.4,0.0
+ESS-only,Original component ratings,20250802-06,0.0,0.0,0.0,0.0,-484.92,0.0
+ESS-only,Original component ratings,20250802-07,0.0,0.0,0.0,0.0,-24.52200000001487,0.0
 ESS-only,Original component ratings,20250802-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250802-09,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250802-10,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250802-11,0.0,0.0,0.0,0.0,96865.75499049999,0.0
-ESS-only,Original component ratings,20250802-12,0.0,0.0,0.0,0.0,68833.2107075,0.0
+ESS-only,Original component ratings,20250802-12,0.0,0.0,0.0,0.0,68832.15699333939,0.0
 ESS-only,Original component ratings,20250802-13,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250802-14,0.0,0.0,0.0,0.0,-15000.0,0.0
-ESS-only,Original component ratings,20250802-15,0.0,0.0,0.0,0.0,79133.56620655,0.0
+ESS-only,Original component ratings,20250802-15,0.0,0.0,0.0,0.0,79133.56620655001,0.0
 ESS-only,Original component ratings,20250802-16,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250802-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250802-18,0.0,0.0,0.0,0.0,-15000.0,0.0
@@ -54,13 +54,13 @@ ESS-only,Original component ratings,20250803-04,0.0,0.0,0.0,0.0,-47565.0,0.0
 ESS-only,Original component ratings,20250803-05,0.0,0.0,0.0,0.0,-37950.0,0.0
 ESS-only,Original component ratings,20250803-06,0.0,0.0,0.0,0.0,-47685.0,0.0
 ESS-only,Original component ratings,20250803-07,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250803-08,0.0,0.0,0.0,0.0,-32818.0,0.0
+ESS-only,Original component ratings,20250803-08,0.0,0.0,0.0,0.0,-31177.100000000002,0.0
 ESS-only,Original component ratings,20250803-09,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250803-10,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250803-11,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250803-12,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250803-10,0.0,0.0,0.0,0.0,-475.0,0.0
+ESS-only,Original component ratings,20250803-11,0.0,0.0,0.0,0.0,-23.749999999995453,0.0
+ESS-only,Original component ratings,20250803-12,0.0,0.0,0.0,0.0,-1.1875000000031832,0.0
 ESS-only,Original component ratings,20250803-13,0.0,0.0,0.0,0.0,98817.054981,0.0
-ESS-only,Original component ratings,20250803-14,0.0,0.0,0.0,0.0,70426.496415,0.0
+ESS-only,Original component ratings,20250803-14,0.0,0.0,0.0,0.0,70426.32579287102,0.0
 ESS-only,Original component ratings,20250803-15,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Original component ratings,20250803-16,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250803-17,0.0,0.0,0.0,0.0,0.0,0.0
@@ -72,16 +72,16 @@ ESS-only,Original component ratings,20250803-22,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250803-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250803-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-01,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250804-02,0.0,0.0,0.0,0.0,-49437.00000000001,0.0
+ESS-only,Original component ratings,20250804-02,0.0,0.0,0.0,0.0,-49437.0,0.0
 ESS-only,Original component ratings,20250804-03,0.0,0.0,0.0,0.0,-48885.0,0.0
 ESS-only,Original component ratings,20250804-04,0.0,0.0,0.0,0.0,-47232.0,0.0
-ESS-only,Original component ratings,20250804-05,0.0,0.0,0.0,0.0,-8751.78947368421,0.0
-ESS-only,Original component ratings,20250804-06,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250804-05,0.0,0.0,0.0,0.0,-8314.2,0.0
+ESS-only,Original component ratings,20250804-06,0.0,0.0,0.0,0.0,-472.32,0.0
 ESS-only,Original component ratings,20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250804-10,1413.2744595238073,700.0,0.0,713.2744595238073,-38256.505263157895,3431925.7818653216
-ESS-only,Original component ratings,20250804-11,1802.3204595238076,439.99999999999994,0.0,1362.3204595238076,-24572.294736842105,2157210.491458202
+ESS-only,Original component ratings,20250804-10,1413.2744595238073,665.0,0.0,748.2744595238073,-36414.4,3260329.492772056
+ESS-only,Original component ratings,20250804-11,1802.3204595238076,474.8574999999999,0.0,1327.4629595238077,-26406.899999999998,2328108.1385173025
 ESS-only,Original component ratings,20250804-12,1774.192459523807,0.0,0.0,1774.192459523807,0.0,0.0
 ESS-only,Original component ratings,20250804-13,1194.5964595238074,0.0,0.0,1194.5964595238074,0.0,0.0
 ESS-only,Original component ratings,20250804-14,1395.777459523808,0.0,0.0,1395.777459523808,0.0,0.0
@@ -95,16 +95,16 @@ ESS-only,Original component ratings,20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250804-24,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250805-01,0.0,0.0,0.0,0.0,-49587.00000000001,0.0
+ESS-only,Original component ratings,20250805-01,0.0,0.0,0.0,0.0,-49587.0,0.0
 ESS-only,Original component ratings,20250805-02,0.0,0.0,0.0,0.0,-37887.0,0.0
 ESS-only,Original component ratings,20250805-03,0.0,0.0,0.0,0.0,-37746.0,0.0
 ESS-only,Original component ratings,20250805-04,0.0,0.0,0.0,0.0,-37746.0,0.0
-ESS-only,Original component ratings,20250805-05,0.0,0.0,0.0,0.0,-7946.526315789474,0.0
-ESS-only,Original component ratings,20250805-06,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250805-07,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250805-05,0.0,0.0,0.0,0.0,-7549.2,0.0
+ESS-only,Original component ratings,20250805-06,0.0,0.0,0.0,0.0,-377.46,0.0
+ESS-only,Original component ratings,20250805-07,0.0,0.0,0.0,0.0,-24.793500000015033,0.0
 ESS-only,Original component ratings,20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250805-09,545.6374595238085,545.6374595238085,0.0,0.0,-30132.161027568873,2675124.664130363
-ESS-only,Original component ratings,20250805-10,813.1434595238079,594.3625404761914,0.0,218.78091904761652,-32696.63897243113,2914011.60919316
+ESS-only,Original component ratings,20250805-10,813.1434595238079,594.3554154761914,0.0,218.7880440476165,-32696.263972431134,2913976.677091452
 ESS-only,Original component ratings,20250805-11,2160.447459523808,0.0,0.0,2160.447459523808,0.0,0.0
 ESS-only,Original component ratings,20250805-12,2435.461459523807,0.0,0.0,2435.461459523807,0.0,0.0
 ESS-only,Original component ratings,20250805-13,1838.3644595238075,0.0,0.0,1838.3644595238075,0.0,0.0
@@ -122,13 +122,13 @@ ESS-only,Original component ratings,20250805-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250806-01,0.0,0.0,0.0,0.0,-49485.0,0.0
 ESS-only,Original component ratings,20250806-02,0.0,0.0,0.0,0.0,-40320.0,0.0
 ESS-only,Original component ratings,20250806-03,0.0,0.0,0.0,0.0,-40314.0,0.0
-ESS-only,Original component ratings,20250806-04,0.0,0.0,0.0,0.0,-8486.526315789475,0.0
-ESS-only,Original component ratings,20250806-05,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250806-06,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250806-04,0.0,0.0,0.0,0.0,-8062.200000000001,0.0
+ESS-only,Original component ratings,20250806-05,0.0,0.0,0.0,0.0,-403.14,0.0
+ESS-only,Original component ratings,20250806-06,0.0,0.0,0.0,0.0,-20.154000000012218,0.0
 ESS-only,Original component ratings,20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Original component ratings,20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250806-09,1060.0384595238083,700.0,0.0,360.03845952380834,-38256.505263157895,3431925.7818653216
-ESS-only,Original component ratings,20250806-10,2461.698459523808,439.99999999999994,0.0,2021.6984595238082,-24572.294736842105,2157210.491458202
+ESS-only,Original component ratings,20250806-09,1060.0384595238083,665.0,0.0,395.03845952380834,-36414.4,3260329.492772056
+ESS-only,Original component ratings,20250806-10,2461.698459523808,474.992875,0.0,1986.7055845238083,-26414.025000000005,2328771.84844976
 ESS-only,Original component ratings,20250806-11,2443.805459523808,0.0,0.0,2443.805459523808,0.0,0.0
 ESS-only,Original component ratings,20250806-12,2186.710459523807,0.0,0.0,2186.710459523807,0.0,0.0
 ESS-only,Original component ratings,20250806-13,1421.6674595238073,0.0,0.0,1421.6674595238073,0.0,0.0
@@ -147,12 +147,12 @@ ESS-only,Original component ratings,20250807-01,0.0,0.0,0.0,0.0,-49350.0,0.0
 ESS-only,Original component ratings,20250807-02,0.0,0.0,0.0,0.0,-40641.0,0.0
 ESS-only,Original component ratings,20250807-03,0.0,0.0,0.0,0.0,-39561.0,0.0
 ESS-only,Original component ratings,20250807-04,0.0,0.0,0.0,0.0,-39561.0,0.0
-ESS-only,Original component ratings,20250807-05,0.0,0.0,0.0,0.0,-8328.63157894737,0.0
-ESS-only,Original component ratings,20250807-06,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250807-07,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Original component ratings,20250807-05,0.0,0.0,0.0,0.0,-7912.200000000001,0.0
+ESS-only,Original component ratings,20250807-06,0.0,0.0,0.0,0.0,-395.61,0.0
+ESS-only,Original component ratings,20250807-07,0.0,0.0,0.0,0.0,-24.67500000001496,0.0
 ESS-only,Original component ratings,20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Original component ratings,20250807-09,679.7124595238074,679.7124595238074,0.0,0.0,-37188.739974937234,3332461.0201354907
-ESS-only,Original component ratings,20250807-10,2232.192459523807,460.2875404761926,0.0,1771.9049190476144,-25640.06002506277,2256675.253188033
+ESS-only,Original component ratings,20250807-09,679.7124595238074,665.0,0.0,14.71245952380741,-36414.4,3260329.492772056
+ESS-only,Original component ratings,20250807-10,2232.192459523807,474.992875,0.0,1757.199584523807,-26414.025000000005,2328771.84844976
 ESS-only,Original component ratings,20250807-11,2319.893459523808,0.0,0.0,2319.893459523808,0.0,0.0
 ESS-only,Original component ratings,20250807-12,2095.323459523808,0.0,0.0,2095.323459523808,0.0,0.0
 ESS-only,Original component ratings,20250807-13,1530.0954595238072,0.0,0.0,1530.0954595238072,0.0,0.0
@@ -248,16 +248,16 @@ HFC-only,Original component ratings,20250804-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Original component ratings,20250804-10,1413.2744595238073,0.0,500.0,913.2744595238073,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250804-11,1802.3204595238076,0.0,500.0,1302.3204595238076,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,-309483.5123123124,2418070.1895875623
+HFC-only,Original component ratings,20250804-10,1413.2744595238073,0.0,500.0,913.2744595238073,0.0,2451375.55847523
+HFC-only,Original component ratings,20250804-11,1802.3204595238076,0.0,500.0,1302.3204595238076,0.0,2451375.55847523
+HFC-only,Original component ratings,20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,0.0,2418070.1895875623
 HFC-only,Original component ratings,20250804-13,1194.5964595238074,0.0,0.0,1194.5964595238074,0.0,0.0
 HFC-only,Original component ratings,20250804-14,1395.777459523808,0.0,0.0,1395.777459523808,0.0,0.0
 HFC-only,Original component ratings,20250804-15,1708.822459523808,0.0,0.0,1708.822459523808,0.0,0.0
 HFC-only,Original component ratings,20250804-16,1576.013459523807,0.0,0.0,1576.013459523807,0.0,0.0
 HFC-only,Original component ratings,20250804-17,1398.6574595238071,0.0,0.0,1398.6574595238071,0.0,0.0
 HFC-only,Original component ratings,20250804-18,476.85745952380785,0.0,0.0,476.85745952380785,0.0,0.0
-HFC-only,Original component ratings,20250804-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Original component ratings,20250804-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 HFC-only,Original component ratings,20250804-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -271,9 +271,9 @@ HFC-only,Original component ratings,20250805-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250805-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250805-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Original component ratings,20250805-09,545.6374595238085,0.0,500.0,45.6374595238085,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250805-10,813.1434595238079,0.0,500.0,313.1434595238079,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250805-11,2160.447459523808,0.0,343.20680000000016,1817.2406595238078,-215789.81861861874,1682657.5220449937
+HFC-only,Original component ratings,20250805-09,545.6374595238085,0.0,500.0,45.6374595238085,0.0,2451375.55847523
+HFC-only,Original component ratings,20250805-10,813.1434595238079,0.0,500.0,313.1434595238079,0.0,2451375.55847523
+HFC-only,Original component ratings,20250805-11,2160.447459523808,0.0,343.20680000000016,1817.2406595238078,0.0,1682657.5220449937
 HFC-only,Original component ratings,20250805-12,2435.461459523807,0.0,0.0,2435.461459523807,0.0,0.0
 HFC-only,Original component ratings,20250805-13,1838.3644595238075,0.0,0.0,1838.3644595238075,0.0,0.0
 HFC-only,Original component ratings,20250805-14,1954.0534595238078,0.0,0.0,1954.0534595238078,0.0,0.0
@@ -281,7 +281,7 @@ HFC-only,Original component ratings,20250805-15,843.5444595238077,0.0,0.0,843.54
 HFC-only,Original component ratings,20250805-16,2396.207459523808,0.0,0.0,2396.207459523808,0.0,0.0
 HFC-only,Original component ratings,20250805-17,1865.9494595238084,0.0,0.0,1865.9494595238084,0.0,0.0
 HFC-only,Original component ratings,20250805-18,964.563459523808,0.0,0.0,964.563459523808,0.0,0.0
-HFC-only,Original component ratings,20250805-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Original component ratings,20250805-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 HFC-only,Original component ratings,20250805-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250805-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250805-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -295,9 +295,9 @@ HFC-only,Original component ratings,20250806-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250806-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Original component ratings,20250806-09,1060.0384595238083,0.0,500.0,560.0384595238083,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250806-10,2461.698459523808,0.0,500.0,1961.6984595238082,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,-215789.81861861874,1682657.5220449937
+HFC-only,Original component ratings,20250806-09,1060.0384595238083,0.0,500.0,560.0384595238083,0.0,2451375.55847523
+HFC-only,Original component ratings,20250806-10,2461.698459523808,0.0,500.0,1961.6984595238082,0.0,2451375.55847523
+HFC-only,Original component ratings,20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,0.0,1682657.5220449937
 HFC-only,Original component ratings,20250806-12,2186.710459523807,0.0,0.0,2186.710459523807,0.0,0.0
 HFC-only,Original component ratings,20250806-13,1421.6674595238073,0.0,0.0,1421.6674595238073,0.0,0.0
 HFC-only,Original component ratings,20250806-14,1564.2564595238073,0.0,0.0,1564.2564595238073,0.0,0.0
@@ -305,7 +305,7 @@ HFC-only,Original component ratings,20250806-15,1708.764459523807,0.0,0.0,1708.7
 HFC-only,Original component ratings,20250806-16,1338.8814595238073,0.0,0.0,1338.8814595238073,0.0,0.0
 HFC-only,Original component ratings,20250806-17,1165.135459523808,0.0,0.0,1165.135459523808,0.0,0.0
 HFC-only,Original component ratings,20250806-18,166.27745952380792,0.0,0.0,166.27745952380792,0.0,0.0
-HFC-only,Original component ratings,20250806-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Original component ratings,20250806-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 HFC-only,Original component ratings,20250806-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250806-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250806-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -319,9 +319,9 @@ HFC-only,Original component ratings,20250807-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250807-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250807-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Original component ratings,20250807-09,679.7124595238074,0.0,500.0,179.7124595238074,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250807-10,2232.192459523807,0.0,500.0,1732.192459523807,-313726.71231231233,2451375.55847523
-HFC-only,Original component ratings,20250807-11,2319.893459523808,0.0,343.20680000000016,1976.6866595238077,-215789.81861861874,1682657.5220449937
+HFC-only,Original component ratings,20250807-09,679.7124595238074,0.0,500.0,179.7124595238074,0.0,2451375.55847523
+HFC-only,Original component ratings,20250807-10,2232.192459523807,0.0,500.0,1732.192459523807,0.0,2451375.55847523
+HFC-only,Original component ratings,20250807-11,2319.893459523808,0.0,343.20680000000016,1976.6866595238077,0.0,1682657.5220449937
 HFC-only,Original component ratings,20250807-12,2095.323459523808,0.0,0.0,2095.323459523808,0.0,0.0
 HFC-only,Original component ratings,20250807-13,1530.0954595238072,0.0,0.0,1530.0954595238072,0.0,0.0
 HFC-only,Original component ratings,20250807-14,1653.7264595238084,0.0,0.0,1653.7264595238084,0.0,0.0
@@ -329,7 +329,7 @@ HFC-only,Original component ratings,20250807-15,2014.2844595238075,0.0,0.0,2014.
 HFC-only,Original component ratings,20250807-16,1824.1954595238076,0.0,0.0,1824.1954595238076,0.0,0.0
 HFC-only,Original component ratings,20250807-17,1683.8284595238074,0.0,0.0,1683.8284595238074,0.0,0.0
 HFC-only,Original component ratings,20250807-18,847.5084595238077,0.0,0.0,847.5084595238077,0.0,0.0
-HFC-only,Original component ratings,20250807-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Original component ratings,20250807-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 HFC-only,Original component ratings,20250807-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250807-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Original component ratings,20250807-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -338,22 +338,22 @@ HFC-only,Original component ratings,20250807-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-01,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-02,0.0,0.0,0.0,0.0,-48930.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-03,0.0,0.0,0.0,0.0,-48930.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-04,0.0,0.0,0.0,0.0,-30205.89473684211,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-05,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-04,0.0,0.0,0.0,0.0,-28695.6,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-05,0.0,0.0,0.0,0.0,-1451.3400000000001,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-06,0.0,0.0,0.0,0.0,-73.39500000000741,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-09,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-10,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-11,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-12,0.0,0.0,0.0,0.0,95453.10500000001,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-13,0.0,0.0,0.0,0.0,67776.67499999999,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-12,0.0,0.0,0.0,0.0,96867.505,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-13,0.0,0.0,0.0,0.0,69187.961401625,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-14,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-15,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-16,0.0,0.0,0.0,0.0,82683.48550000001,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-16,0.0,0.0,0.0,0.0,84097.8855,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-18,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250801-19,0.0,0.0,0.0,0.0,79856.8555,0.0
+Hybrid ESS–HFC,Original component ratings,20250801-19,0.0,0.0,0.0,0.0,81271.25550000001,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -361,23 +361,23 @@ Hybrid ESS–HFC,Original component ratings,20250801-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250801-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-01,0.0,0.0,0.0,0.0,-49650.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-02,0.0,0.0,0.0,0.0,-49650.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-03,0.0,0.0,0.0,0.0,-49044.00000000001,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-04,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-05,0.0,0.0,0.0,0.0,-10208.842105263158,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-03,0.0,0.0,0.0,0.0,-49044.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-04,0.0,0.0,0.0,0.0,-48492.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-05,0.0,0.0,0.0,0.0,-9698.4,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-06,0.0,0.0,0.0,0.0,-484.92,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-07,0.0,0.0,0.0,0.0,-24.52200000001487,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-09,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-10,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-11,0.0,0.0,0.0,0.0,96865.75499049999,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-12,0.0,0.0,0.0,0.0,68833.2107075,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-11,0.0,0.0,0.0,0.0,98280.15499049998,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-12,0.0,0.0,0.0,0.0,70246.55699333939,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-13,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-14,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-15,0.0,0.0,0.0,0.0,79133.56620655,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-15,0.0,0.0,0.0,0.0,80547.96620655,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-16,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-18,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250802-19,0.0,0.0,0.0,0.0,96639.65499050001,0.0
+Hybrid ESS–HFC,Original component ratings,20250802-19,0.0,0.0,0.0,0.0,98054.05499050001,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250802-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -390,13 +390,13 @@ Hybrid ESS–HFC,Original component ratings,20250803-04,0.0,0.0,0.0,0.0,-47565.0
 Hybrid ESS–HFC,Original component ratings,20250803-05,0.0,0.0,0.0,0.0,-37950.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-06,0.0,0.0,0.0,0.0,-47685.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-07,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-08,0.0,0.0,0.0,0.0,-32818.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-08,0.0,0.0,0.0,0.0,-31177.100000000002,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-09,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-10,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-11,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-12,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-13,0.0,0.0,0.0,0.0,98817.054981,0.0
-Hybrid ESS–HFC,Original component ratings,20250803-14,0.0,0.0,0.0,0.0,70426.496415,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-10,0.0,0.0,0.0,0.0,-475.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-11,0.0,0.0,0.0,0.0,-23.749999999995453,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-12,0.0,0.0,0.0,0.0,-1.1875000000031832,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-13,0.0,0.0,0.0,0.0,100231.45498099999,0.0
+Hybrid ESS–HFC,Original component ratings,20250803-14,0.0,0.0,0.0,0.0,71840.72579287102,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-15,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-16,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-17,0.0,0.0,0.0,0.0,0.0,0.0
@@ -408,48 +408,48 @@ Hybrid ESS–HFC,Original component ratings,20250803-22,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250803-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-01,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250804-02,0.0,0.0,0.0,0.0,-49437.00000000001,0.0
+Hybrid ESS–HFC,Original component ratings,20250804-02,0.0,0.0,0.0,0.0,-49437.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-03,0.0,0.0,0.0,0.0,-48885.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-04,0.0,0.0,0.0,0.0,-47232.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250804-05,0.0,0.0,0.0,0.0,-8751.78947368421,0.0
-Hybrid ESS–HFC,Original component ratings,20250804-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250804-05,0.0,0.0,0.0,0.0,-8314.2,0.0
+Hybrid ESS–HFC,Original component ratings,20250804-06,0.0,0.0,0.0,0.0,-472.32,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250804-10,1413.2744595238073,700.0,500.0,213.2744595238073,-350568.8175754702,5883301.340340552
-Hybrid ESS–HFC,Original component ratings,20250804-11,1802.3204595238076,439.99999999999994,500.0,862.3204595238076,-336884.6070491544,4608586.049933432
-Hybrid ESS–HFC,Original component ratings,20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,-309483.5123123124,2418070.1895875623
+Hybrid ESS–HFC,Original component ratings,20250804-10,1413.2744595238073,665.0,500.0,248.2744595238073,-35000.0,5711705.051247286
+Hybrid ESS–HFC,Original component ratings,20250804-11,1802.3204595238076,474.8574999999999,500.0,827.4629595238077,-24992.499999999996,4779483.696992532
+Hybrid ESS–HFC,Original component ratings,20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,0.0,2418070.1895875623
 Hybrid ESS–HFC,Original component ratings,20250804-13,1194.5964595238074,0.0,0.0,1194.5964595238074,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-14,1395.777459523808,0.0,0.0,1395.777459523808,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-15,1708.822459523808,0.0,0.0,1708.822459523808,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-16,1576.013459523807,0.0,0.0,1576.013459523807,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-17,1398.6574595238071,0.0,0.0,1398.6574595238071,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-18,476.85745952380785,0.0,0.0,476.85745952380785,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250804-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250804-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250804-24,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-01,0.0,0.0,0.0,0.0,-49587.00000000001,0.0
+Hybrid ESS–HFC,Original component ratings,20250805-01,0.0,0.0,0.0,0.0,-49587.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-02,0.0,0.0,0.0,0.0,-37887.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-03,0.0,0.0,0.0,0.0,-37746.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-04,0.0,0.0,0.0,0.0,-37746.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-05,0.0,0.0,0.0,0.0,-7946.526315789474,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250805-05,0.0,0.0,0.0,0.0,-7549.2,0.0
+Hybrid ESS–HFC,Original component ratings,20250805-06,0.0,0.0,0.0,0.0,-377.46,0.0
+Hybrid ESS–HFC,Original component ratings,20250805-07,0.0,0.0,0.0,0.0,-24.793500000015033,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-09,545.6374595238085,45.6374595238085,500.0,0.0,-316128.683866197,2675124.664130363
-Hybrid ESS–HFC,Original component ratings,20250805-10,813.1434595238079,313.1434595238079,500.0,0.0,-330207.94702409167,3986640.00442131
-Hybrid ESS–HFC,Original component ratings,20250805-11,2160.447459523808,700.0,343.20680000000016,1117.2406595238078,-252631.92388177663,5114583.303910316
-Hybrid ESS–HFC,Original component ratings,20250805-12,2435.461459523807,81.21908095238364,0.0,2354.2423785714236,-5689.088471178087,398196.93985698867
+Hybrid ESS–HFC,Original component ratings,20250805-09,545.6374595238085,45.6374595238085,500.0,0.0,-2401.971553884658,2675124.664130363
+Hybrid ESS–HFC,Original component ratings,20250805-10,813.1434595238079,313.1434595238079,500.0,0.0,-16481.234711779365,3986640.00442131
+Hybrid ESS–HFC,Original component ratings,20250805-11,2160.447459523808,665.0,343.20680000000016,1152.2406595238078,-35000.0,4942987.01481705
+Hybrid ESS–HFC,Original component ratings,20250805-12,2435.461459523807,116.21195595238372,0.0,2319.2495035714237,-6116.418734335985,569758.296848547
 Hybrid ESS–HFC,Original component ratings,20250805-13,1838.3644595238075,0.0,0.0,1838.3644595238075,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-14,1954.0534595238078,0.0,0.0,1954.0534595238078,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-15,843.5444595238077,0.0,0.0,843.5444595238077,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-16,2396.207459523808,0.0,0.0,2396.207459523808,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-17,1865.9494595238084,0.0,0.0,1865.9494595238084,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-18,964.563459523808,0.0,0.0,964.563459523808,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250805-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250805-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250805-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -459,13 +459,13 @@ Hybrid ESS–HFC,Original component ratings,20250806-01,0.0,0.0,0.0,0.0,-49485.0
 Hybrid ESS–HFC,Original component ratings,20250806-02,0.0,0.0,0.0,0.0,-40320.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-03,0.0,0.0,0.0,0.0,-40314.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-04,0.0,0.0,0.0,0.0,-40311.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250806-05,0.0,0.0,0.0,0.0,-8487.157894736842,0.0
-Hybrid ESS–HFC,Original component ratings,20250806-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250806-05,0.0,0.0,0.0,0.0,-8062.799999999999,0.0
+Hybrid ESS–HFC,Original component ratings,20250806-06,0.0,0.0,0.0,0.0,-403.08,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250806-09,1060.0384595238083,560.0384595238083,500.0,0.0,-343202.42070830223,5197104.741440796
-Hybrid ESS–HFC,Original component ratings,20250806-10,2461.698459523808,579.9615404761915,500.0,1381.7369190476165,-344251.0039163224,5294782.648833187
-Hybrid ESS–HFC,Original component ratings,20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,-215789.81861861874,1682657.5220449937
+Hybrid ESS–HFC,Original component ratings,20250806-09,1060.0384595238083,560.0384595238083,500.0,0.0,-29475.708395989914,5197104.741440796
+Hybrid ESS–HFC,Original component ratings,20250806-10,2461.698459523808,579.8190404761915,500.0,1381.8794190476167,-30516.79160401008,5294084.006799022
+Hybrid ESS–HFC,Original component ratings,20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,0.0,1682657.5220449937
 Hybrid ESS–HFC,Original component ratings,20250806-12,2186.710459523807,0.0,0.0,2186.710459523807,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-13,1421.6674595238073,0.0,0.0,1421.6674595238073,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-14,1564.2564595238073,0.0,0.0,1564.2564595238073,0.0,0.0
@@ -473,7 +473,7 @@ Hybrid ESS–HFC,Original component ratings,20250806-15,1708.764459523807,0.0,0.
 Hybrid ESS–HFC,Original component ratings,20250806-16,1338.8814595238073,0.0,0.0,1338.8814595238073,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-17,1165.135459523808,0.0,0.0,1165.135459523808,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-18,166.27745952380792,0.0,0.0,166.27745952380792,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250806-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250806-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250806-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -483,13 +483,13 @@ Hybrid ESS–HFC,Original component ratings,20250807-01,0.0,0.0,0.0,0.0,-49350.0
 Hybrid ESS–HFC,Original component ratings,20250807-02,0.0,0.0,0.0,0.0,-40641.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-03,0.0,0.0,0.0,0.0,-39561.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-04,0.0,0.0,0.0,0.0,-39561.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250807-05,0.0,0.0,0.0,0.0,-8328.63157894737,0.0
-Hybrid ESS–HFC,Original component ratings,20250807-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250807-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250807-05,0.0,0.0,0.0,0.0,-7912.200000000001,0.0
+Hybrid ESS–HFC,Original component ratings,20250807-06,0.0,0.0,0.0,0.0,-395.61,0.0
+Hybrid ESS–HFC,Original component ratings,20250807-07,0.0,0.0,0.0,0.0,-24.67500000001496,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250807-09,679.7124595238074,179.7124595238074,500.0,0.0,-323185.2628135654,3332461.0201354907
-Hybrid ESS–HFC,Original component ratings,20250807-10,2232.192459523807,700.0,500.0,1032.192459523807,-350568.8175754702,5883301.340340552
-Hybrid ESS–HFC,Original component ratings,20250807-11,2319.893459523808,260.28754047619253,343.20680000000016,1716.3991190476152,-229489.16285420783,2958782.551842935
+Hybrid ESS–HFC,Original component ratings,20250807-09,679.7124595238074,179.7124595238074,500.0,0.0,-9458.550501253021,3332461.0201354907
+Hybrid ESS–HFC,Original component ratings,20250807-10,2232.192459523807,665.0,500.0,1067.192459523807,-35000.0,5711705.051247286
+Hybrid ESS–HFC,Original component ratings,20250807-11,2319.893459523808,295.2804154761926,343.20680000000016,1681.406244047615,-15541.07449874698,3130343.908834493
 Hybrid ESS–HFC,Original component ratings,20250807-12,2095.323459523808,0.0,0.0,2095.323459523808,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-13,1530.0954595238072,0.0,0.0,1530.0954595238072,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-14,1653.7264595238084,0.0,0.0,1653.7264595238084,0.0,0.0
@@ -497,7 +497,7 @@ Hybrid ESS–HFC,Original component ratings,20250807-15,2014.2844595238075,0.0,0
 Hybrid ESS–HFC,Original component ratings,20250807-16,1824.1954595238076,0.0,0.0,1824.1954595238076,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-17,1683.8284595238074,0.0,0.0,1683.8284595238074,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-18,847.5084595238077,0.0,0.0,847.5084595238077,0.0,0.0
-Hybrid ESS–HFC,Original component ratings,20250807-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Original component ratings,20250807-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Original component ratings,20250807-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -506,10 +506,10 @@ Hybrid ESS–HFC,Original component ratings,20250807-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-01,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-02,0.0,0.0,0.0,0.0,-48930.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-03,0.0,0.0,0.0,0.0,-48930.0,0.0
-ESS-only,Equal total storage (3 MWh),20250801-04,0.0,0.0,0.0,0.0,-47826.00000000001,0.0
+ESS-only,Equal total storage (3 MWh),20250801-04,0.0,0.0,0.0,0.0,-47826.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-05,0.0,0.0,0.0,0.0,-48378.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-06,0.0,0.0,0.0,0.0,-48930.0,0.0
-ESS-only,Equal total storage (3 MWh),20250801-07,0.0,0.0,0.0,0.0,-12876.315789473683,0.0
+ESS-only,Equal total storage (3 MWh),20250801-07,0.0,0.0,0.0,0.0,-12232.5,0.0
 ESS-only,Equal total storage (3 MWh),20250801-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-09,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-10,0.0,0.0,0.0,0.0,0.0,0.0
@@ -529,12 +529,12 @@ ESS-only,Equal total storage (3 MWh),20250801-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250801-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250802-01,0.0,0.0,0.0,0.0,-49650.0,0.0
 ESS-only,Equal total storage (3 MWh),20250802-02,0.0,0.0,0.0,0.0,-49650.0,0.0
-ESS-only,Equal total storage (3 MWh),20250802-03,0.0,0.0,0.0,0.0,-49044.00000000001,0.0
-ESS-only,Equal total storage (3 MWh),20250802-04,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-ESS-only,Equal total storage (3 MWh),20250802-05,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-ESS-only,Equal total storage (3 MWh),20250802-06,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-ESS-only,Equal total storage (3 MWh),20250802-07,0.0,0.0,0.0,0.0,-40439.78947368421,0.0
-ESS-only,Equal total storage (3 MWh),20250802-08,0.0,0.0,0.0,0.0,0.0,0.0
+ESS-only,Equal total storage (3 MWh),20250802-03,0.0,0.0,0.0,0.0,-49044.0,0.0
+ESS-only,Equal total storage (3 MWh),20250802-04,0.0,0.0,0.0,0.0,-48492.0,0.0
+ESS-only,Equal total storage (3 MWh),20250802-05,0.0,0.0,0.0,0.0,-48492.0,0.0
+ESS-only,Equal total storage (3 MWh),20250802-06,0.0,0.0,0.0,0.0,-48492.0,0.0
+ESS-only,Equal total storage (3 MWh),20250802-07,0.0,0.0,0.0,0.0,-39030.850000000006,0.0
+ESS-only,Equal total storage (3 MWh),20250802-08,0.0,0.0,0.0,0.0,-1973.5075,0.0
 ESS-only,Equal total storage (3 MWh),20250802-09,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250802-10,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250802-11,0.0,0.0,0.0,0.0,96865.75499049999,0.0
@@ -565,7 +565,7 @@ ESS-only,Equal total storage (3 MWh),20250803-11,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-12,0.0,0.0,0.0,0.0,-15000.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-13,0.0,0.0,0.0,0.0,98817.054981,0.0
 ESS-only,Equal total storage (3 MWh),20250803-14,0.0,0.0,0.0,0.0,99162.85498100001,0.0
-ESS-only,Equal total storage (3 MWh),20250803-15,0.0,0.0,0.0,0.0,88049.98344704998,0.0
+ESS-only,Equal total storage (3 MWh),20250803-15,0.0,0.0,0.0,0.0,87965.89044882954,0.0
 ESS-only,Equal total storage (3 MWh),20250803-16,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-17,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-18,0.0,0.0,0.0,0.0,0.0,0.0
@@ -576,7 +576,7 @@ ESS-only,Equal total storage (3 MWh),20250803-22,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250803-24,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-01,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Equal total storage (3 MWh),20250804-02,0.0,0.0,0.0,0.0,-49437.00000000001,0.0
+ESS-only,Equal total storage (3 MWh),20250804-02,0.0,0.0,0.0,0.0,-49437.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-03,0.0,0.0,0.0,0.0,-48885.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-04,0.0,0.0,0.0,0.0,-47232.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-05,0.0,0.0,0.0,0.0,-41571.0,0.0
@@ -584,9 +584,9 @@ ESS-only,Equal total storage (3 MWh),20250804-06,0.0,0.0,0.0,0.0,-47232.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Equal total storage (3 MWh),20250804-10,1413.2744595238073,700.0,0.0,713.2744595238073,-38256.505263157895,3431925.7818653216
-ESS-only,Equal total storage (3 MWh),20250804-11,1802.3204595238076,653.75,0.0,1148.5704595238076,-35822.29473684211,3205173.542706363
-ESS-only,Equal total storage (3 MWh),20250804-12,1774.192459523807,0.0,0.0,1774.192459523807,0.0,0.0
+ESS-only,Equal total storage (3 MWh),20250804-10,1413.2744595238073,665.0,0.0,748.2744595238073,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250804-11,1802.3204595238076,665.0,0.0,1137.3204595238076,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250804-12,1774.192459523807,23.75,0.0,1750.442459523807,-2664.4,116440.33902757341
 ESS-only,Equal total storage (3 MWh),20250804-13,1194.5964595238074,0.0,0.0,1194.5964595238074,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-14,1395.777459523808,0.0,0.0,1395.777459523808,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-15,1708.822459523808,0.0,0.0,1708.822459523808,0.0,0.0
@@ -599,18 +599,18 @@ ESS-only,Equal total storage (3 MWh),20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-23,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250804-24,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Equal total storage (3 MWh),20250805-01,0.0,0.0,0.0,0.0,-49587.00000000001,0.0
+ESS-only,Equal total storage (3 MWh),20250805-01,0.0,0.0,0.0,0.0,-49587.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-02,0.0,0.0,0.0,0.0,-37887.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-03,0.0,0.0,0.0,0.0,-37746.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-04,0.0,0.0,0.0,0.0,-37746.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-05,0.0,0.0,0.0,0.0,-37746.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-06,0.0,0.0,0.0,0.0,-37746.0,0.0
-ESS-only,Equal total storage (3 MWh),20250805-07,0.0,0.0,0.0,0.0,-49587.00000000001,0.0
+ESS-only,Equal total storage (3 MWh),20250805-07,0.0,0.0,0.0,0.0,-49587.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-09,545.6374595238085,545.6374595238085,0.0,0.0,-30132.161027568873,2675124.664130363
-ESS-only,Equal total storage (3 MWh),20250805-10,813.1434595238079,700.0,0.0,113.1434595238079,-38256.505263157895,3431925.7818653216
-ESS-only,Equal total storage (3 MWh),20250805-11,2160.447459523808,649.6125404761914,0.0,1510.8349190476165,-35604.53370927323,3184888.608404673
-ESS-only,Equal total storage (3 MWh),20250805-12,2435.461459523807,0.0,0.0,2435.461459523807,0.0,0.0
+ESS-only,Equal total storage (3 MWh),20250805-10,813.1434595238079,665.0,0.0,148.1434595238079,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250805-11,2160.447459523808,665.0,0.0,1495.447459523808,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250805-12,2435.461459523807,19.61254047619143,0.0,2415.8489190476157,-2446.638972431128,96155.40472588364
 ESS-only,Equal total storage (3 MWh),20250805-13,1838.3644595238075,0.0,0.0,1838.3644595238075,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-14,1954.0534595238078,0.0,0.0,1954.0534595238078,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250805-15,843.5444595238077,0.0,0.0,843.5444595238077,0.0,0.0
@@ -628,12 +628,12 @@ ESS-only,Equal total storage (3 MWh),20250806-02,0.0,0.0,0.0,0.0,-40320.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-03,0.0,0.0,0.0,0.0,-40314.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-04,0.0,0.0,0.0,0.0,-40311.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-05,0.0,0.0,0.0,0.0,-40314.0,0.0
-ESS-only,Equal total storage (3 MWh),20250806-06,0.0,0.0,0.0,0.0,-40308.00000000001,0.0
+ESS-only,Equal total storage (3 MWh),20250806-06,0.0,0.0,0.0,0.0,-40308.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Equal total storage (3 MWh),20250806-09,1060.0384595238083,700.0,0.0,360.03845952380834,-38256.505263157895,3431925.7818653216
-ESS-only,Equal total storage (3 MWh),20250806-10,2461.698459523808,700.0,0.0,1761.6984595238082,-38256.505263157895,3431925.7818653216
-ESS-only,Equal total storage (3 MWh),20250806-11,2443.805459523808,495.24999999999994,0.0,1948.5554595238082,-27480.189473684208,2428087.4906697148
+ESS-only,Equal total storage (3 MWh),20250806-09,1060.0384595238083,665.0,0.0,395.03845952380834,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250806-10,2461.698459523808,665.0,0.0,1796.6984595238082,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250806-11,2443.805459523808,565.25,0.0,1878.5554595238082,-31164.4,2771280.0688562472
 ESS-only,Equal total storage (3 MWh),20250806-12,2186.710459523807,0.0,0.0,2186.710459523807,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-13,1421.6674595238073,0.0,0.0,1421.6674595238073,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250806-14,1564.2564595238073,0.0,0.0,1564.2564595238073,0.0,0.0
@@ -655,9 +655,9 @@ ESS-only,Equal total storage (3 MWh),20250807-05,0.0,0.0,0.0,0.0,-39561.0,0.0
 ESS-only,Equal total storage (3 MWh),20250807-06,0.0,0.0,0.0,0.0,-39561.0,0.0
 ESS-only,Equal total storage (3 MWh),20250807-07,0.0,0.0,0.0,0.0,-49350.0,0.0
 ESS-only,Equal total storage (3 MWh),20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-ESS-only,Equal total storage (3 MWh),20250807-09,679.7124595238074,679.7124595238074,0.0,0.0,-37188.739974937234,3332461.0201354907
-ESS-only,Equal total storage (3 MWh),20250807-10,2232.192459523807,700.0,0.0,1532.192459523807,-38256.505263157895,3431925.7818653216
-ESS-only,Equal total storage (3 MWh),20250807-11,2319.893459523808,515.5375404761926,0.0,1804.3559190476153,-28547.954761904875,2527552.252399546
+ESS-only,Equal total storage (3 MWh),20250807-09,679.7124595238074,665.0,0.0,14.71245952380741,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250807-10,2232.192459523807,665.0,0.0,1567.192459523807,-36414.4,3260329.492772056
+ESS-only,Equal total storage (3 MWh),20250807-11,2319.893459523808,565.25,0.0,1754.643459523808,-31164.4,2771280.0688562472
 ESS-only,Equal total storage (3 MWh),20250807-12,2095.323459523808,0.0,0.0,2095.323459523808,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250807-13,1530.0954595238072,0.0,0.0,1530.0954595238072,0.0,0.0
 ESS-only,Equal total storage (3 MWh),20250807-14,1653.7264595238084,0.0,0.0,1653.7264595238084,0.0,0.0
@@ -752,16 +752,16 @@ HFC-only,Equal total storage (3 MWh),20250804-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250804-10,1413.2744595238073,0.0,500.0,913.2744595238073,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250804-11,1802.3204595238076,0.0,500.0,1302.3204595238076,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250804-12,1774.192459523807,0.0,500.0,1274.192459523807,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250804-13,1194.5964595238074,0.0,500.0,694.5964595238074,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250804-14,1395.777459523808,0.0,500.0,895.7774595238079,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250804-15,1708.822459523808,0.0,486.4136000000001,1222.408859523808,-305240.31231231237,2384764.8206998943
+HFC-only,Equal total storage (3 MWh),20250804-10,1413.2744595238073,0.0,500.0,913.2744595238073,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250804-11,1802.3204595238076,0.0,500.0,1302.3204595238076,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250804-12,1774.192459523807,0.0,500.0,1274.192459523807,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250804-13,1194.5964595238074,0.0,500.0,694.5964595238074,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250804-14,1395.777459523808,0.0,500.0,895.7774595238079,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250804-15,1708.822459523808,0.0,486.4136000000001,1222.408859523808,0.0,2384764.8206998943
 HFC-only,Equal total storage (3 MWh),20250804-16,1576.013459523807,0.0,0.0,1576.013459523807,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-17,1398.6574595238071,0.0,0.0,1398.6574595238071,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-18,476.85745952380785,0.0,0.0,476.85745952380785,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250804-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Equal total storage (3 MWh),20250804-19,0.0,0.0,0.0,0.0,-1686486.4864864869,0.0
 HFC-only,Equal total storage (3 MWh),20250804-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -775,17 +775,17 @@ HFC-only,Equal total storage (3 MWh),20250805-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250805-09,545.6374595238085,0.0,500.0,45.6374595238085,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250805-10,813.1434595238079,0.0,500.0,313.1434595238079,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250805-11,2160.447459523808,0.0,500.0,1660.447459523808,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250805-12,2435.461459523807,0.0,500.0,1935.4614595238072,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250805-13,1838.3644595238075,0.0,500.0,1338.3644595238075,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250805-14,1954.0534595238078,0.0,186.41360000000023,1767.6398595238074,-117852.92492492507,913939.4856147573
+HFC-only,Equal total storage (3 MWh),20250805-09,545.6374595238085,0.0,500.0,45.6374595238085,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250805-10,813.1434595238079,0.0,500.0,313.1434595238079,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250805-11,2160.447459523808,0.0,500.0,1660.447459523808,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250805-12,2435.461459523807,0.0,500.0,1935.4614595238072,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250805-13,1838.3644595238075,0.0,500.0,1338.3644595238075,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250805-14,1954.0534595238078,0.0,186.41360000000023,1767.6398595238074,0.0,913939.4856147573
 HFC-only,Equal total storage (3 MWh),20250805-15,843.5444595238077,0.0,0.0,843.5444595238077,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-16,2396.207459523808,0.0,0.0,2396.207459523808,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-17,1865.9494595238084,0.0,0.0,1865.9494595238084,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-18,964.563459523808,0.0,0.0,964.563459523808,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250805-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Equal total storage (3 MWh),20250805-19,0.0,0.0,0.0,0.0,-1686486.4864864869,0.0
 HFC-only,Equal total storage (3 MWh),20250805-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250805-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -799,17 +799,17 @@ HFC-only,Equal total storage (3 MWh),20250806-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250806-09,1060.0384595238083,0.0,500.0,560.0384595238083,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250806-10,2461.698459523808,0.0,500.0,1961.6984595238082,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250806-11,2443.805459523808,0.0,500.0,1943.8054595238082,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250806-12,2186.710459523807,0.0,500.0,1686.710459523807,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250806-13,1421.6674595238073,0.0,500.0,921.6674595238073,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250806-14,1564.2564595238073,0.0,186.41360000000023,1377.842859523807,-117852.92492492507,913939.4856147573
+HFC-only,Equal total storage (3 MWh),20250806-09,1060.0384595238083,0.0,500.0,560.0384595238083,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250806-10,2461.698459523808,0.0,500.0,1961.6984595238082,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250806-11,2443.805459523808,0.0,500.0,1943.8054595238082,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250806-12,2186.710459523807,0.0,500.0,1686.710459523807,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250806-13,1421.6674595238073,0.0,500.0,921.6674595238073,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250806-14,1564.2564595238073,0.0,186.41360000000023,1377.842859523807,0.0,913939.4856147573
 HFC-only,Equal total storage (3 MWh),20250806-15,1708.764459523807,0.0,0.0,1708.764459523807,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-16,1338.8814595238073,0.0,0.0,1338.8814595238073,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-17,1165.135459523808,0.0,0.0,1165.135459523808,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-18,166.27745952380792,0.0,0.0,166.27745952380792,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250806-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Equal total storage (3 MWh),20250806-19,0.0,0.0,0.0,0.0,-1686486.4864864869,0.0
 HFC-only,Equal total storage (3 MWh),20250806-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250806-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -823,17 +823,17 @@ HFC-only,Equal total storage (3 MWh),20250807-05,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-06,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-07,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250807-09,679.7124595238074,0.0,500.0,179.7124595238074,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250807-10,2232.192459523807,0.0,500.0,1732.192459523807,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250807-11,2319.893459523808,0.0,500.0,1819.893459523808,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250807-12,2095.323459523808,0.0,500.0,1595.3234595238082,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250807-13,1530.0954595238072,0.0,500.0,1030.0954595238072,-313726.71231231233,2451375.55847523
-HFC-only,Equal total storage (3 MWh),20250807-14,1653.7264595238084,0.0,186.41360000000023,1467.3128595238081,-117852.92492492507,913939.4856147573
+HFC-only,Equal total storage (3 MWh),20250807-09,679.7124595238074,0.0,500.0,179.7124595238074,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250807-10,2232.192459523807,0.0,500.0,1732.192459523807,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250807-11,2319.893459523808,0.0,500.0,1819.893459523808,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250807-12,2095.323459523808,0.0,500.0,1595.3234595238082,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250807-13,1530.0954595238072,0.0,500.0,1030.0954595238072,0.0,2451375.55847523
+HFC-only,Equal total storage (3 MWh),20250807-14,1653.7264595238084,0.0,186.41360000000023,1467.3128595238081,0.0,913939.4856147573
 HFC-only,Equal total storage (3 MWh),20250807-15,2014.2844595238075,0.0,0.0,2014.2844595238075,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-16,1824.1954595238076,0.0,0.0,1824.1954595238076,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-17,1683.8284595238074,0.0,0.0,1683.8284595238074,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-18,847.5084595238077,0.0,0.0,847.5084595238077,0.0,0.0
-HFC-only,Equal total storage (3 MWh),20250807-19,0.0,0.0,0.0,0.0,0.0,0.0
+HFC-only,Equal total storage (3 MWh),20250807-19,0.0,0.0,0.0,0.0,-1686486.4864864869,0.0
 HFC-only,Equal total storage (3 MWh),20250807-20,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-21,0.0,0.0,0.0,0.0,0.0,0.0
 HFC-only,Equal total storage (3 MWh),20250807-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -842,22 +842,22 @@ HFC-only,Equal total storage (3 MWh),20250807-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-01,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-02,0.0,0.0,0.0,0.0,-48930.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-03,0.0,0.0,0.0,0.0,-48930.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-04,0.0,0.0,0.0,0.0,-30205.89473684211,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-05,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-04,0.0,0.0,0.0,0.0,-28695.6,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-05,0.0,0.0,0.0,0.0,-1451.3400000000001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-06,0.0,0.0,0.0,0.0,-73.39500000000741,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-09,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-10,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-11,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-12,0.0,0.0,0.0,0.0,95453.10500000001,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-13,0.0,0.0,0.0,0.0,67776.67499999999,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-12,0.0,0.0,0.0,0.0,96867.505,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-13,0.0,0.0,0.0,0.0,69187.961401625,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-14,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-15,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-16,0.0,0.0,0.0,0.0,82683.48550000001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-16,0.0,0.0,0.0,0.0,84097.8855,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-18,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-19,0.0,0.0,0.0,0.0,79856.8555,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-19,0.0,0.0,0.0,0.0,81271.25550000001,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -865,23 +865,23 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250801-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-01,0.0,0.0,0.0,0.0,-49650.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-02,0.0,0.0,0.0,0.0,-49650.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-03,0.0,0.0,0.0,0.0,-49044.00000000001,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-04,0.0,0.0,0.0,0.0,-48491.99999999999,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-05,0.0,0.0,0.0,0.0,-10208.842105263158,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-03,0.0,0.0,0.0,0.0,-49044.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-04,0.0,0.0,0.0,0.0,-48492.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-05,0.0,0.0,0.0,0.0,-9698.4,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-06,0.0,0.0,0.0,0.0,-484.92,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-07,0.0,0.0,0.0,0.0,-24.52200000001487,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-09,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-10,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-11,0.0,0.0,0.0,0.0,96865.75499049999,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-12,0.0,0.0,0.0,0.0,68833.2107075,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-11,0.0,0.0,0.0,0.0,98280.15499049998,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-12,0.0,0.0,0.0,0.0,70246.55699333939,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-13,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-14,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-15,0.0,0.0,0.0,0.0,79133.56620655,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-15,0.0,0.0,0.0,0.0,80547.96620655,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-16,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-17,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-18,0.0,0.0,0.0,0.0,-15000.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-19,0.0,0.0,0.0,0.0,96639.65499050001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-19,0.0,0.0,0.0,0.0,98054.05499050001,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250802-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -894,13 +894,13 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-04,0.0,0.0,0.0,0.0,-47565.
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-05,0.0,0.0,0.0,0.0,-37950.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-06,0.0,0.0,0.0,0.0,-47685.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-07,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-08,0.0,0.0,0.0,0.0,-32818.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-08,0.0,0.0,0.0,0.0,-31177.100000000002,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-09,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-10,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-11,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-12,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-13,0.0,0.0,0.0,0.0,98817.054981,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-14,0.0,0.0,0.0,0.0,70426.496415,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-10,0.0,0.0,0.0,0.0,-475.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-11,0.0,0.0,0.0,0.0,-23.749999999995453,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-12,0.0,0.0,0.0,0.0,-1.1875000000031832,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-13,0.0,0.0,0.0,0.0,100231.45498099999,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-14,0.0,0.0,0.0,0.0,71840.72579287102,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-15,0.0,0.0,0.0,0.0,-15000.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-16,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-17,0.0,0.0,0.0,0.0,0.0,0.0
@@ -912,48 +912,48 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-22,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250803-24,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-01,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-02,0.0,0.0,0.0,0.0,-49437.00000000001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-02,0.0,0.0,0.0,0.0,-49437.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-03,0.0,0.0,0.0,0.0,-48885.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-04,0.0,0.0,0.0,0.0,-47232.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-05,0.0,0.0,0.0,0.0,-8751.78947368421,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-05,0.0,0.0,0.0,0.0,-8314.2,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-06,0.0,0.0,0.0,0.0,-472.32,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-08,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-09,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-10,1413.2744595238073,700.0,500.0,213.2744595238073,-350568.8175754702,5883301.340340552
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-11,1802.3204595238076,439.99999999999994,500.0,862.3204595238076,-336884.6070491544,4608586.049933432
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,-309483.5123123124,2418070.1895875623
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-10,1413.2744595238073,665.0,500.0,248.2744595238073,-35000.0,5711705.051247286
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-11,1802.3204595238076,474.8574999999999,500.0,827.4629595238077,-24992.499999999996,4779483.696992532
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-12,1774.192459523807,0.0,493.2068000000001,1280.9856595238068,0.0,2418070.1895875623
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-13,1194.5964595238074,0.0,0.0,1194.5964595238074,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-14,1395.777459523808,0.0,0.0,1395.777459523808,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-15,1708.822459523808,0.0,0.0,1708.822459523808,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-16,1576.013459523807,0.0,0.0,1576.013459523807,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-17,1398.6574595238071,0.0,0.0,1398.6574595238071,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-18,476.85745952380785,0.0,0.0,476.85745952380785,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-22,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-23,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250804-24,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-01,0.0,0.0,0.0,0.0,-49587.00000000001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-01,0.0,0.0,0.0,0.0,-49587.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-02,0.0,0.0,0.0,0.0,-37887.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-03,0.0,0.0,0.0,0.0,-37746.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-04,0.0,0.0,0.0,0.0,-37746.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-05,0.0,0.0,0.0,0.0,-7946.526315789474,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-05,0.0,0.0,0.0,0.0,-7549.2,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-06,0.0,0.0,0.0,0.0,-377.46,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-07,0.0,0.0,0.0,0.0,-24.793500000015033,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-09,545.6374595238085,45.6374595238085,500.0,0.0,-316128.683866197,2675124.664130363
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-10,813.1434595238079,313.1434595238079,500.0,0.0,-330207.94702409167,3986640.00442131
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-11,2160.447459523808,700.0,343.20680000000016,1117.2406595238078,-252631.92388177663,5114583.303910316
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-12,2435.461459523807,81.21908095238364,0.0,2354.2423785714236,-5689.088471178087,398196.93985698867
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-09,545.6374595238085,45.6374595238085,500.0,0.0,-2401.971553884658,2675124.664130363
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-10,813.1434595238079,313.1434595238079,500.0,0.0,-16481.234711779365,3986640.00442131
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-11,2160.447459523808,665.0,343.20680000000016,1152.2406595238078,-35000.0,4942987.01481705
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-12,2435.461459523807,116.21195595238372,0.0,2319.2495035714237,-6116.418734335985,569758.296848547
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-13,1838.3644595238075,0.0,0.0,1838.3644595238075,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-14,1954.0534595238078,0.0,0.0,1954.0534595238078,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-15,843.5444595238077,0.0,0.0,843.5444595238077,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-16,2396.207459523808,0.0,0.0,2396.207459523808,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-17,1865.9494595238084,0.0,0.0,1865.9494595238084,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-18,964.563459523808,0.0,0.0,964.563459523808,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250805-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -963,13 +963,13 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-01,0.0,0.0,0.0,0.0,-49485.
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-02,0.0,0.0,0.0,0.0,-40320.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-03,0.0,0.0,0.0,0.0,-40314.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-04,0.0,0.0,0.0,0.0,-40311.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-05,0.0,0.0,0.0,0.0,-8487.157894736842,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-06,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-05,0.0,0.0,0.0,0.0,-8062.799999999999,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-06,0.0,0.0,0.0,0.0,-403.08,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-07,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-09,1060.0384595238083,560.0384595238083,500.0,0.0,-343202.42070830223,5197104.741440796
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-10,2461.698459523808,579.9615404761915,500.0,1381.7369190476165,-344251.0039163224,5294782.648833187
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,-215789.81861861874,1682657.5220449937
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-09,1060.0384595238083,560.0384595238083,500.0,0.0,-29475.708395989914,5197104.741440796
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-10,2461.698459523808,579.8190404761915,500.0,1381.8794190476167,-30516.79160401008,5294084.006799022
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-11,2443.805459523808,0.0,343.20680000000016,2100.5986595238082,0.0,1682657.5220449937
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-12,2186.710459523807,0.0,0.0,2186.710459523807,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-13,1421.6674595238073,0.0,0.0,1421.6674595238073,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-14,1564.2564595238073,0.0,0.0,1564.2564595238073,0.0,0.0
@@ -977,7 +977,7 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-15,1708.764459523807,0.0,0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-16,1338.8814595238073,0.0,0.0,1338.8814595238073,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-17,1165.135459523808,0.0,0.0,1165.135459523808,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-18,166.27745952380792,0.0,0.0,166.27745952380792,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250806-22,0.0,0.0,0.0,0.0,0.0,0.0
@@ -987,13 +987,13 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-01,0.0,0.0,0.0,0.0,-49350.
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-02,0.0,0.0,0.0,0.0,-40641.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-03,0.0,0.0,0.0,0.0,-39561.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-04,0.0,0.0,0.0,0.0,-39561.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-05,0.0,0.0,0.0,0.0,-8328.63157894737,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-06,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-07,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-05,0.0,0.0,0.0,0.0,-7912.200000000001,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-06,0.0,0.0,0.0,0.0,-395.61,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-07,0.0,0.0,0.0,0.0,-24.67500000001496,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-08,0.0,0.0,0.0,0.0,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-09,679.7124595238074,179.7124595238074,500.0,0.0,-323185.2628135654,3332461.0201354907
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-10,2232.192459523807,700.0,500.0,1032.192459523807,-350568.8175754702,5883301.340340552
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-11,2319.893459523808,260.28754047619253,343.20680000000016,1716.3991190476152,-229489.16285420783,2958782.551842935
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-09,679.7124595238074,179.7124595238074,500.0,0.0,-9458.550501253021,3332461.0201354907
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-10,2232.192459523807,665.0,500.0,1067.192459523807,-35000.0,5711705.051247286
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-11,2319.893459523808,295.2804154761926,343.20680000000016,1681.406244047615,-15541.07449874698,3130343.908834493
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-12,2095.323459523808,0.0,0.0,2095.323459523808,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-13,1530.0954595238072,0.0,0.0,1530.0954595238072,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-14,1653.7264595238084,0.0,0.0,1653.7264595238084,0.0,0.0
@@ -1001,7 +1001,7 @@ Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-15,2014.2844595238075,0.0,
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-16,1824.1954595238076,0.0,0.0,1824.1954595238076,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-17,1683.8284595238074,0.0,0.0,1683.8284595238074,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-18,847.5084595238077,0.0,0.0,847.5084595238077,0.0,0.0
-Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-19,0.0,0.0,0.0,0.0,0.0,0.0
+Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-19,0.0,0.0,0.0,0.0,-843243.2432432434,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-20,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-21,0.0,0.0,0.0,0.0,0.0,0.0
 Hybrid ESS–HFC,Equal total storage (3 MWh),20250807-22,0.0,0.0,0.0,0.0,0.0,0.0

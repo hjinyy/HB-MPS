@@ -3,13 +3,13 @@
 The measured profiles provide time variation only. Their peaks are anchored to
 the corresponding IEEE 33-bus customer-group demand, while every original load
 and its bus-specific Q/P ratio are retained. HB-MPS dispatch uses the same raw
-industrial-load threshold as the operational simulation and is limited to the
-equivalent excess demand instead of injecting full-truck power.
+industrial-load threshold as the operational simulation. Actual finite-fleet
+P1 HFC plus ESS supply is mapped through the established industrial-group
+peak normalization before AC power-flow injection.
 """
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
@@ -19,6 +19,9 @@ import pandapower as pp
 import pandapower.networks as nw
 import pandas as pd
 
+from emergency_dispatch import run_scenario
+from emergency_dispatch_model import Scenario, Strategy
+from hb_inputs import INPUT, load_hours
 from powerflow_plot import save_figure
 
 BASE_DIR: Final = Path(__file__).resolve().parent
@@ -55,7 +58,13 @@ class ScenarioResult:
 
 def load_profiles(path: Path) -> pd.DataFrame:
     """Load, validate, and chronologically order the hourly input profiles."""
-    required = [DATE_COLUMN, HOUR_COLUMN, INDUSTRIAL_COLUMN, RESIDENTIAL_COLUMN, PV_COLUMN]
+    required = [
+        DATE_COLUMN,
+        HOUR_COLUMN,
+        INDUSTRIAL_COLUMN,
+        RESIDENTIAL_COLUMN,
+        PV_COLUMN,
+    ]
     frame = pd.read_csv(path)
     missing = [column for column in required if column not in frame.columns]
     if missing:
@@ -157,6 +166,9 @@ def simulate_scenario(
     pv_rating_mw = system_rating_mw * PV_PENETRATION
 
     industrial_raw = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
+    operational = run_scenario(load_hours(INPUT), Scenario(alpha, 5, Strategy.P1))
+    if len(operational.steps) != len(frame):
+        raise ValueError("Operational and power-flow hours must align.")
     industrial_peak = float(industrial_raw.max())
     threshold_raw = float(industrial_raw.mean()) * alpha
     group_rating_mw = industrial_rating_mw + residential_rating_mw
@@ -172,20 +184,19 @@ def simulate_scenario(
             + residential_rating_mw * residential_fraction[hour]
         ) / group_rating_mw
         excess_raw_kwh = max(industrial_raw[hour] - threshold_raw, 0.0)
-        required_hbmps_mw = excess_raw_kwh / industrial_peak * industrial_rating_mw
-        truck_count = (
-            math.ceil(required_hbmps_mw / TRUCK_RATED_OUTPUT_MW)
-            if required_hbmps_mw > 0
-            else 0
-        )
-        dispatched_hbmps_mw = min(
-            required_hbmps_mw, truck_count * TRUCK_RATED_OUTPUT_MW
-        )
+        step = operational.steps[hour]
+        supplied_raw_kwh = step.hfc_kwh + step.ess_emergency_kwh
+        truck_count = step.hfc_trucks_dispatched
+        dispatched_hbmps_mw = supplied_raw_kwh / industrial_peak * industrial_rating_mw
         pv_mw = pv_fraction[hour] * pv_rating_mw
 
         set_operating_point(
             base_net,
-            industrial_fraction[hour], residential_fraction[hour], mixed_scale, pv_mw, 0.0
+            industrial_fraction[hour],
+            residential_fraction[hour],
+            mixed_scale,
+            pv_mw,
+            0.0,
         )
         set_operating_point(
             hbmps_net,
@@ -208,6 +219,9 @@ def simulate_scenario(
                 "mode2": int(excess_raw_kwh > 0),
                 "ntruck": truck_count,
                 "raw_excess_kwh": excess_raw_kwh,
+                "hfc_supplied_kwh": step.hfc_kwh,
+                "ess_emergency_kwh": step.ess_emergency_kwh,
+                "unserved_kwh": step.unserved_kwh,
                 "hbmps_mw": dispatched_hbmps_mw,
                 "pv_mw": pv_mw,
                 "vmin_base": float(base_voltage.min()),
