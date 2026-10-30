@@ -22,7 +22,13 @@ import pandas as pd
 from emergency_dispatch import run_scenario
 from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
-from p1_multibus_dispatch import InjectionHour, TruckHour, allocate_p1_supply
+from p1_multibus_dispatch import (
+    InjectionHour,
+    TruckHour,
+    allocate_p1_supply,
+    validate_main_reference,
+)
+from p1_multibus_timeline import save_fleet_timeline
 from powerflow_plot import save_figure
 
 BASE_DIR: Final = Path(__file__).resolve().parent
@@ -33,6 +39,7 @@ FIGURE_PATH: Final = OUTPUT_DIR / "fig_powerflow_validation_bold.png"
 FIGURE_PDF_PATH: Final = OUTPUT_DIR / "fig_powerflow_validation_bold.pdf"
 TRUCK_PATH: Final = OUTPUT_DIR / "p1_multibus_vehicle_dispatch.csv"
 INJECTION_PATH: Final = OUTPUT_DIR / "p1_multibus_hourly_injection.csv"
+MAIN_REFERENCE_PATH: Final = OUTPUT_DIR / "p1_main_hourly.csv"
 
 SCENARIO_MULTIPLIERS: Final = (1.3, 1.5, 1.8)
 INDUSTRIAL_BUS_NUMBERS: Final = (18, 17, 16, 15, 14, 33, 32, 31, 30)
@@ -178,6 +185,7 @@ def simulate_scenario(
     industrial_raw = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
     hours = load_hours(INPUT)
     operational = run_scenario(hours, Scenario(alpha, 5, Strategy.P1))
+    validate_main_reference(operational, MAIN_REFERENCE_PATH)
     bus18_rating = float(
         benchmark.load.loc[benchmark.load.bus.eq(HB_BUS_NUMBER - 1), "p_mw"].sum()
     )
@@ -308,6 +316,7 @@ def main() -> None:
     ).to_csv(TRUCK_PATH, index=False)
     save_figure(results, FIGURE_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
     save_figure(results, FIGURE_PDF_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
+    save_fleet_timeline(results[0].truck_rows, results[0].injection_rows, OUTPUT_DIR)
 
     benchmark = nw.case33bw()
     print(

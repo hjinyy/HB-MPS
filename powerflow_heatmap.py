@@ -20,13 +20,14 @@ from matplotlib.transforms import Bbox
 from emergency_dispatch import run_scenario
 from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
-from p1_multibus_dispatch import allocate_p1_supply
+from p1_multibus_dispatch import allocate_p1_supply, validate_main_reference
 from powerflow_validation import (
     AUX_BUS_NUMBER,
     HB_BUS_NUMBER,
     INDUSTRIAL_BUS_NUMBERS,
     INDUSTRIAL_COLUMN,
     INPUT_PATH,
+    MAIN_REFERENCE_PATH,
     OUTPUT_DIR,
     PV_COLUMN,
     PV_PENETRATION,
@@ -53,6 +54,7 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
     raw_industrial = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
     hours = load_hours(INPUT)
     operational = run_scenario(hours, Scenario(ALPHA, 5, Strategy.P1))
+    validate_main_reference(operational, MAIN_REFERENCE_PATH)
     if len(operational.steps) != len(frame):
         raise ValueError("Operational and power-flow hours must align.")
     benchmark = nw.case33bw()

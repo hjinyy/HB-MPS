@@ -10,7 +10,7 @@ from pathlib import Path
 from emergency_dispatch import H2_CAPACITY_KG, HFC_OUTPUT_KWH, run_scenario
 from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
-from p1_multibus_dispatch import allocate_p1_supply
+from p1_multibus_dispatch import allocate_p1_supply, validate_main_reference
 from powerflow_validation import (
     build_network,
 )
@@ -32,6 +32,7 @@ def test_truck_replay_preserves_original_p1_energy_and_inventories() -> None:
     assert math.isclose(p18 / (p18 + p33), 0.6)
     for alpha in (1.3, 1.5, 1.8):
         original = run_scenario(hours, Scenario(alpha, 5, Strategy.P1))
+        validate_main_reference(original, RESULTS / "p1_main_hourly.csv")
         injection, trucks = allocate_p1_supply(hours, original, p18 / (p18 + p33))
         assert len(injection) == 168
         assert len(trucks) == 168 * 5
@@ -97,3 +98,26 @@ def test_saved_ac_injection_and_figure_csvs_close_to_p1() -> None:
         assert math.isfinite(float(row["vmin_hbmps"]))
         assert math.isfinite(float(row["ploss_hbmps_mw"]))
     assert any(row["bus"] == "33" and float(row["hfc_kwh"]) > 0 for row in trucks)
+    assert (RESULTS / "figure_16_p1_multitruck_deployment.png").is_file()
+    assert (RESULTS / "figure_16_p1_multitruck_deployment.pdf").is_file()
+
+
+def test_timeline_activity_matches_main_fleet_count() -> None:
+    main = [
+        row
+        for row in read_csv("p1_main_hourly.csv")
+        if math.isclose(float(row["Alpha"]), 1.3)
+    ]
+    trucks = [
+        row
+        for row in read_csv("p1_multibus_vehicle_dispatch.csv")
+        if row["alpha"] == "1.3"
+    ]
+    assert len(main) == 168
+    assert len(trucks) == 168 * 5
+    for t, row in enumerate(main):
+        vehicles = trucks[t * 5 : (t + 1) * 5]
+        assert [int(vehicle["truck"]) for vehicle in vehicles] == list(range(5))
+        assert sum(float(vehicle["hfc_kwh"]) > 0 for vehicle in vehicles) == int(
+            row["Active_Trucks"]
+        )

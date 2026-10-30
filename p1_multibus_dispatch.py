@@ -6,8 +6,10 @@ the P1 engine's SOC, LOH, hydrogen purchases, or economic calculation.
 
 from __future__ import annotations
 
+import csv
 import math
 from dataclasses import dataclass
+from pathlib import Path
 
 from emergency_dispatch import (
     H2_CAPACITY_KG,
@@ -41,6 +43,43 @@ class InjectionHour:
     hfc33_kwh: float
     ess18_kwh: float
     total_kwh: float
+
+
+def validate_main_reference(run: Run, path: Path) -> None:
+    """Require every plotted P1 hour to match the saved main simulation path."""
+    with path.open(newline="", encoding="utf-8") as source:
+        reference = [
+            row
+            for row in csv.DictReader(source)
+            if math.isclose(float(row["Alpha"]), run.scenario.alpha)
+        ]
+    if len(reference) != len(run.steps):
+        raise AssertionError("Main simulation and power-flow hours differ")
+    for t, (row, step) in enumerate(zip(reference, run.steps, strict=True)):
+        expected = {
+            "HFC_Supply": step.hfc_kwh,
+            "ESS_Emergency_Supply": step.ess_emergency_kwh,
+            "ESS_Mode1_Supply": step.phase1_ess_kwh,
+            "Unserved_Energy": step.unserved_kwh,
+            "ESS_SOC": step.soc_end * 100,
+            "H2_LOH": step.main_h2_end_kg / H2_CAPACITY_KG * 100,
+            "Active_Trucks": step.hfc_trucks_dispatched,
+            "Required_Trucks": step.required_hfc_trucks,
+            "Revenue": step.revenue_krw,
+            "Op_Cost": step.h2_purchase_krw
+            + step.grid_purchase_krw
+            + step.ess_wear_krw,
+            "Net_Step_Profit": step.operating_net_krw,
+            "Avoided_Penalty": step.avoided_interruption_krw,
+            "H2_External_kg": step.external_h2_kg,
+            "Grid_Charge_kWh": step.grid_ess_charge_kwh,
+            "ESS_Wear_Cost": step.ess_wear_krw,
+        }
+        for column, value in expected.items():
+            if not math.isclose(float(row[column]), value, rel_tol=1e-9, abs_tol=1e-5):
+                raise AssertionError(
+                    f"Main/P1 mismatch alpha={run.scenario.alpha} t={t} {column}"
+                )
 
 
 def allocate_p1_supply(
