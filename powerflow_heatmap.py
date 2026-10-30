@@ -15,11 +15,14 @@ import pandapower.networks as nw
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 
 from emergency_dispatch import run_scenario
 from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
+from p1_multibus_dispatch import allocate_p1_supply
 from powerflow_validation import (
+    AUX_BUS_NUMBER,
     HB_BUS_NUMBER,
     INDUSTRIAL_BUS_NUMBERS,
     INDUSTRIAL_COLUMN,
@@ -48,7 +51,8 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
     residential = profile_fraction(frame[RESIDENTIAL_COLUMN])
     pv = profile_fraction(frame[PV_COLUMN])
     raw_industrial = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
-    operational = run_scenario(load_hours(INPUT), Scenario(ALPHA, 5, Strategy.P1))
+    hours = load_hours(INPUT)
+    operational = run_scenario(hours, Scenario(ALPHA, 5, Strategy.P1))
     if len(operational.steps) != len(frame):
         raise ValueError("Operational and power-flow hours must align.")
     benchmark = nw.case33bw()
@@ -56,6 +60,15 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
     residential_buses = {bus - 1 for bus in RESIDENTIAL_BUS_NUMBERS}
     industrial_rating = float(
         benchmark.load.loc[benchmark.load.bus.isin(industrial_buses), "p_mw"].sum()
+    )
+    bus18_rating = float(
+        benchmark.load.loc[benchmark.load.bus.eq(HB_BUS_NUMBER - 1), "p_mw"].sum()
+    )
+    bus33_rating = float(
+        benchmark.load.loc[benchmark.load.bus.eq(AUX_BUS_NUMBER - 1), "p_mw"].sum()
+    )
+    injections, _ = allocate_p1_supply(
+        hours, operational, bus18_rating / (bus18_rating + bus33_rating)
     )
     residential_rating = float(
         benchmark.load.loc[benchmark.load.bus.isin(residential_buses), "p_mw"].sum()
@@ -72,16 +85,23 @@ def calculate_voltages() -> tuple[np.ndarray, np.ndarray, list[str]]:
             industrial_rating * industrial[hour]
             + residential_rating * residential[hour]
         ) / (industrial_rating + residential_rating)
-        supplied_raw_kwh = (
-            operational.steps[hour].hfc_kwh + operational.steps[hour].ess_emergency_kwh
+        injection = injections[hour]
+        hb18_mw = (
+            (injection.hfc18_kwh + injection.ess18_kwh) / raw_peak * industrial_rating
         )
-        hb_mw = supplied_raw_kwh / raw_peak * industrial_rating
+        hb33_mw = injection.hfc33_kwh / raw_peak * industrial_rating
         pv_mw = pv[hour] * pv_rating
         set_operating_point(
             base_net, industrial[hour], residential[hour], mixed, pv_mw, 0.0
         )
         set_operating_point(
-            hb_net, industrial[hour], residential[hour], mixed, pv_mw, hb_mw
+            hb_net,
+            industrial[hour],
+            residential[hour],
+            mixed,
+            pv_mw,
+            hb18_mw,
+            hb33_mw,
         )
         base_series.append(solve_network(base_net)[0])
         hb_series.append(solve_network(hb_net)[0])
@@ -160,8 +180,23 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
     )
     axes[-1].set_xlabel("Date (2025)")
     fig.tight_layout()
+    fig.canvas.draw()
+    # The changing colorbar tick widths alter bbox_inches="tight" by a few
+    # pixels. Keep the archived Figure 13 canvas without moving any subplot.
+    tight = fig.get_tightbbox(fig.canvas.get_renderer()).padded(0.1)
+    target_width, target_height = 2693 / fig.dpi, 2164 / fig.dpi
+    horizontal_pad = max((target_width - tight.width) / 2, 0.0)
+    vertical_pad = max((target_height - tight.height) / 2, 0.0)
+    canvas = Bbox.from_extents(
+        tight.x0 - horizontal_pad,
+        tight.y0 - vertical_pad,
+        tight.x1 + horizontal_pad,
+        tight.y1 + vertical_pad,
+    )
     for suffix in ("png", "pdf"):
-        fig.savefig(OUTPUT_DIR / f"{OUTPUT_NAME}.{suffix}", bbox_inches="tight")
+        fig.savefig(
+            OUTPUT_DIR / f"{OUTPUT_NAME}.{suffix}", bbox_inches=canvas, pad_inches=0
+        )
     plt.close(fig)
 
 
