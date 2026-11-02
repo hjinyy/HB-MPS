@@ -550,7 +550,7 @@ def draw_financial_flow(ax, res, alpha):
     ax.plot(
         res["timestamp"],
         cost_cum,
-        label="Total Op Cost (H2 + Grid)",
+        label="Total Op Cost (H2 + Grid + ESS Wear)",
         color="red",
         linestyle="--",
         linewidth=2.4
