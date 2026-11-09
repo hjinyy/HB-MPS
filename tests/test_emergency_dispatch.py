@@ -12,8 +12,8 @@ from emergency_dispatch import (
     HFC_OUTPUT_KWH,
     run_scenario,
 )
-from emergency_dispatch_experiment import validate_run
 from emergency_dispatch_model import Scenario, Strategy
+from emergency_validation import validate_run
 
 
 def hour(index: int, industrial: float, price: float = 100.0) -> Hour:

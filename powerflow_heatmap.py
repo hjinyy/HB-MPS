@@ -180,7 +180,7 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
         )
     axes[-1].set_xticks(
         np.arange(0, 168, 24),
-        ("Aug 1", "Aug 2", "Aug 3", "Aug 4", "Aug 5", "Aug 6", "Aug 7"),
+        ("08-01", "08-02", "08-03", "08-04", "08-05", "08-06", "08-07"),
     )
     axes[-1].set_xlabel("Date (2025)")
     fig.tight_layout()

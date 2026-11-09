@@ -1,0 +1,4 @@
+alpha,available_trucks,hfc_supply_mwh,ess_emergency_supply_mwh,residual_unserved_mwh,operating_net_mkrw,avoided_interruption_mkrw,net_societal_benefit_mkrw
+1.3,5,26.402814,4.559701,29.993366,-17.585824,151.801504,134.21568
+1.5,5,1.569834,0.0,0.0,0.118538,7.696505,7.815043
+1.8,5,0.0,0.0,0.0,0.577968,0.0,0.577968

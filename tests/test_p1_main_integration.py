@@ -6,7 +6,6 @@ import hashlib
 import math
 import runpy
 import struct
-import tarfile
 from pathlib import Path
 
 import pandapower.networks as nw
@@ -81,20 +80,43 @@ def test_powerflow_csv_uses_normalized_actual_p1_supply() -> None:
         assert all(math.isclose(raw, step.unserved_kwh, abs_tol=1e-7) for raw, step in zip(rows.unserved_kwh, run.steps, strict=True))
 
 
-def test_preexisting_png_dimensions_match_archived_design() -> None:
-    # Given the exact pre-P1 archive of all prior result files.
-    with tarfile.open(RESULTS / "legacy_pre_p1.tar.gz") as archive:
-        names = [member.name for member in archive.getmembers() if member.name.startswith("figure_") and member.name.endswith(".png")]
+def test_retained_main_png_design_and_input_figure() -> None:
+    expected_dimensions = {
+        "figure_5_energy_supply_demand_mismatch.png": (3790, 2533),
+        "figure_6_grid_resilience_fleet_deployment_all_cases.png": (3870, 4245),
+        "figure_7_asset_status_main_truck_all_cases.png": (3855, 4245),
+        "figure_8_financial_flow_all_cases.png": (3852, 4245),
+        "figure_9_operational_mode_distribution_all_cases.png": (4977, 1646),
+        "figure_load_profiles.png": (3786, 2533),
+    }
+    for name, dimensions in expected_dimensions.items():
+        image = (RESULTS / name).read_bytes()
+        assert struct.unpack(">II", image[16:24]) == dimensions, name
+    assert hashlib.sha256(
+        (RESULTS / "figure_5_energy_supply_demand_mismatch.png").read_bytes()
+    ).hexdigest() == "ec0f5bcfe0b8757ae4ad4191edea2ae0caecd85e0c9fda3915a8e58c20651a44"
 
-        # When regenerated files are compared to their originals.
-        for name in names:
-            # Figures 10–13 use larger canvases to fit the paper typography.
-            if name.startswith(("figure_10_", "figure_11_", "figure_12_", "figure_13_")):
-                continue
-            original = archive.extractfile(name).read()
-            updated = (RESULTS / name).read_bytes()
 
-            # Then canvas pixel dimensions are unchanged; Figure 5 is byte-identical.
-            assert struct.unpack(">II", original[16:24]) == struct.unpack(">II", updated[16:24]), name
-            if name == "figure_5_energy_supply_demand_mismatch.png":
-                assert hashlib.sha256(original).digest() == hashlib.sha256(updated).digest()
+def test_table_ii_and_figure_8_accounting_match_main_p1() -> None:
+    table = pd.read_csv(RESULTS / "table_ii_p1.csv")
+    summary = pd.read_csv(RESULTS / "p1_main_summary.csv")
+    hourly = pd.read_csv(RESULTS / "p1_main_hourly.csv")
+    assert len(table) == 3
+    for row in table.itertuples():
+        matching = summary.loc[summary.alpha.eq(row.alpha)].iloc[0]
+        hours = hourly.loc[hourly.Alpha.eq(row.alpha)]
+        assert len(hours) == 168
+        assert row.available_trucks == 5
+        assert math.isclose(row.operating_net_mkrw, matching.net_profit / 1e6, abs_tol=1e-6)
+        assert math.isclose(row.avoided_interruption_mkrw, matching.avoided_penalty / 1e6, abs_tol=1e-6)
+        assert math.isclose(
+            row.net_societal_benefit_mkrw,
+            row.operating_net_mkrw + row.avoided_interruption_mkrw,
+            abs_tol=1e-6,
+        )
+        assert math.isclose(
+            hours.Revenue.sum() - hours.Op_Cost.sum(),
+            matching.net_profit,
+            abs_tol=1e-6,
+        )
+        assert math.isclose(hours.Avoided_Penalty.sum(), matching.avoided_penalty, abs_tol=1e-6)

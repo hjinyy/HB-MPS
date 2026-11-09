@@ -1,6 +1,5 @@
-"""Finite-truck rule-based emergency dispatch without modifying the paper model.
+"""Finite-truck rule-based dispatch shared by the final P1 simulations.
 
-Run with ``uv run --with numpy --with matplotlib emergency_dispatch_experiment.py``.
 Hydrogen is expensed when externally replenished, never again when consumed.
 """
 

@@ -559,7 +559,7 @@ def draw_financial_flow(ax, res, alpha):
     ax.plot(
         res["timestamp"],
         profit_cum,
-        label="Net Profit",
+        label="Operating Net Benefit",
         color="blue",
         linewidth=3.0
     )
@@ -575,42 +575,6 @@ def draw_financial_flow(ax, res, alpha):
     )
 
     format_date_axis(ax)
-
-
-def draw_economic_value(ax, res, alpha):
-    total_base_penalty = res["Base_Penalty"].sum()
-    total_avoided = res["Avoided_Penalty"].sum()
-    total_profit = res["Net_Step_Profit"].sum()
-
-    hmep_value = -(total_base_penalty - total_avoided) + total_profit
-    values = [-total_base_penalty, hmep_value]
-
-    bars = ax.bar(
-        ["Base Case\nRisk Cost", "HB-MPS\nNet Value"],
-        values,
-        color=["gray", "royalblue"],
-        width=0.5
-    )
-
-    ax.axhline(0, color="black", linewidth=1.2)
-    ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
-    ax.set_ylabel("KRW", fontsize=Config.FONT_LABEL)
-    ax.grid(True, axis="y", linestyle="--", alpha=0.35)
-
-    ax.tick_params(axis="x", labelsize=Config.FONT_TICK)
-    ax.tick_params(axis="y", labelsize=Config.FONT_TICK)
-
-    for rect in bars:
-        height = rect.get_height()
-        ax.text(
-            rect.get_x() + rect.get_width() / 2.0,
-            height,
-            f"{height/1e6:.1f}M",
-            ha="center",
-            va="bottom" if height > 0 else "top",
-            fontsize=Config.FONT_TEXT,
-            fontweight="bold"
-        )
 
 
 def draw_mode_distribution(ax, res, alpha):
@@ -777,21 +741,6 @@ def create_financial_flow_figure(scenario_results):
     save_figure(fig, "figure_8_financial_flow_all_cases")
 
 
-def create_economic_value_figure(scenario_results):
-    fig, axes = plt.subplots(
-        3, 1,
-        figsize=(12, 15),
-        dpi=300
-    )
-
-    for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
-        draw_economic_value(ax, scenario_results[alpha], alpha)
-
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
-    fig.subplots_adjust(hspace=0.55)
-    save_figure(fig, "figure_economic_value_all_cases")
-
-
 def create_mode_distribution_figure(scenario_results):
     from matplotlib.patches import Patch
 
@@ -833,6 +782,29 @@ def create_mode_distribution_figure(scenario_results):
 # ---------------------------------------------------------
 # 6. Main
 # ---------------------------------------------------------
+def write_table_ii_p1(scenario_results, scenario_summaries):
+    """Export the manuscript's P1 economic quantities from the main run."""
+    rows = []
+    for alpha in Config.SCENARIO_MULTIPLIERS:
+        hourly = scenario_results[alpha]
+        summary = scenario_summaries[alpha]
+        operating = float(summary["net_profit"])
+        avoided = float(summary["avoided_penalty"])
+        rows.append({
+            "alpha": alpha,
+            "available_trucks": Config.AVAILABLE_TRUCKS,
+            "hfc_supply_mwh": round(hourly["HFC_Supply"].sum() / 1000, 6),
+            "ess_emergency_supply_mwh": round(hourly["ESS_Emergency_Supply"].sum() / 1000, 6),
+            "residual_unserved_mwh": round(hourly["Unserved_Energy"].sum() / 1000, 6),
+            "operating_net_mkrw": round(operating / 1e6, 6),
+            "avoided_interruption_mkrw": round(avoided / 1e6, 6),
+            "net_societal_benefit_mkrw": round((operating + avoided) / 1e6, 6),
+        })
+    pd.DataFrame(rows).to_csv(
+        os.path.join(Config.FIGURE_DIR, "table_ii_p1.csv"), index=False
+    )
+
+
 def main():
     scenario_results, scenario_summaries = run_all_scenarios()
 
@@ -843,11 +815,11 @@ def main():
     pd.DataFrame.from_dict(scenario_summaries, orient="index").to_csv(
         os.path.join(Config.FIGURE_DIR, "p1_main_summary.csv"), index=False
     )
+    write_table_ii_p1(scenario_results, scenario_summaries)
 
     create_grid_resilience_figure(scenario_results)
     create_asset_status_figure(scenario_results)
     create_financial_flow_figure(scenario_results)
-    create_economic_value_figure(scenario_results)
     create_mode_distribution_figure(scenario_results)
 
     print("\nAll multi-scenario figures have been saved successfully.")
