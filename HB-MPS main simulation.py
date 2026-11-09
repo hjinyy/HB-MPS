@@ -762,7 +762,10 @@ def create_mode_distribution_figure(scenario_results):
 
     fig.legend(
         [Patch(facecolor=c) for c in colors.values()],
-        list(colors.keys()),
+        [
+            {"PHASE 1": "Mode 1", "PHASE 2": "Mode 2"}.get(mode, mode)
+            for mode in colors
+        ],
         loc="lower center",
         bbox_to_anchor=(0.5, 0.06),
         ncol=6,
