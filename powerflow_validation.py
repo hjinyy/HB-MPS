@@ -3,14 +3,14 @@
 The measured profiles provide time variation only. Their peaks are anchored to
 the corresponding IEEE 33-bus customer-group demand, while every original load
 and its bus-specific Q/P ratio are retained. HB-MPS dispatch uses the same raw
-industrial-load threshold as the operational simulation and is limited to the
-equivalent excess demand instead of injecting full-truck power.
+industrial-load threshold as the operational simulation. Actual finite-fleet
+P1 HFC plus ESS supply is mapped through the established industrial-group
+peak normalization before AC power-flow injection.
 """
 
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Final
 
@@ -19,6 +19,16 @@ import pandapower as pp
 import pandapower.networks as nw
 import pandas as pd
 
+from emergency_dispatch import run_scenario
+from emergency_dispatch_model import Scenario, Strategy
+from hb_inputs import INPUT, load_hours
+from p1_multibus_dispatch import (
+    InjectionHour,
+    TruckHour,
+    allocate_p1_supply,
+    validate_main_reference,
+)
+from p1_multibus_timeline import save_fleet_timeline
 from powerflow_plot import save_figure
 
 BASE_DIR: Final = Path(__file__).resolve().parent
@@ -26,12 +36,17 @@ INPUT_PATH: Final = BASE_DIR / "Data file" / "data_file.csv"
 OUTPUT_DIR: Final = BASE_DIR / "results"
 RESULT_PATH: Final = OUTPUT_DIR / "pf_results.csv"
 FIGURE_PATH: Final = OUTPUT_DIR / "fig_powerflow_validation_bold.png"
+FIGURE_PDF_PATH: Final = OUTPUT_DIR / "fig_powerflow_validation_bold.pdf"
+TRUCK_PATH: Final = OUTPUT_DIR / "p1_multibus_vehicle_dispatch.csv"
+INJECTION_PATH: Final = OUTPUT_DIR / "p1_multibus_hourly_injection.csv"
+MAIN_REFERENCE_PATH: Final = OUTPUT_DIR / "p1_main_hourly.csv"
 
 SCENARIO_MULTIPLIERS: Final = (1.3, 1.5, 1.8)
 INDUSTRIAL_BUS_NUMBERS: Final = (18, 17, 16, 15, 14, 33, 32, 31, 30)
 RESIDENTIAL_BUS_NUMBERS: Final = (9, 10, 11, 12, 13, 25, 26, 22, 23)
 PV_BUS_NUMBER: Final = 7
 HB_BUS_NUMBER: Final = 18
+AUX_BUS_NUMBER: Final = 33
 SLACK_VOLTAGE_PU: Final = 1.0
 MIN_VOLTAGE_PU: Final = 0.95
 PV_PENETRATION: Final = 0.20
@@ -51,11 +66,19 @@ class ScenarioResult:
     worst_hour: int
     base_voltages: np.ndarray
     hbmps_voltages: np.ndarray
+    injection_rows: tuple[InjectionHour, ...]
+    truck_rows: tuple[TruckHour, ...]
 
 
 def load_profiles(path: Path) -> pd.DataFrame:
     """Load, validate, and chronologically order the hourly input profiles."""
-    required = [DATE_COLUMN, HOUR_COLUMN, INDUSTRIAL_COLUMN, RESIDENTIAL_COLUMN, PV_COLUMN]
+    required = [
+        DATE_COLUMN,
+        HOUR_COLUMN,
+        INDUSTRIAL_COLUMN,
+        RESIDENTIAL_COLUMN,
+        PV_COLUMN,
+    ]
     frame = pd.read_csv(path)
     missing = [column for column in required if column not in frame.columns]
     if missing:
@@ -100,6 +123,7 @@ def build_network() -> pp.pandapowerNet:
     net.ext_grid.loc[:, "vm_pu"] = SLACK_VOLTAGE_PU
     pp.create_sgen(net, PV_BUS_NUMBER - 1, p_mw=0.0, q_mvar=0.0, name="PV")
     pp.create_sgen(net, HB_BUS_NUMBER - 1, p_mw=0.0, q_mvar=0.0, name="HB-MPS")
+    pp.create_sgen(net, AUX_BUS_NUMBER - 1, p_mw=0.0, q_mvar=0.0, name="HB-MPS-33")
     return net
 
 
@@ -110,6 +134,7 @@ def set_operating_point(
     mixed_scale: float,
     pv_mw: float,
     hbmps_mw: float,
+    hbmps33_mw: float = 0.0,
 ) -> None:
     """Apply one hour of PQ-load scaling and generator dispatch in place."""
     industrial_buses = {number - 1 for number in INDUSTRIAL_BUS_NUMBERS}
@@ -119,6 +144,7 @@ def set_operating_point(
     net.load.loc[net.load.bus.isin(residential_buses), "scaling"] = residential_scale
     net.sgen.loc[net.sgen.name.eq("PV"), "p_mw"] = pv_mw
     net.sgen.loc[net.sgen.name.eq("HB-MPS"), "p_mw"] = hbmps_mw
+    net.sgen.loc[net.sgen.name.eq("HB-MPS-33"), "p_mw"] = hbmps33_mw
 
 
 def solve_network(net: pp.pandapowerNet) -> tuple[np.ndarray, float]:
@@ -157,6 +183,20 @@ def simulate_scenario(
     pv_rating_mw = system_rating_mw * PV_PENETRATION
 
     industrial_raw = frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
+    hours = load_hours(INPUT)
+    operational = run_scenario(hours, Scenario(alpha, 5, Strategy.P1))
+    validate_main_reference(operational, MAIN_REFERENCE_PATH)
+    bus18_rating = float(
+        benchmark.load.loc[benchmark.load.bus.eq(HB_BUS_NUMBER - 1), "p_mw"].sum()
+    )
+    bus33_rating = float(
+        benchmark.load.loc[benchmark.load.bus.eq(AUX_BUS_NUMBER - 1), "p_mw"].sum()
+    )
+    injection_rows, truck_rows = allocate_p1_supply(
+        hours, operational, bus18_rating / (bus18_rating + bus33_rating)
+    )
+    if len(operational.steps) != len(frame):
+        raise ValueError("Operational and power-flow hours must align.")
     industrial_peak = float(industrial_raw.max())
     threshold_raw = float(industrial_raw.mean()) * alpha
     group_rating_mw = industrial_rating_mw + residential_rating_mw
@@ -172,20 +212,31 @@ def simulate_scenario(
             + residential_rating_mw * residential_fraction[hour]
         ) / group_rating_mw
         excess_raw_kwh = max(industrial_raw[hour] - threshold_raw, 0.0)
-        required_hbmps_mw = excess_raw_kwh / industrial_peak * industrial_rating_mw
-        truck_count = (
-            math.ceil(required_hbmps_mw / TRUCK_RATED_OUTPUT_MW)
-            if required_hbmps_mw > 0
-            else 0
+        step = operational.steps[hour]
+        supplied_raw_kwh = step.hfc_kwh + step.ess_emergency_kwh
+        allocation = injection_rows[hour]
+        truck_count = step.hfc_trucks_dispatched
+        dispatched18_mw = (
+            (allocation.hfc18_kwh + allocation.ess18_kwh)
+            / industrial_peak
+            * industrial_rating_mw
         )
-        dispatched_hbmps_mw = min(
-            required_hbmps_mw, truck_count * TRUCK_RATED_OUTPUT_MW
-        )
+        dispatched33_mw = allocation.hfc33_kwh / industrial_peak * industrial_rating_mw
+        dispatched_hbmps_mw = dispatched18_mw + dispatched33_mw
+        if not np.isclose(
+            dispatched_hbmps_mw,
+            supplied_raw_kwh / industrial_peak * industrial_rating_mw,
+        ):
+            raise AssertionError("Multibus injection differs from P1 supplied energy")
         pv_mw = pv_fraction[hour] * pv_rating_mw
 
         set_operating_point(
             base_net,
-            industrial_fraction[hour], residential_fraction[hour], mixed_scale, pv_mw, 0.0
+            industrial_fraction[hour],
+            residential_fraction[hour],
+            mixed_scale,
+            pv_mw,
+            0.0,
         )
         set_operating_point(
             hbmps_net,
@@ -193,7 +244,8 @@ def simulate_scenario(
             residential_fraction[hour],
             mixed_scale,
             pv_mw,
-            dispatched_hbmps_mw,
+            dispatched18_mw,
+            dispatched33_mw,
         )
         base_voltage, base_loss = solve_network(base_net)
         hbmps_voltage, hbmps_loss = solve_network(hbmps_net)
@@ -208,7 +260,12 @@ def simulate_scenario(
                 "mode2": int(excess_raw_kwh > 0),
                 "ntruck": truck_count,
                 "raw_excess_kwh": excess_raw_kwh,
+                "hfc_supplied_kwh": step.hfc_kwh,
+                "ess_emergency_kwh": step.ess_emergency_kwh,
+                "unserved_kwh": step.unserved_kwh,
                 "hbmps_mw": dispatched_hbmps_mw,
+                "hbmps18_mw": dispatched18_mw,
+                "hbmps33_mw": dispatched33_mw,
                 "pv_mw": pv_mw,
                 "vmin_base": float(base_voltage.min()),
                 "vminbus_base": int(base_voltage.argmin()) + 1,
@@ -229,6 +286,8 @@ def simulate_scenario(
         worst_hour=worst_hour,
         base_voltages=base_profiles[worst_hour],
         hbmps_voltages=hbmps_profiles[worst_hour],
+        injection_rows=injection_rows,
+        truck_rows=truck_rows,
     )
 
 
@@ -249,7 +308,15 @@ def main() -> None:
     pd.concat([result.records for result in results], ignore_index=True).to_csv(
         RESULT_PATH, index=False
     )
+    pd.DataFrame(
+        [asdict(row) for result in results for row in result.injection_rows]
+    ).to_csv(INJECTION_PATH, index=False)
+    pd.DataFrame(
+        [asdict(row) for result in results for row in result.truck_rows]
+    ).to_csv(TRUCK_PATH, index=False)
     save_figure(results, FIGURE_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
+    save_figure(results, FIGURE_PDF_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
+    save_fleet_timeline(results[0].truck_rows, results[0].injection_rows, OUTPUT_DIR)
 
     benchmark = nw.case33bw()
     print(
