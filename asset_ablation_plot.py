@@ -11,16 +11,21 @@ import numpy as np
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from paper_figure_style import apply_paper_typography, bold_figure_text
+
 OUT: Final = Path(__file__).resolve().parent / "results"
 
 
 def plot_results(summaries: list[dict[str, str | float]]) -> None:
     """Save energy-balance and operating-value comparisons at both capacity bases."""
-    plt.rcParams.update({"font.family": "Times New Roman", "font.size": 13})
-    names = [str(row["configuration"]) for row in summaries[:3]]
+    apply_paper_typography(text_scale=1.2, legend_scale=1.5, y_tick_scale=1.0)
+    names = [
+        str(row["configuration"]).replace("Hybrid ESS–HFC", "Hybrid\nESS–HFC")
+        for row in summaries[:3]
+    ]
     x = np.arange(3)
     colors = ("#3E7CB1", "#DE8F43", "#8F9BA8")
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5), dpi=200, sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(22, 9), dpi=200, sharey=True)
     for ax, group in zip(axes, (summaries[:3], summaries[3:]), strict=True):
         bottom = np.zeros(3)
         for field, label, color in zip(
@@ -44,14 +49,14 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         loc="lower center",
         bbox_to_anchor=(0.5, -0.04),
     )
-    fig.suptitle("Single-truck asset ablation: supplied and unserved energy")
     fig.subplots_adjust(bottom=0.23, wspace=0.15)
     fig.tight_layout()
+    bold_figure_text(fig)
     fig.savefig(OUT / "figure_10_asset_ablation_energy.png", bbox_inches="tight")
     fig.savefig(OUT / "figure_10_asset_ablation_energy.pdf", bbox_inches="tight")
     plt.close(fig)
 
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5), dpi=200, sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(22, 9), dpi=200, sharey=True)
     for ax, group in zip(axes, (summaries[:3], summaries[3:]), strict=True):
         for offset, field, label, color in zip(
             (-0.25, 0.0, 0.25),
@@ -79,9 +84,9 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         loc="lower center",
         bbox_to_anchor=(0.5, -0.04),
     )
-    fig.suptitle("Operating plus avoided-outage value (excluding capex)")
     fig.subplots_adjust(bottom=0.23, wspace=0.15)
     fig.tight_layout()
+    bold_figure_text(fig)
     fig.savefig(OUT / "figure_11_asset_ablation_value.png", bbox_inches="tight")
     fig.savefig(OUT / "figure_11_asset_ablation_value.pdf", bbox_inches="tight")
     plt.close(fig)

@@ -17,6 +17,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.transforms import Bbox
 
+from paper_figure_style import apply_paper_typography, bold_figure_text
+
 from emergency_dispatch import run_scenario
 from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
@@ -137,8 +139,8 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
                     )
                 )
 
-    plt.rcParams.update({"font.family": "Times New Roman", "font.size": 12})
-    fig, axes = plt.subplots(3, 1, figsize=(13, 10), dpi=220, sharex=True)
+    apply_paper_typography()
+    fig, axes = plt.subplots(3, 1, figsize=(15, 12), dpi=220, sharex=True)
     voltage_limits = (min(base.min(), hb.min()), max(base.max(), hb.max()))
     panels = (
         (base, "Baseline bus voltages", "viridis", voltage_limits),
@@ -177,11 +179,12 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
             pad=0.012,
         )
     axes[-1].set_xticks(
-        np.arange(0, 169, 24),
-        ("Aug 1", "Aug 2", "Aug 3", "Aug 4", "Aug 5", "Aug 6", "Aug 7", "Aug 8"),
+        np.arange(0, 168, 24),
+        ("Aug 1", "Aug 2", "Aug 3", "Aug 4", "Aug 5", "Aug 6", "Aug 7"),
     )
     axes[-1].set_xlabel("Date (2025)")
     fig.tight_layout()
+    bold_figure_text(fig)
     fig.canvas.draw()
     # The changing colorbar tick widths alter bbox_inches="tight" by a few
     # pixels. Keep the archived Figure 13 canvas without moving any subplot.

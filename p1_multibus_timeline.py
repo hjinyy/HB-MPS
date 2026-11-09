@@ -13,6 +13,7 @@ from matplotlib.patches import Patch
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from paper_figure_style import apply_paper_typography, bold_figure_text
 from p1_multibus_dispatch import InjectionHour, TruckHour
 
 
@@ -37,20 +38,8 @@ def save_fleet_timeline(
             active_t.append(row.t)
             active_truck.append(row.truck)
 
-    plt.rcParams.update(
-        {
-            "font.family": "Times New Roman",
-            "font.weight": "bold",
-            "axes.titlesize": 18,
-            "axes.titleweight": "bold",
-            "axes.labelsize": 18,
-            "axes.labelweight": "bold",
-            "xtick.labelsize": 16,
-            "ytick.labelsize": 16,
-            "legend.fontsize": 12,
-        }
-    )
-    fig, axis = plt.subplots(figsize=(15, 5), dpi=220)
+    apply_paper_typography()
+    fig, axis = plt.subplots(figsize=(18, 8), dpi=220)
     axis.imshow(
         locations,
         aspect="auto",
@@ -89,6 +78,7 @@ def save_fleet_timeline(
         frameon=False,
     )
     fig.tight_layout()
+    bold_figure_text(fig)
     output_dir.mkdir(exist_ok=True)
     for extension in ("png", "pdf"):
         fig.savefig(

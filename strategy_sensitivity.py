@@ -16,6 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from asset_ablation import CONFIGURATIONS, INPUT, Policy, load_hours, run_configuration
+from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, bold_figure_text
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 SOC_THRESHOLDS: Final = (0.2, 0.3, 0.5)
@@ -58,8 +59,8 @@ def main() -> None:
     operating = np.array([row["operating_net_million_krw"] for row in records]).reshape(
         3, 3
     )
-    plt.rcParams.update({"font.family": "Times New Roman", "font.size": 13})
-    fig, axes = plt.subplots(1, 2, figsize=(11, 5.5), dpi=220)
+    apply_paper_typography()
+    fig, axes = plt.subplots(1, 2, figsize=(18, 9), dpi=220)
     for ax, values, title, units, cmap in zip(
         axes,
         (unserved, operating),
@@ -76,7 +77,10 @@ def main() -> None:
                 if 0.299 * red + 0.587 * green + 0.114 * blue < 0.45
                 else "black"
             )
-            ax.text(x, y, f"{values[y, x]:.2f}", ha="center", va="center", color=ink)
+            ax.text(
+                x, y, f"{values[y, x]:.2f}", ha="center", va="center",
+                color=ink, fontsize=ANNOTATION_SIZE,
+            )
         ax.set_xticks(range(3), ("0.4", "0.6", "0.8"))
         ax.set_yticks(range(3), ("0.2", "0.3", "0.5"))
         ax.set_xlabel("Phase 1 LCOE quantile")
@@ -85,6 +89,7 @@ def main() -> None:
         fig.colorbar(image, ax=ax, label=units, shrink=0.75)
     fig.suptitle("Dual-mode policy sensitivity (α=1.3, 1.5 + 1.5 MWh)")
     fig.tight_layout()
+    bold_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(
             OUT / f"figure_12_dual_mode_policy_sensitivity.{suffix}",
