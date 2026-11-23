@@ -19,7 +19,12 @@ from emergency_dispatch import H2_KWH_PER_KG, VOLL_KRW_PER_KWH, run_scenario
 from emergency_dispatch_model import Run, Scenario, Strategy
 from emergency_validation import validate_run
 from hb_inputs import INPUT, load_hours
-from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, normalize_figure_text
+from paper_figure_style import (
+    ANNOTATION_SIZE,
+    apply_paper_typography,
+    normalize_figure_text,
+    scale_figure_text,
+)
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 MULTIPLIERS: Final = (0.0, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 1.5, 2.0)
@@ -155,6 +160,7 @@ def main() -> None:
         ncol=3,
         frameon=False,
     )
+    scale_figure_text(fig, 1.2)
     save(fig, "fig12_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)

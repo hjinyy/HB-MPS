@@ -40,3 +40,9 @@ def normalize_figure_text(fig: plt.Figure) -> None:
     for item in fig.findobj(match=Text):
         item.set_fontfamily("Times New Roman")
         item.set_fontweight("normal")
+
+
+def scale_figure_text(fig: plt.Figure, factor: float) -> None:
+    """Scale every visible text item in one figure, including legends and colorbars."""
+    for item in fig.findobj(match=Text):
+        item.set_fontsize(item.get_fontsize() * factor)

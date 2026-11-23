@@ -8,6 +8,7 @@ matplotlib.use("Agg")  # 팝업 창 없이 저장만 수행
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter, MaxNLocator
+from paper_figure_style import scale_figure_text
 
 plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "normal"})
 plt.rcParams["axes.labelweight"] = "normal"
@@ -717,6 +718,7 @@ def create_grid_resilience_figure(scenario_results):
     handles, labels = legends[0]
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
                ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+    scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=3.0)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
@@ -739,6 +741,7 @@ def create_asset_status_figure(scenario_results):
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
                ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+    scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=2.8)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
@@ -760,6 +763,7 @@ def create_financial_flow_figure(scenario_results):
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
                ncol=3, frameon=False, prop={"size": Config.FONT_LEGEND})
+    scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0.08, 1, 1], h_pad=2.8)
     save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
 
@@ -812,6 +816,7 @@ def create_mode_distribution_figure(scenario_results):
         frameon=False
     )
 
+    scale_figure_text(fig, 1.2)
     fig.subplots_adjust(
         left=0.03, right=0.97,
         top=0.96, bottom=0.27,

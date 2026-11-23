@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
+from paper_figure_style import scale_figure_text
 
 
 # ---------------------------------------------------------
@@ -163,6 +164,7 @@ def plot_supply_demand_mismatch(df):
         frameon=False,
         prop={"weight": "normal", "size": FONT_LEGEND},
     )
+    scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0.15, 1, 1], pad=2.0, h_pad=2.0)
 
     # Save figures

@@ -4,6 +4,7 @@ from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+from paper_figure_style import scale_figure_text
 
 
 # ---------------------------------------------------------
@@ -135,6 +136,7 @@ def plot_load_profiles(df):
         ax.tick_params(axis="both", labelsize=FONT_TICK)
         ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
 
+    scale_figure_text(fig, 0.8)
     fig.tight_layout(pad=2.0, h_pad=3.0)
 
     # -----------------------------------------------------

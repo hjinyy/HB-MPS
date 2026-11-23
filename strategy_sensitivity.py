@@ -16,7 +16,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from asset_ablation import CONFIGURATIONS, INPUT, Policy, load_hours, run_configuration
-from paper_figure_style import TICK_SIZE, apply_paper_typography, normalize_figure_text
+from paper_figure_style import (
+    TICK_SIZE,
+    apply_paper_typography,
+    normalize_figure_text,
+    scale_figure_text,
+)
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 SOC_THRESHOLDS: Final = (0.2, 0.3, 0.5)
@@ -88,6 +93,7 @@ def main() -> None:
         )
         ax.set_ylabel("Mode 1 ESS SOC threshold")
         fig.colorbar(image, ax=ax, label=colorbar_label, shrink=0.75)
+    scale_figure_text(fig, 1.2)
     fig.tight_layout()
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
