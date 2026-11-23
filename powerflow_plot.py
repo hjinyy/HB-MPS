@@ -34,7 +34,7 @@ def save_figure(
     hb_bus_number: int,
 ) -> None:
     """Save time-series and nodal-voltage comparisons for all scenarios."""
-    fig, axes = plt.subplots(3, 2, figsize=(16, 13), dpi=220)
+    fig, axes = plt.subplots(3, 2, figsize=(16, 10), dpi=220)
     bus_numbers = np.arange(1, 34)
     for row, result in enumerate(results):
         records = result.records
