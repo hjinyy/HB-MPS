@@ -45,15 +45,16 @@ def save_fleet_timeline(
         aspect="auto",
         interpolation="nearest",
         origin="upper",
-        extent=(-0.5, 167.5, 4.5, -0.5),
+        extent=(0, 168, 4.5, -0.5),
         cmap=ListedColormap(("#2574ac", "#32b16d")),
         vmin=-0.5,
         vmax=1.5,
     )
-    axis.scatter(active_t, active_truck, color="black", marker="o", s=18, zorder=3)
-    axis.set_yticks(range(5), ["Main truck", "Aux 1", "Aux 2", "Aux 3", "Aux 4"])
+    axis.scatter(np.array(active_t) + 0.5, active_truck, color="black", marker="o", s=18, zorder=3)
+    axis.set_yticks(range(5), ["Main\ntruck", "Aux 1", "Aux 2", "Aux 3", "Aux 4"])
     axis.set_xticks(np.arange(0, 169, 24))
-    axis.set_xlabel(f"Hour (α={alpha:.1f})")
+    axis.set_xlim(0, 168)
+    axis.set_xlabel("Time[h]")
     axis.set_ylabel("Vehicle")
     axis.grid(axis="x", color="white", alpha=0.45)
     axis.legend(

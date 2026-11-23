@@ -4,9 +4,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import matplotlib
-import matplotlib.dates as mdates
 import numpy as np
-import pandas as pd
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -36,17 +34,17 @@ def save_figure(
     hb_bus_number: int,
 ) -> None:
     """Save time-series and nodal-voltage comparisons for all scenarios."""
-    fig, axes = plt.subplots(3, 2, figsize=(15, 9), dpi=220)
+    fig, axes = plt.subplots(3, 2, figsize=(16, 13), dpi=220)
     bus_numbers = np.arange(1, 34)
     for row, result in enumerate(results):
         records = result.records
-        time_axis = pd.to_datetime(records["timestamp"])
+        time_axis = np.arange(1, len(records) + 1)
         left, right = axes[row]
         left.plot(time_axis, records["vmin_base"], color="#c6382b", label="Baseline")
         left.plot(time_axis, records["vmin_hbmps"], color="#2574ac", label="HB-MPS")
         active = records["mode2"].eq(1)
         left.scatter(
-            time_axis[active],
+            time_axis[active.to_numpy()],
             records.loc[active, "vmin_base"],
             color="#e68127",
             s=18,
@@ -59,8 +57,9 @@ def save_figure(
             (0.93, 0.94, 0.95, 0.96),
             labels=("0.93", "0.94", "0.95", "0.96"),
         )
-        left.xaxis.set_major_locator(mdates.DayLocator())
-        left.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
+        left.set_xlim(0, 168)
+        left.set_xticks(range(0, 169, 24))
+        left.set_xlabel(f"Time[h]\n({'abcdef'[2 * row]})")
         left.grid(alpha=0.3)
         left.legend(loc="best")
 
@@ -77,9 +76,8 @@ def save_figure(
         )
         right.grid(alpha=0.3)
         right.legend(loc="best")
+        right.set_xlabel(f"IEEE bus number\n({'abcdef'[2 * row + 1]})")
 
-    axes[-1, 0].set_xlabel("Time")
-    axes[-1, 1].set_xlabel("IEEE bus number")
-    fig.tight_layout()
+    fig.tight_layout(h_pad=2.5, w_pad=2.0)
     fig.savefig(output_path, bbox_inches="tight")
     plt.close(fig)

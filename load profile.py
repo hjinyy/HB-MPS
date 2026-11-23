@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
 
 
@@ -93,7 +92,7 @@ def plot_load_profiles(df):
 
     # (a) Residential Load
     axes[0].plot(
-        df["timestamp_dt"],
+        range(1, len(df) + 1),
         df["load_A"],
         color="royalblue",
         linewidth=LINE_WIDTH,
@@ -105,7 +104,7 @@ def plot_load_profiles(df):
 
     # (b) Industrial Load
     axes[1].plot(
-        df["timestamp_dt"],
+        range(1, len(df) + 1),
         df["load_B"],
         color="darkorange",
         linewidth=LINE_WIDTH,
@@ -116,26 +115,23 @@ def plot_load_profiles(df):
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
     axes[2].plot(
-        df["timestamp_dt"],
+        range(1, len(df) + 1),
         df["solar"],
         color="seagreen",
         linewidth=LINE_WIDTH,
         label="PV generation",
     )
     axes[2].set_ylabel("PV generation (kWh)")
-    axes[2].set_xlabel("Date")
+    axes[2].set_xlabel("Time[h]\n(c)")
     axes[2].grid(True, linestyle="--", alpha=0.4)
 
-    # Date axis formatting
-    axes[2].xaxis.set_major_formatter(
-        mdates.DateFormatter("%m-%d")
-    )
-    axes[2].xaxis.set_major_locator(
-        mdates.DayLocator(interval=1)
-    )
+    axes[0].set_xlabel("(a)")
+    axes[1].set_xlabel("(b)")
 
     # Font and tick formatting
     for ax in axes:
+        ax.set_xlim(0, 168)
+        ax.set_xticks(range(0, 169, 24))
         ax.tick_params(axis="both", labelsize=FONT_TICK)
         ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
 

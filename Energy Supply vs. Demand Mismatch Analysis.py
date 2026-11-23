@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 
 
 # ---------------------------------------------------------
@@ -84,7 +83,7 @@ def load_data(file_path):
 def plot_supply_demand_mismatch(df):
     fig, axes = plt.subplots(
         2, 1,
-        figsize=(13, 8.8),
+        figsize=(13, 11),
         dpi=PAPER_DPI,
         sharex=True,
         gridspec_kw={"height_ratios": [1, 1]},
@@ -95,14 +94,14 @@ def plot_supply_demand_mismatch(df):
 
     # (a) Supply and demand profiles
     axes[0].plot(
-        df["timestamp_dt"],
+        range(1, len(df) + 1),
         df["solar"],
         linewidth=LINE_WIDTH,
         label="PV Generation",
     )
 
     axes[0].plot(
-        df["timestamp_dt"],
+        range(1, len(df) + 1),
         df["total_load"],
         linewidth=LINE_WIDTH,
         linestyle="--",
@@ -113,7 +112,7 @@ def plot_supply_demand_mismatch(df):
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Mismatch analysis
-    x = df["timestamp_dt"]
+    x = range(1, len(df) + 1)
     mismatch = df["mismatch"].to_numpy()
 
     axes[1].axhline(
@@ -143,19 +142,14 @@ def plot_supply_demand_mismatch(df):
     )
 
     axes[1].set_ylabel("Mismatch (kWh)")
-    axes[1].set_xlabel("Date")
+    axes[0].set_xlabel("(a)")
+    axes[1].set_xlabel("Time[h]\n(b)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
-
-    # Date axis
-    axes[1].xaxis.set_major_formatter(
-        mdates.DateFormatter("%m-%d")
-    )
-    axes[1].xaxis.set_major_locator(
-        mdates.DayLocator(interval=1)
-    )
 
     # Font and legend formatting
     for ax in axes:
+        ax.set_xlim(0, 168)
+        ax.set_xticks(range(0, 169, 24))
         ax.tick_params(axis="both", labelsize=FONT_TICK)
 
         ax.legend(

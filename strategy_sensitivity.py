@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from asset_ablation import CONFIGURATIONS, INPUT, Policy, load_hours, run_configuration
-from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, normalize_figure_text
+from paper_figure_style import TICK_SIZE, apply_paper_typography, normalize_figure_text
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 SOC_THRESHOLDS: Final = (0.2, 0.3, 0.5)
@@ -64,7 +64,7 @@ def main() -> None:
     for ax, values, colorbar_label, cmap in zip(
         axes,
         (unserved, operating),
-        ("Residual unserved energy (MWh)", "Operating net benefit (million KRW)"),
+        ("Residual unserved energy (MWh)", "Operating net benefit (M KRW)"),
         ("YlOrRd", "BrBG"),
         strict=True,
     ):
@@ -78,11 +78,14 @@ def main() -> None:
             )
             ax.text(
                 x, y, f"{values[y, x]:.2f}", ha="center", va="center",
-                color=ink, fontsize=ANNOTATION_SIZE,
+                color=ink, fontsize=TICK_SIZE,
             )
         ax.set_xticks(range(3), ("0.4", "0.6", "0.8"))
         ax.set_yticks(range(3), ("0.2", "0.3", "0.5"))
-        ax.set_xlabel(r"Electricity value quantile ($q_{\mathrm{dis}}$)")
+        ax.set_xlabel(
+            r"Electricity value quantile ($q_{\mathrm{dis}}$)"
+            + f"\n({'a' if ax is axes[0] else 'b'})"
+        )
         ax.set_ylabel("Mode 1 ESS SOC threshold")
         fig.colorbar(image, ax=ax, label=colorbar_label, shrink=0.75)
     fig.tight_layout()
@@ -95,7 +98,7 @@ def main() -> None:
     plt.close(fig)
     print(f"Unserved range: {unserved.min():.3f}–{unserved.max():.3f} MWh")
     print(
-        f"Operating net range: {operating.min():.3f}–{operating.max():.3f} million KRW"
+        f"Operating net range: {operating.min():.3f}–{operating.max():.3f} M KRW"
     )
 
 

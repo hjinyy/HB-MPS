@@ -139,7 +139,7 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
                 )
 
     apply_paper_typography()
-    fig, axes = plt.subplots(3, 1, figsize=(15, 12), dpi=220, sharex=True)
+    fig, axes = plt.subplots(3, 1, figsize=(15, 14), dpi=220, sharex=True)
     voltage_limits = (min(base.min(), hb.min()), max(base.max(), hb.max()))
     panels = (
         (base, "Baseline (p.u.)", "viridis", voltage_limits),
@@ -151,13 +151,13 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
             (0.0, max((hb - base).max(), 1e-6)),
         ),
     )
-    for axis, (values, title, palette, limits) in zip(axes, panels, strict=True):
+    for axis, (values, title, palette, limits), letter in zip(axes, panels, "abc", strict=True):
         artist = axis.imshow(
             values,
             aspect="auto",
             origin="lower",
             cmap=palette,
-            extent=(-0.5, len(timestamps) - 0.5, 0.5, 33.5),
+            extent=(0, len(timestamps), 0.5, 33.5),
             vmin=limits[0],
             vmax=limits[1],
             interpolation="nearest",
@@ -169,6 +169,7 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
             linewidth=1.2,
         )
         axis.set_ylabel("Bus number")
+        axis.set_xlabel(f"({letter})")
         axis.set_yticks((1, 9, 18, 25, 33))
         colorbar = fig.colorbar(
             artist,
@@ -177,12 +178,10 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
         )
         colorbar.set_label(title, fontsize=21)
         colorbar.ax.tick_params(labelsize=24)
-    axes[-1].set_xticks(
-        np.arange(0, 168, 24),
-        ("Aug 1", "Aug 2", "Aug 3", "Aug 4", "Aug 5", "Aug 6", "Aug 7"),
-    )
-    axes[-1].set_xlabel("Date (2025)")
-    fig.tight_layout()
+    axes[-1].set_xlim(0, 168)
+    axes[-1].set_xticks(np.arange(0, 169, 24))
+    axes[-1].set_xlabel("Time[h]\n(c)")
+    fig.tight_layout(h_pad=1.0)
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(

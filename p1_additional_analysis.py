@@ -106,7 +106,7 @@ def main() -> None:
         1, 3, figsize=(22, 9.5), sharey=True, constrained_layout=True
     )
     fig.set_constrained_layout_pads(wspace=0.08)
-    for axis, trucks in zip(axes, (1, 2, 5), strict=True):
+    for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
         p0 = runs[1.3, trucks, Strategy.P0]
         p1 = runs[1.3, trucks, Strategy.P1]
         op0 = sum(step.operating_net_krw for step in p0.steps)
@@ -144,11 +144,11 @@ def main() -> None:
                 )
         axis.axvline(break_even, color="black", linestyle=":", linewidth=1.3)
         axis.axvline(VOLL_KRW_PER_KWH, color="firebrick", linestyle="--", linewidth=1.3)
-        axis.set_xlabel(f"VOLL (KRW/kWh)\n{trucks} truck{'s' if trucks > 1 else ''}")
+        axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
         axis.set_box_aspect(1)
         axis.set_xticks((0, 5000, 10000))
         axis.grid(alpha=0.2)
-    axes[0].set_ylabel("Net societal benefit (million KRW)")
+    axes[0].set_ylabel("Net societal benefit (M KRW)")
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         loc="outside lower center",
@@ -183,8 +183,16 @@ def main() -> None:
     values = [value / 1e6 for _, value in components] + [net_change / 1e6]
     colors = ["#B85C5C" if value < 0 else "#4F9272" for value in values]
     apply_paper_typography()
-    fig, axis = plt.subplots(figsize=(17, 9), constrained_layout=True)
-    axis.barh(labels[::-1], values[::-1], color=colors[::-1])
+    plot_labels = {
+        "Internal valuation benefit": "Internal valuation\nbenefit",
+        "Grid electricity purchase cost": "Grid electricity\npurchase cost",
+        "Battery degradation cost": "Battery\ndegradation cost",
+        "Hydrogen purchase cost": "Hydrogen\npurchase cost",
+        "Avoided interruption benefit": "Avoided\ninterruption benefit",
+    }
+    fig, axis = plt.subplots(figsize=(17, 10.5), constrained_layout=True)
+    axis.barh([plot_labels.get(label, label) for label in labels[::-1]], values[::-1],
+              color=colors[::-1])
     axis.set_xlim(min(values) - 1.5, max(values) + 3.5)
     for position, value in enumerate(values[::-1]):
         display_value = 0.0 if abs(value) < 0.0005 else value

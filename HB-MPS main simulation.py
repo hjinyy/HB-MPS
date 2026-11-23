@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use("Agg")  # 팝업 창 없이 저장만 수행
 
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
 
 plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "normal"})
@@ -402,20 +401,21 @@ def scenario_title(alpha):
     return f"α = {alpha}"
 
 
-def format_date_axis(ax):
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%m-%d"))
-    ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+def format_time_axis(ax):
+    ax.set_xlim(0, 168)
+    ax.set_xticks(range(0, 169, 24))
     ax.tick_params(axis="x", labelsize=Config.FONT_TICK)
     ax.tick_params(axis="y", labelsize=Config.FONT_TICK)
     ax.yaxis.get_offset_text().set_fontsize(Config.FONT_TICK)
 
 
 def draw_grid_resilience(ax, res, alpha):
+    hours = np.arange(1, len(res) + 1)
     max_trucks = res["Active_Trucks"].max()
     threshold = res["Threshold"].iloc[0]
 
     ax.plot(
-        res["timestamp"],
+        hours,
         res["Load_B"],
         color="gray",
         alpha=0.55,
@@ -434,7 +434,7 @@ def draw_grid_resilience(ax, res, alpha):
     p2_mask = res["Mode"] == "PHASE 2"
     if p2_mask.any():
         ax.scatter(
-            res[p2_mask]["timestamp"],
+            hours[p2_mask.to_numpy()],
             res[p2_mask]["Load_B"],
             color="red",
             s=60,
@@ -448,13 +448,13 @@ def draw_grid_resilience(ax, res, alpha):
     additional_indices = res[additional_mask].index
 
     if not additional_indices.empty:
-        x_vals = res.loc[additional_indices, "timestamp"]
+        x_vals = additional_indices.to_numpy() + 1
         y_vals = res.loc[additional_indices, "Active_Trucks"] - 1
 
         ax_right.bar(
             x_vals,
             y_vals,
-            width=0.04,
+            width=0.8,
             color="royalblue",
             alpha=0.6,
             label="Additional Trucks"
@@ -467,6 +467,7 @@ def draw_grid_resilience(ax, res, alpha):
     ax.grid(True, linestyle="--", alpha=0.35)
 
     ax_right.set_ylabel("Additional Trucks", color="royalblue", fontsize=Config.FONT_LABEL)
+    ax_right.spines["right"].set_position(("outward", 12))
     ax_right.tick_params(axis="y", labelcolor="royalblue", labelsize=Config.FONT_TICK)
 
     max_additional = max(0, int(max_trucks) - 1)
@@ -482,12 +483,13 @@ def draw_grid_resilience(ax, res, alpha):
         prop={"weight": "normal", "size": Config.FONT_LEGEND}
     )
 
-    format_date_axis(ax)
+    format_time_axis(ax)
 
 
 def draw_asset_status(ax, res, alpha):
+    hours = np.arange(1, len(res) + 1)
     ax.plot(
-        res["timestamp"],
+        hours,
         res["ESS_SOC"],
         label="Battery SOC (%)",
         color="green",
@@ -495,7 +497,7 @@ def draw_asset_status(ax, res, alpha):
     )
 
     ax.plot(
-        res["timestamp"],
+        hours,
         res["H2_LOH"],
         label="Hydrogen LOH (%)",
         color="orange",
@@ -505,7 +507,7 @@ def draw_asset_status(ax, res, alpha):
     buy_mask = res["Action"] == "BUY_EXTERNAL_H2"
     if buy_mask.any():
         ax.scatter(
-            res[buy_mask]["timestamp"],
+            hours[buy_mask.to_numpy()],
             res[buy_mask]["H2_LOH"],
             color="blue",
             marker="^",
@@ -518,7 +520,7 @@ def draw_asset_status(ax, res, alpha):
     grid_mask = res["Mode"] == "GRID_CHARGE"
     if grid_mask.any():
         ax.scatter(
-            res[grid_mask]["timestamp"],
+            hours[grid_mask.to_numpy()],
             res[grid_mask]["ESS_SOC"],
             color="mediumseagreen",
             marker="s",
@@ -528,23 +530,21 @@ def draw_asset_status(ax, res, alpha):
             label="Grid charging"
         )
 
-    ax.set_ylabel("SOC and LOH (%)", fontsize=Config.FONT_LABEL)
-    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
-            ha="right", va="top", fontsize=Config.FONT_TEXT,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
-    ax.set_ylim(0, 100)
+    ax.set_ylabel("SOC(%)", fontsize=Config.FONT_LABEL)
+    ax.set_ylim(0, 110)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.grid(True, linestyle="--", alpha=0.35)
-    format_date_axis(ax)
+    format_time_axis(ax)
 
 
 def draw_financial_flow(ax, res, alpha):
-    revenue_cum = res["Revenue"].cumsum()
-    cost_cum = -res["Op_Cost"].cumsum()
-    profit_cum = res["Net_Step_Profit"].cumsum()
+    hours = np.arange(1, len(res) + 1)
+    revenue_cum = res["Revenue"].cumsum() / 1e6
+    cost_cum = -res["Op_Cost"].cumsum() / 1e6
+    profit_cum = res["Net_Step_Profit"].cumsum() / 1e6
 
     ax.plot(
-        res["timestamp"],
+        hours,
         revenue_cum,
         label="Internal valuation benefit",
         color="gold",
@@ -552,7 +552,7 @@ def draw_financial_flow(ax, res, alpha):
     )
 
     ax.plot(
-        res["timestamp"],
+        hours,
         cost_cum,
         label="Operating cost",
         color="red",
@@ -561,7 +561,7 @@ def draw_financial_flow(ax, res, alpha):
     )
 
     ax.plot(
-        res["timestamp"],
+        hours,
         profit_cum,
         label="Operating net benefit",
         color="blue",
@@ -570,17 +570,12 @@ def draw_financial_flow(ax, res, alpha):
 
     ax.axhline(0, color="black", linewidth=1.2)
 
-    ax.set_ylabel("KRW", fontsize=Config.FONT_LABEL)
+    ax.set_ylabel("M KRW", fontsize=Config.FONT_LABEL)
     ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
             ha="right", va="top", fontsize=Config.FONT_TEXT,
             bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.grid(True, linestyle="--", alpha=0.35)
-    ax.legend(
-        loc="best",
-        prop={"weight": "normal", "size": Config.FONT_LEGEND}
-    )
-
-    format_date_axis(ax)
+    format_time_axis(ax)
 
 
 def draw_economic_value(ax, res, alpha):
@@ -699,8 +694,6 @@ def draw_mode_distribution(ax, res, alpha):
                 )
             )
 
-    ax.set_xlabel(f"α = {alpha}", fontsize=Config.FONT_LABEL)
-
     ax.set_aspect("equal")
 
     # 작은 숫자가 잘리지 않도록 좌우 공간 확보
@@ -726,9 +719,10 @@ def create_grid_resilience_figure(scenario_results):
         ax.set_ylim(7000, 19000)
         ax.set_yticks([7500, 10000, 12500, 15000, 17500])
 
-    axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-    fig.tight_layout()
-    fig.subplots_adjust(hspace=0.25)
+    for ax, letter in zip(axes, "abc"):
+        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
+    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
+    fig.tight_layout(h_pad=3.0)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
 
@@ -744,12 +738,13 @@ def create_asset_status_figure(scenario_results):
         draw_asset_status(ax, scenario_results[alpha], alpha)
 
 
-    axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
+    for ax, letter in zip(axes, "abc"):
+        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
+    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
                ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
-    fig.tight_layout(rect=[0, 0.09, 1, 1])
-    fig.subplots_adjust(hspace=0.25)
+    fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=2.8)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
 
@@ -764,9 +759,13 @@ def create_financial_flow_figure(scenario_results):
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_financial_flow(ax, scenario_results[alpha], alpha)
 
-    axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-    fig.tight_layout()
-    fig.subplots_adjust(hspace=0.25)
+    for ax, letter in zip(axes, "abc"):
+        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
+    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+               ncol=3, frameon=False, prop={"size": Config.FONT_LEGEND})
+    fig.tight_layout(rect=[0, 0.08, 1, 1], h_pad=2.8)
     save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
 
 
@@ -803,9 +802,10 @@ def create_mode_distribution_figure(scenario_results):
     )
     fig, axes = plt.subplots(1, 3, figsize=(22, 8), dpi=300)
 
-    for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
+    for ax, alpha, letter in zip(axes, Config.SCENARIO_MULTIPLIERS, "abc"):
         draw_mode_distribution(ax, scenario_results[alpha], alpha)
         ax.set_xlim(-1.4, 1.6)
+        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
 
     fig.legend(
         [Patch(facecolor=c) for c in colors.values()],
