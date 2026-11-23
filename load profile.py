@@ -85,7 +85,7 @@ def plot_load_profiles(df):
 
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 16),
+        figsize=(13, 13.8),
         dpi=PAPER_DPI,
         sharex=True
     )

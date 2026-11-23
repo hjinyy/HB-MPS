@@ -461,9 +461,6 @@ def draw_grid_resilience(ax, res, alpha):
         )
 
     ax.set_ylabel("Load (MWh)", fontsize=Config.FONT_LABEL)
-    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
-            ha="right", va="top", fontsize=Config.FONT_TEXT,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.grid(True, linestyle="--", alpha=0.35)
 
     ax_right.set_ylabel("Additional Trucks", color="royalblue", fontsize=Config.FONT_LABEL)
