@@ -524,7 +524,7 @@ def draw_asset_status(ax, res, alpha):
 
     ax.set_ylabel("SOC(%)", fontsize=Config.FONT_LABEL)
     ax.set_ylim(-10, 110)
-    ax.set_yticks([-10, 0, 25, 50, 75, 100])
+    ax.set_yticks([0, 25, 50, 75, 100])
     ax.grid(True, linestyle="--", alpha=0.35)
     format_time_axis(ax)
 
