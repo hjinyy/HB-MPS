@@ -847,7 +847,6 @@ def main():
     create_grid_resilience_figure(scenario_results)
     create_asset_status_figure(scenario_results)
     create_financial_flow_figure(scenario_results)
-    create_economic_value_figure(scenario_results)
     create_mode_distribution_figure(scenario_results)
 
     print("\nAll multi-scenario figures have been saved successfully.")

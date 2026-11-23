@@ -1,7 +1,7 @@
 """Reproduce finite-truck P0/P1/P2 experiments from the repository's CSV.
 
 Run: ``uv run --with numpy --with matplotlib emergency_dispatch_experiment.py``.
-Outputs are prefixed ``emergency_`` so Figures 5–13 are untouched.
+Writes the validated hourly and summary CSV files in ``results``.
 """
 
 from __future__ import annotations
@@ -15,7 +15,6 @@ from emergency_dispatch import (
     run_scenario,
 )
 from emergency_dispatch_model import Run, Scenario, Strategy
-from emergency_dispatch_plot import make_figures
 from emergency_validation import validate_run
 from hb_inputs import INPUT, load_hours
 
@@ -109,7 +108,7 @@ def write_csv(
 
 
 def main() -> None:
-    """Execute and validate all 36 paths, then create tables and figures."""
+    """Execute and validate all 36 paths, then write result tables."""
     hours = load_hours(INPUT)
     runs = [run_scenario(hours, scenario) for scenario in scenarios()]
     for run in runs:
@@ -133,7 +132,6 @@ def main() -> None:
         for index, step in enumerate(run.steps)
     ]
     write_csv(OUT / "emergency_dispatch_hourly.csv", hourly)
-    make_figures(summaries, OUT)
     print(f"Validated {len(runs)} scenarios × {len(hours)} hours; output: {OUT}")
 
 

@@ -92,13 +92,14 @@ def test_preexisting_png_dimensions_match_archived_design() -> None:
         "figure_9_operational_mode_distribution_all_cases": "fig7_distribution_of_hb_mps_operating_modes",
     }
     with tarfile.open(RESULTS / "legacy_pre_p1.tar.gz") as archive:
-        names = [member.name for member in archive.getmembers() if member.name.startswith("figure_") and member.name.endswith(".png")]
+        names = [
+            member.name
+            for member in archive.getmembers()
+            if Path(member.name).stem in current_names and member.name.endswith(".png")
+        ]
 
         # When regenerated files are compared to their originals.
         for name in names:
-            # Figures 10–13 use larger canvases to fit the paper typography.
-            if name.startswith(("figure_10_", "figure_11_", "figure_12_", "figure_13_")):
-                continue
             original = archive.extractfile(name).read()
             stem = Path(name).stem
             updated = (RESULTS / f"{current_names.get(stem, stem)}.png").read_bytes()

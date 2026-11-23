@@ -1,6 +1,6 @@
 """Paper-style figures for the finite-truck emergency dispatch experiment.
 
-Run: ``uv run --with numpy --with matplotlib emergency_dispatch_experiment.py``.
+Call ``make_figures`` explicitly to recreate the archived supplementary plots.
 """
 
 from __future__ import annotations

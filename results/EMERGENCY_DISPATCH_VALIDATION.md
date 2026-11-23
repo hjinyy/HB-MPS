@@ -1,5 +1,7 @@
 # HB-MPS emergency dispatch strategy validation
 
+Historical note: Figures A–C described below were removed from the current `results` directory because the supplied manuscript does not use them. The experiment now writes only its hourly and summary CSV files. The figures remain recoverable from Git history and the legacy archive.
+
 ## Scope and reproducibility
 
 This is an **operational 168-hour experiment**, separate from the IEEE 33-bus power-flow study. It uses only `Data file/data_file.csv` (1–7 August 2025, 168 valid hourly rows). The existing main simulation and Figures 5–13 were not edited. Run from the repository root:
@@ -9,7 +11,7 @@ uv run --with numpy --with matplotlib emergency_dispatch_experiment.py
 uv run --with numpy --with matplotlib --with pytest python -m pytest -q tests/test_emergency_dispatch.py
 ```
 
-The experiment writes `emergency_dispatch_hourly.csv` (36 × 168 = 6,048 rows), `emergency_dispatch_summary.csv` (36 rows), and Figures A–C as PNG and PDF. All new files use an `emergency_` prefix except this report. Figure A and B show a **prespecified P2 reserve of 0.3**; Figure C and the CSV include every reserve from 0.2 to 0.5. No result was used to choose the plotted reserve.
+The experiment writes `emergency_dispatch_hourly.csv` (36 × 168 = 6,048 rows) and `emergency_dispatch_summary.csv` (36 rows). The archived Figures A–C were previously exported as PNG and PDF. Figures A and B showed a **prespecified P2 reserve of 0.3**; Figure C and the CSV include every reserve from 0.2 to 0.5. No result was used to choose the plotted reserve.
 
 ## 1. Exact strategy difference
 
