@@ -43,7 +43,7 @@ from powerflow_validation import (
 )
 
 ALPHA: Final = 1.3
-OUTPUT_NAME: Final = "figure_13_powerflow_voltage_heatmap"
+OUTPUT_NAME: Final = "fig16_spatiotemporal_voltage_heatmaps_of_the_ieee_33_bus_system"
 CSV_PATH: Final = OUTPUT_DIR / "powerflow_voltage_by_bus_hour.csv"
 
 

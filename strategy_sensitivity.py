@@ -92,7 +92,7 @@ def main() -> None:
     bold_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(
-            OUT / f"figure_12_dual_mode_policy_sensitivity.{suffix}",
+            OUT / f"fig11_sensitivity_of_residual_unserved_energy_and_operating_net_benefit.{suffix}",
             bbox_inches="tight",
         )
     plt.close(fig)

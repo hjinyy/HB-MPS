@@ -739,7 +739,7 @@ def create_grid_resilience_figure(scenario_results):
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.subplots_adjust(hspace=0.25)
-    save_figure(fig, "figure_6_grid_resilience_fleet_deployment_all_cases")
+    save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
 
 def create_asset_status_figure(scenario_results):
@@ -757,7 +757,7 @@ def create_asset_status_figure(scenario_results):
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.subplots_adjust(hspace=0.25)
-    save_figure(fig, "figure_7_asset_status_main_truck_all_cases")
+    save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
 
 def create_financial_flow_figure(scenario_results):
@@ -774,7 +774,7 @@ def create_financial_flow_figure(scenario_results):
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
     fig.tight_layout(rect=[0, 0, 1, 0.95])
     fig.subplots_adjust(hspace=0.25)
-    save_figure(fig, "figure_8_financial_flow_all_cases")
+    save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
 
 
 def create_economic_value_figure(scenario_results):
@@ -827,7 +827,7 @@ def create_mode_distribution_figure(scenario_results):
         wspace=0.00
     )
 
-    save_figure(fig, "figure_9_operational_mode_distribution_all_cases")
+    save_figure(fig, "fig7_distribution_of_hb_mps_operating_modes")
 
 
 # ---------------------------------------------------------

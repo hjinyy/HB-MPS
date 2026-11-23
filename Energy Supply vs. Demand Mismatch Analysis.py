@@ -185,13 +185,13 @@ def plot_supply_demand_mismatch(df):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     fig.savefig(
-        OUTPUT_DIR / "figure_5_energy_supply_demand_mismatch.png",
+        OUTPUT_DIR / "fig4_energy_supply_vs_demand_mismatch_analysis.png",
         dpi=PAPER_DPI,
         bbox_inches="tight"
     )
 
     fig.savefig(
-        OUTPUT_DIR / "figure_5_energy_supply_demand_mismatch.pdf",
+        OUTPUT_DIR / "fig4_energy_supply_vs_demand_mismatch_analysis.pdf",
         bbox_inches="tight"
     )
 

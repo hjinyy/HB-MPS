@@ -157,13 +157,13 @@ def plot_load_profiles(df):
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     fig.savefig(
-        OUTPUT_DIR / "figure_load_profiles.png",
+        OUTPUT_DIR / "fig3_comparison_of_load_profiles.png",
         dpi=PAPER_DPI,
         bbox_inches="tight"
     )
 
     fig.savefig(
-        OUTPUT_DIR / "figure_load_profiles.pdf",
+        OUTPUT_DIR / "fig3_comparison_of_load_profiles.pdf",
         bbox_inches="tight"
     )
 
