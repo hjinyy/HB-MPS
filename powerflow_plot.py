@@ -14,11 +14,11 @@ import matplotlib.pyplot as plt
 plt.rcParams.update(
     {
         "font.family": "Times New Roman",
-        "font.weight": "bold",
+        "font.weight": "normal",
         "axes.titlesize": 18,
-        "axes.titleweight": "bold",
+        "axes.titleweight": "normal",
         "axes.labelsize": 18,
-        "axes.labelweight": "bold",
+        "axes.labelweight": "normal",
         "xtick.labelsize": 18,
         "ytick.labelsize": 18,
         "legend.fontsize": 12,
@@ -54,8 +54,7 @@ def save_figure(
             zorder=4,
         )
         left.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
-        left.set_title(f"Minimum bus voltage (α={result.alpha})", fontweight="bold")
-        left.set_ylabel("Voltage (pu)")
+        left.set_ylabel(f"Voltage (pu), α={result.alpha}")
         left.set_yticks(
             (0.93, 0.94, 0.95, 0.96),
             labels=("0.93", "0.94", "0.95", "0.96"),
@@ -71,11 +70,7 @@ def save_figure(
         )
         right.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
         right.axvline(hb_bus_number, color="#32b16d", linestyle=":", linewidth=1.4)
-        right.set_title(
-            f"Nodal profile at worst baseline hour t={result.worst_hour}",
-            fontweight="bold",
-        )
-        right.set_ylabel("Voltage (pu)")
+        right.set_ylabel(f"Voltage (pu), α={result.alpha}")
         right.set_yticks(
             (0.92, 0.94, 0.96, 0.98, 1.00),
             labels=("0.92", "0.94", "0.96", "0.98", "1.00"),

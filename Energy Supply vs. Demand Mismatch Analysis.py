@@ -22,9 +22,9 @@ LINE_WIDTH = 3.2
 
 plt.rcParams.update({
     "font.family": "Times New Roman",
-    "font.weight": "bold",
-    "axes.titleweight": "bold",
-    "axes.labelweight": "bold",
+    "font.weight": "normal",
+    "axes.titleweight": "normal",
+    "axes.labelweight": "normal",
     "axes.titlesize": FONT_TITLE,
     "axes.labelsize": FONT_LABEL,
     "xtick.labelsize": FONT_TICK,
@@ -109,10 +109,6 @@ def plot_supply_demand_mismatch(df):
         label="Total Load",
     )
 
-    axes[0].set_title(
-        "(a) Energy Supply and Demand Profiles",
-        pad=14
-    )
     axes[0].set_ylabel("Energy (kWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
@@ -146,10 +142,6 @@ def plot_supply_demand_mismatch(df):
         label="PV - Total Load",
     )
 
-    axes[1].set_title(
-        "(b) Supply-Demand Mismatch",
-        pad=14
-    )
     axes[1].set_ylabel("Mismatch (kWh)")
     axes[1].set_xlabel("Date")
     axes[1].grid(True, linestyle="--", alpha=0.4)
@@ -168,16 +160,8 @@ def plot_supply_demand_mismatch(df):
 
         ax.legend(
             loc="upper right",
-            prop={
-                "weight": "bold",
-                "size": FONT_LEGEND
-            }
+            prop={"weight": "normal", "size": FONT_LEGEND}
         )
-
-        for tick in ax.get_xticklabels() + ax.get_yticklabels():
-            tick.set_fontweight("bold")
-
-        ax.yaxis.get_offset_text().set_fontweight("bold")
 
     fig.tight_layout(pad=2.0, h_pad=2.0)
 

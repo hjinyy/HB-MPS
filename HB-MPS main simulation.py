@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.ticker import MaxNLocator
 
-plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "bold"})
-plt.rcParams["axes.labelweight"] = "bold"
-plt.rcParams["axes.titleweight"] = "bold"
+plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "normal"})
+plt.rcParams["axes.labelweight"] = "normal"
+plt.rcParams["axes.titleweight"] = "normal"
 
 # ---------------------------------------------------------
 # 1. Configuration & Constants
@@ -460,8 +460,10 @@ def draw_grid_resilience(ax, res, alpha):
             label="Additional Trucks"
         )
 
-    ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
     ax.set_ylabel("Load (kWh)", fontsize=Config.FONT_LABEL)
+    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
+            ha="right", va="top", fontsize=Config.FONT_TEXT,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.grid(True, linestyle="--", alpha=0.35)
 
     ax_right.set_ylabel("Additional Trucks", color="royalblue", fontsize=Config.FONT_LABEL)
@@ -477,7 +479,7 @@ def draw_grid_resilience(ax, res, alpha):
         lines_1 + lines_2,
         labels_1 + labels_2,
         loc="upper left",
-        prop={"weight": "bold", "size": Config.FONT_LEGEND}
+        prop={"weight": "normal", "size": Config.FONT_LEGEND}
     )
 
     format_date_axis(ax)
@@ -507,8 +509,10 @@ def draw_asset_status(ax, res, alpha):
             res[buy_mask]["H2_LOH"],
             color="blue",
             marker="^",
-            s=90,
-            label="External H2 Refueling"
+            s=170,
+            edgecolors="black",
+            linewidths=0.6,
+            label="External hydrogen refueling"
         )
 
     grid_mask = res["Mode"] == "GRID_CHARGE"
@@ -517,20 +521,20 @@ def draw_asset_status(ax, res, alpha):
             res[grid_mask]["timestamp"],
             res[grid_mask]["ESS_SOC"],
             color="mediumseagreen",
-            s=45,
-            label="Grid Charge"
+            marker="s",
+            s=100,
+            edgecolors="black",
+            linewidths=0.5,
+            label="Grid charging"
         )
 
-    ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
-    ax.set_ylabel("State (%)", fontsize=Config.FONT_LABEL)
+    ax.set_ylabel("SOC and LOH (%)", fontsize=Config.FONT_LABEL)
+    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
+            ha="right", va="top", fontsize=Config.FONT_TEXT,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.set_ylim(0, 100)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.grid(True, linestyle="--", alpha=0.35)
-    ax.legend(
-        loc="lower left",
-        prop={"weight": "bold", "size": Config.FONT_LEGEND}
-    )
-
     format_date_axis(ax)
 
 
@@ -542,7 +546,7 @@ def draw_financial_flow(ax, res, alpha):
     ax.plot(
         res["timestamp"],
         revenue_cum,
-        label="Revenue",
+        label="Internal valuation benefit",
         color="gold",
         linewidth=2.4
     )
@@ -550,7 +554,7 @@ def draw_financial_flow(ax, res, alpha):
     ax.plot(
         res["timestamp"],
         cost_cum,
-        label="Total Op Cost (H2 + Grid + ESS Wear)",
+        label="Operating cost",
         color="red",
         linestyle="--",
         linewidth=2.4
@@ -559,19 +563,21 @@ def draw_financial_flow(ax, res, alpha):
     ax.plot(
         res["timestamp"],
         profit_cum,
-        label="Net Profit",
+        label="Operating net benefit",
         color="blue",
         linewidth=3.0
     )
 
     ax.axhline(0, color="black", linewidth=1.2)
 
-    ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
     ax.set_ylabel("KRW", fontsize=Config.FONT_LABEL)
+    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
+            ha="right", va="top", fontsize=Config.FONT_TEXT,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.grid(True, linestyle="--", alpha=0.35)
     ax.legend(
         loc="best",
-        prop={"weight": "bold", "size": Config.FONT_LEGEND}
+        prop={"weight": "normal", "size": Config.FONT_LEGEND}
     )
 
     format_date_axis(ax)
@@ -593,7 +599,7 @@ def draw_economic_value(ax, res, alpha):
     )
 
     ax.axhline(0, color="black", linewidth=1.2)
-    ax.set_title(scenario_title(alpha), fontsize=Config.FONT_SUBTITLE, fontweight="bold")
+    ax.set_xlabel(f"α = {alpha}", fontsize=Config.FONT_LABEL)
     ax.set_ylabel("KRW", fontsize=Config.FONT_LABEL)
     ax.grid(True, axis="y", linestyle="--", alpha=0.35)
 
@@ -609,7 +615,7 @@ def draw_economic_value(ax, res, alpha):
             ha="center",
             va="bottom" if height > 0 else "top",
             fontsize=Config.FONT_TEXT,
-            fontweight="bold"
+            fontweight="normal"
         )
 
 
@@ -662,7 +668,7 @@ def draw_mode_distribution(ax, res, alpha):
                 ha="center",
                 va="center",
                 fontsize=Config.FONT_PIE,
-                fontweight="bold"
+                fontweight="normal"
             )
 
         # 작은 조각: pie 오른쪽 위에 세로 정렬해서 표시
@@ -678,7 +684,7 @@ def draw_mode_distribution(ax, res, alpha):
                 ha="left",
                 va="center",
                 fontsize=Config.FONT_PIE,
-                fontweight="bold"
+                fontweight="normal"
             )
 
             # 조각과 숫자를 연결하는 선
@@ -693,24 +699,11 @@ def draw_mode_distribution(ax, res, alpha):
                 )
             )
 
-    ax.legend(
-        wedges,
-        mode_counts.index,
-        loc="center left",
-        bbox_to_anchor=(1.0, 0.5),
-        prop={"weight": "bold", "size": Config.FONT_LEGEND}
-    )
-
-    ax.set_title(
-        scenario_title(alpha),
-        fontsize=Config.FONT_SUBTITLE,
-        fontweight="bold",
-        pad=25
-    )
+    ax.set_xlabel(f"α = {alpha}", fontsize=Config.FONT_LABEL)
 
     ax.set_aspect("equal")
 
-    # 작은 숫자와 legend가 잘리지 않도록 좌우 공간 확보
+    # 작은 숫자가 잘리지 않도록 좌우 공간 확보
     ax.set_xlim(-1.25, 1.75)
     ax.set_ylim(-1.25, 1.25)
 
@@ -734,10 +727,7 @@ def create_grid_resilience_figure(scenario_results):
         ax.set_yticks([7500, 10000, 12500, 15000, 17500])
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-
-
-    axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.tight_layout()
     fig.subplots_adjust(hspace=0.25)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
@@ -755,7 +745,10 @@ def create_asset_status_figure(scenario_results):
 
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+               ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+    fig.tight_layout(rect=[0, 0.09, 1, 1])
     fig.subplots_adjust(hspace=0.25)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
@@ -772,7 +765,7 @@ def create_financial_flow_figure(scenario_results):
         draw_financial_flow(ax, scenario_results[alpha], alpha)
 
     axes[-1].set_xlabel("Date", fontsize=Config.FONT_LABEL)
-    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    fig.tight_layout()
     fig.subplots_adjust(hspace=0.25)
     save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
 
@@ -804,26 +797,29 @@ def create_mode_distribution_figure(scenario_results):
         "H2_MAINTENANCE": "orange"
     }
 
-    fig, axes = plt.subplots(1, 3, figsize=(18, 6), dpi=300)
+    labels = (
+        "Standby", "Grid charging", "Surplus PV charging",
+        "Economic ESS discharging", "Emergency power supply", "Hydrogen refueling",
+    )
+    fig, axes = plt.subplots(1, 3, figsize=(22, 8), dpi=300)
 
     for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
         draw_mode_distribution(ax, scenario_results[alpha], alpha)
-        ax.get_legend().remove()
         ax.set_xlim(-1.4, 1.6)
 
     fig.legend(
         [Patch(facecolor=c) for c in colors.values()],
-        list(colors.keys()),
+        labels,
         loc="lower center",
-        bbox_to_anchor=(0.5, 0.06),
-        ncol=6,
-        prop={"weight": "bold", "size": 16},
+        bbox_to_anchor=(0.5, 0.02),
+        ncol=3,
+        prop={"weight": "normal", "size": Config.FONT_LEGEND},
         frameon=False
     )
 
     fig.subplots_adjust(
         left=0.03, right=0.97,
-        top=0.85, bottom=0.14,
+        top=0.96, bottom=0.27,
         wspace=0.00
     )
 

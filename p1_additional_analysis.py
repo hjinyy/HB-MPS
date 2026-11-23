@@ -19,7 +19,7 @@ from emergency_dispatch import H2_KWH_PER_KG, VOLL_KRW_PER_KWH, run_scenario
 from emergency_dispatch_model import Run, Scenario, Strategy
 from emergency_validation import validate_run
 from hb_inputs import INPUT, load_hours
-from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, bold_figure_text
+from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, normalize_figure_text
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 MULTIPLIERS: Final = (0.0, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 1.5, 2.0)
@@ -35,7 +35,7 @@ def write_rows(name: str, rows: list[dict[str, str | float | int]]) -> None:
 
 def save(fig: plt.Figure, name: str) -> None:
     """Export both paper-ready figure formats with stable PDF metadata."""
-    bold_figure_text(fig)
+    normalize_figure_text(fig)
     fig.savefig(OUT / f"{name}.png", dpi=220, bbox_inches="tight")
     fig.savefig(
         OUT / f"{name}.pdf", bbox_inches="tight", metadata={"CreationDate": None}
@@ -101,7 +101,7 @@ def main() -> None:
 
     sensitivity = []
     break_even_rows = []
-    apply_paper_typography(text_scale=1.5, legend_scale=1.5)
+    apply_paper_typography()
     fig, axes = plt.subplots(
         1, 3, figsize=(22, 9.5), sharey=True, constrained_layout=True
     )
@@ -144,19 +144,11 @@ def main() -> None:
                 )
         axis.axvline(break_even, color="black", linestyle=":", linewidth=1.3)
         axis.axvline(VOLL_KRW_PER_KWH, color="firebrick", linestyle="--", linewidth=1.3)
-        axis.text(
-            break_even + 150,
-            axis.get_ylim()[1] * 0.5,
-            f"BE {break_even:.0f}",
-            rotation=90,
-            fontsize=ANNOTATION_SIZE * 1.5,
-        )
-        axis.set_title(f"{trucks} truck{'s' if trucks > 1 else ''}", fontweight="bold")
+        axis.set_xlabel(f"VOLL (KRW/kWh)\n{trucks} truck{'s' if trucks > 1 else ''}")
         axis.set_box_aspect(1)
         axis.set_xticks((0, 5000, 10000))
         axis.grid(alpha=0.2)
     axes[0].set_ylabel("Net societal benefit (million KRW)")
-    axes[1].set_xlabel("VOLL (KRW/kWh)")
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         loc="outside lower center",
@@ -171,11 +163,11 @@ def main() -> None:
     p1 = runs[1.3, 1, Strategy.P1]
     difference = lambda field: p1.total(field) - p0.total(field)
     components = [
-        ("Lost Mode 1 revenue", difference("revenue_krw")),
-        ("Additional grid purchase", -difference("grid_purchase_krw")),
-        ("Additional ESS wear", -difference("ess_wear_krw")),
-        ("External H2 purchase change", -difference("h2_purchase_krw")),
-        ("Additional avoided interruption", difference("avoided_interruption_krw")),
+        ("Internal valuation benefit", difference("revenue_krw")),
+        ("Grid electricity purchase cost", -difference("grid_purchase_krw")),
+        ("Battery degradation cost", -difference("ess_wear_krw")),
+        ("Hydrogen purchase cost", -difference("h2_purchase_krw")),
+        ("Avoided interruption benefit", difference("avoided_interruption_krw")),
     ]
     net_change = societal(p1, VOLL_KRW_PER_KWH) - societal(p0, VOLL_KRW_PER_KWH)
     if abs(sum(value for _, value in components) - net_change) > 1e-5:
@@ -184,20 +176,20 @@ def main() -> None:
         "p1_opportunity_components.csv",
         [
             {"component": label, "delta_krw": value}
-            for label, value in (*components, ("Net societal change", net_change))
+            for label, value in (*components, ("Net societal benefit", net_change))
         ],
     )
-    labels = [label for label, _ in components] + ["Net societal change"]
+    labels = [label for label, _ in components] + ["Net societal benefit"]
     values = [value / 1e6 for _, value in components] + [net_change / 1e6]
     colors = ["#B85C5C" if value < 0 else "#4F9272" for value in values]
     apply_paper_typography()
     fig, axis = plt.subplots(figsize=(17, 9), constrained_layout=True)
     axis.barh(labels[::-1], values[::-1], color=colors[::-1])
-    axis.set_xlim(-2.0, 24.5)
+    axis.set_xlim(min(values) - 1.5, max(values) + 3.5)
     for position, value in enumerate(values[::-1]):
         display_value = 0.0 if abs(value) < 0.0005 else value
         axis.text(
-            value + 0.2 if display_value >= 0 else 0.4,
+            max(value + 0.2, 1.0),
             position,
             f"{display_value:+.3f}",
             va="center",
@@ -205,7 +197,7 @@ def main() -> None:
             fontsize=ANNOTATION_SIZE,
         )
     axis.axvline(0, color="black", linewidth=0.9)
-    axis.set_xlabel("P1 − P0 (million KRW over 168 hours)")
+    axis.set_xlabel("Difference between P1 and P0 (M KRW)")
     axis.grid(axis="x", alpha=0.2)
     save(fig, "fig13_decomposition_of_economic_opportunity_costs_and_avoided_interruption_benefits")
     print(

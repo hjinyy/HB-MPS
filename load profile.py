@@ -24,9 +24,9 @@ LINE_WIDTH = 3.2
 
 plt.rcParams.update({
     "font.family": "Times New Roman",
-    "font.weight": "bold",
-    "axes.titleweight": "bold",
-    "axes.labelweight": "bold",
+    "font.weight": "normal",
+    "axes.titleweight": "normal",
+    "axes.labelweight": "normal",
     "axes.titlesize": FONT_TITLE,
     "axes.labelsize": FONT_LABEL,
     "xtick.labelsize": FONT_TICK,
@@ -44,13 +44,14 @@ def load_data(file_path):
     col_map = {
         "주택용 전력사용량(kWh)": "load_A",
         "산업용 전력사용량(kWh)": "load_B",
+        "E: 태양광 발전량(kWh)": "solar",
         "날짜": "date",
         "시간": "hour",
     }
 
     df = df.rename(columns=col_map)
 
-    required_cols = ["date", "hour", "load_A", "load_B"]
+    required_cols = ["date", "hour", "load_A", "load_B", "solar"]
 
     for col in required_cols:
         if col not in df.columns:
@@ -84,8 +85,8 @@ def load_data(file_path):
 def plot_load_profiles(df):
 
     fig, axes = plt.subplots(
-        2, 1,
-        figsize=(13, 8.8),
+        3, 1,
+        figsize=(13, 16),
         dpi=PAPER_DPI,
         sharex=True
     )
@@ -99,11 +100,7 @@ def plot_load_profiles(df):
         label="Residential Load"
     )
 
-    axes[0].set_title(
-        "(a) Residential Node",
-        pad=14
-    )
-    axes[0].set_ylabel("Load (kWh)")
+    axes[0].set_ylabel("Residential load (kWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Industrial Load
@@ -115,41 +112,34 @@ def plot_load_profiles(df):
         label="Industrial Load"
     )
 
-    axes[1].set_title(
-        "(b) Industrial Node",
-        pad=14
-    )
-    axes[1].set_ylabel("Load (kWh)")
-    axes[1].set_xlabel("Date")
+    axes[1].set_ylabel("Industrial load (kWh)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
+    axes[2].plot(
+        df["timestamp_dt"],
+        df["solar"],
+        color="seagreen",
+        linewidth=LINE_WIDTH,
+        label="PV generation",
+    )
+    axes[2].set_ylabel("PV generation (kWh)")
+    axes[2].set_xlabel("Date")
+    axes[2].grid(True, linestyle="--", alpha=0.4)
+
     # Date axis formatting
-    axes[1].xaxis.set_major_formatter(
+    axes[2].xaxis.set_major_formatter(
         mdates.DateFormatter("%m-%d")
     )
-    axes[1].xaxis.set_major_locator(
+    axes[2].xaxis.set_major_locator(
         mdates.DayLocator(interval=1)
     )
 
-    # Font, tick and legend formatting
+    # Font and tick formatting
     for ax in axes:
         ax.tick_params(axis="both", labelsize=FONT_TICK)
         ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
 
-        ax.legend(
-            loc="upper right",
-            prop={
-                "weight": "bold",
-                "size": FONT_LEGEND
-            }
-        )
-
-        for tick in ax.get_xticklabels() + ax.get_yticklabels():
-            tick.set_fontweight("bold")
-
-        ax.yaxis.get_offset_text().set_fontweight("bold")
-
-    fig.tight_layout(pad=2.0, h_pad=2.0)
+    fig.tight_layout(pad=2.0, h_pad=3.0)
 
     # -----------------------------------------------------
     # 4. Save Figures - results folder only

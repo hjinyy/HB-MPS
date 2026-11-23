@@ -16,7 +16,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from asset_ablation import CONFIGURATIONS, INPUT, Policy, load_hours, run_configuration
-from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, bold_figure_text
+from paper_figure_style import ANNOTATION_SIZE, apply_paper_typography, normalize_figure_text
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 SOC_THRESHOLDS: Final = (0.2, 0.3, 0.5)
@@ -60,12 +60,11 @@ def main() -> None:
         3, 3
     )
     apply_paper_typography()
-    fig, axes = plt.subplots(1, 2, figsize=(18, 9), dpi=220)
-    for ax, values, title, units, cmap in zip(
+    fig, axes = plt.subplots(1, 2, figsize=(24, 10), dpi=220)
+    for ax, values, colorbar_label, cmap in zip(
         axes,
         (unserved, operating),
-        ("Residual unserved energy", "Operating net"),
-        ("MWh", "million KRW"),
+        ("Residual unserved energy (MWh)", "Operating net benefit (million KRW)"),
         ("YlOrRd", "BrBG"),
         strict=True,
     ):
@@ -83,13 +82,11 @@ def main() -> None:
             )
         ax.set_xticks(range(3), ("0.4", "0.6", "0.8"))
         ax.set_yticks(range(3), ("0.2", "0.3", "0.5"))
-        ax.set_xlabel("Phase 1 LCOE quantile")
-        ax.set_ylabel("Phase 1 ESS SOC threshold")
-        ax.set_title(title)
-        fig.colorbar(image, ax=ax, label=units, shrink=0.75)
-    fig.suptitle("Dual-mode policy sensitivity (α=1.3, 1.5 + 1.5 MWh)")
+        ax.set_xlabel(r"Electricity value quantile ($q_{\mathrm{dis}}$)")
+        ax.set_ylabel("Mode 1 ESS SOC threshold")
+        fig.colorbar(image, ax=ax, label=colorbar_label, shrink=0.75)
     fig.tight_layout()
-    bold_figure_text(fig)
+    normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(
             OUT / f"fig11_sensitivity_of_residual_unserved_energy_and_operating_net_benefit.{suffix}",

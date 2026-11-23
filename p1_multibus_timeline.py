@@ -13,7 +13,7 @@ from matplotlib.patches import Patch
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from paper_figure_style import apply_paper_typography, bold_figure_text
+from paper_figure_style import apply_paper_typography, normalize_figure_text
 from p1_multibus_dispatch import InjectionHour, TruckHour
 
 
@@ -53,11 +53,8 @@ def save_fleet_timeline(
     axis.scatter(active_t, active_truck, color="black", marker="o", s=18, zorder=3)
     axis.set_yticks(range(5), ["Main truck", "Aux 1", "Aux 2", "Aux 3", "Aux 4"])
     axis.set_xticks(np.arange(0, 169, 24))
-    axis.set_xlabel("Hour of 168-hour P1 simulation")
+    axis.set_xlabel(f"Hour (α={alpha:.1f})")
     axis.set_ylabel("Vehicle")
-    axis.set_title(
-        f"P1 multi-truck deployment for IEEE 33-bus power flow (α={alpha:.1f})"
-    )
     axis.grid(axis="x", color="white", alpha=0.45)
     axis.legend(
         handles=[
@@ -78,7 +75,7 @@ def save_fleet_timeline(
         frameon=False,
     )
     fig.tight_layout()
-    bold_figure_text(fig)
+    normalize_figure_text(fig)
     output_dir.mkdir(exist_ok=True)
     for extension in ("png", "pdf"):
         fig.savefig(

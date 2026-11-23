@@ -15,9 +15,8 @@ import pandapower.networks as nw
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from matplotlib.transforms import Bbox
 
-from paper_figure_style import apply_paper_typography, bold_figure_text
+from paper_figure_style import apply_paper_typography, normalize_figure_text
 
 from emergency_dispatch import run_scenario
 from emergency_dispatch_model import Scenario, Strategy
@@ -143,11 +142,11 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
     fig, axes = plt.subplots(3, 1, figsize=(15, 12), dpi=220, sharex=True)
     voltage_limits = (min(base.min(), hb.min()), max(base.max(), hb.max()))
     panels = (
-        (base, "Baseline bus voltages", "viridis", voltage_limits),
-        (hb, "HB-MPS bus voltages", "viridis", voltage_limits),
+        (base, "Baseline (p.u.)", "viridis", voltage_limits),
+        (hb, "HB-MPS (p.u.)", "viridis", voltage_limits),
         (
             hb - base,
-            "Voltage improvement (HB-MPS − baseline)",
+            "Voltage gain (p.u.)",
             "YlGnBu",
             (0.0, max((hb - base).max(), 1e-6)),
         ),
@@ -169,38 +168,25 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
             linestyle=":",
             linewidth=1.2,
         )
-        axis.set_title(title, fontweight="bold", loc="left")
         axis.set_ylabel("Bus number")
         axis.set_yticks((1, 9, 18, 25, 33))
-        fig.colorbar(
+        colorbar = fig.colorbar(
             artist,
             ax=axis,
-            label="Voltage (p.u.)" if axis is not axes[2] else "Δ voltage (p.u.)",
             pad=0.012,
         )
+        colorbar.set_label(title, fontsize=21)
+        colorbar.ax.tick_params(labelsize=24)
     axes[-1].set_xticks(
         np.arange(0, 168, 24),
         ("Aug 1", "Aug 2", "Aug 3", "Aug 4", "Aug 5", "Aug 6", "Aug 7"),
     )
     axes[-1].set_xlabel("Date (2025)")
     fig.tight_layout()
-    bold_figure_text(fig)
-    fig.canvas.draw()
-    # The changing colorbar tick widths alter bbox_inches="tight" by a few
-    # pixels. Keep the archived Figure 13 canvas without moving any subplot.
-    tight = fig.get_tightbbox(fig.canvas.get_renderer()).padded(0.1)
-    target_width, target_height = 2693 / fig.dpi, 2164 / fig.dpi
-    horizontal_pad = max((target_width - tight.width) / 2, 0.0)
-    vertical_pad = max((target_height - tight.height) / 2, 0.0)
-    canvas = Bbox.from_extents(
-        tight.x0 - horizontal_pad,
-        tight.y0 - vertical_pad,
-        tight.x1 + horizontal_pad,
-        tight.y1 + vertical_pad,
-    )
+    normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(
-            OUTPUT_DIR / f"{OUTPUT_NAME}.{suffix}", bbox_inches=canvas, pad_inches=0
+            OUTPUT_DIR / f"{OUTPUT_NAME}.{suffix}", bbox_inches="tight", pad_inches=0.12
         )
     plt.close(fig)
 

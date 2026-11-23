@@ -16,18 +16,18 @@ def apply_paper_typography(
     *, text_scale: float = 1.0, legend_scale: float = 1.0,
     y_tick_scale: float | None = None,
 ) -> None:
-    """Match the Times New Roman sizes and weights of the main figures."""
+    """Use the Figure 11 type sizes with regular Times New Roman."""
     if y_tick_scale is None:
         y_tick_scale = text_scale
     plt.rcParams.update(
         {
             "font.family": "Times New Roman",
             "font.size": TICK_SIZE * text_scale,
-            "font.weight": "bold",
+            "font.weight": "normal",
             "axes.titlesize": TITLE_SIZE * text_scale,
-            "axes.titleweight": "bold",
+            "axes.titleweight": "normal",
             "axes.labelsize": LABEL_SIZE * text_scale,
-            "axes.labelweight": "bold",
+            "axes.labelweight": "normal",
             "xtick.labelsize": TICK_SIZE * text_scale,
             "ytick.labelsize": TICK_SIZE * y_tick_scale,
             "legend.fontsize": LEGEND_SIZE * legend_scale,
@@ -35,8 +35,8 @@ def apply_paper_typography(
     )
 
 
-def bold_figure_text(fig: plt.Figure) -> None:
-    """Apply the paper face to ticks, annotations, legends, and colorbars."""
+def normalize_figure_text(fig: plt.Figure) -> None:
+    """Use regular weight for ticks, annotations, legends, and colorbars."""
     for item in fig.findobj(match=Text):
         item.set_fontfamily("Times New Roman")
-        item.set_fontweight("bold")
+        item.set_fontweight("normal")

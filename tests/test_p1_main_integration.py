@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import hashlib
 import math
 import runpy
-import struct
-import tarfile
 from pathlib import Path
 
 import pandapower.networks as nw
@@ -79,32 +76,3 @@ def test_powerflow_csv_uses_normalized_actual_p1_supply() -> None:
         assert len(rows) == 168
         assert all(math.isclose(actual, value, abs_tol=1e-9) for actual, value in zip(rows.hbmps_mw, expected, strict=True))
         assert all(math.isclose(raw, step.unserved_kwh, abs_tol=1e-7) for raw, step in zip(rows.unserved_kwh, run.steps, strict=True))
-
-
-def test_preexisting_png_dimensions_match_archived_design() -> None:
-    # Given the exact pre-P1 archive of all prior result files.
-    current_names = {
-        "figure_load_profiles": "fig3_comparison_of_load_profiles",
-        "figure_5_energy_supply_demand_mismatch": "fig4_energy_supply_vs_demand_mismatch_analysis",
-        "figure_6_grid_resilience_fleet_deployment_all_cases": "fig5_mode_2_activation_and_auxiliary_truck_deployment",
-        "figure_7_asset_status_main_truck_all_cases": "fig6_ess_soc_and_hydrogen_loh_profiles",
-        "figure_8_financial_flow_all_cases": "fig8_cumulative_financial_flow_of_hb_mps",
-        "figure_9_operational_mode_distribution_all_cases": "fig7_distribution_of_hb_mps_operating_modes",
-    }
-    with tarfile.open(RESULTS / "legacy_pre_p1.tar.gz") as archive:
-        names = [
-            member.name
-            for member in archive.getmembers()
-            if Path(member.name).stem in current_names and member.name.endswith(".png")
-        ]
-
-        # When regenerated files are compared to their originals.
-        for name in names:
-            original = archive.extractfile(name).read()
-            stem = Path(name).stem
-            updated = (RESULTS / f"{current_names.get(stem, stem)}.png").read_bytes()
-
-            # Then canvas pixel dimensions are unchanged; Figure 5 is byte-identical.
-            assert struct.unpack(">II", original[16:24]) == struct.unpack(">II", updated[16:24]), name
-            if name == "figure_5_energy_supply_demand_mismatch.png":
-                assert hashlib.sha256(original).digest() == hashlib.sha256(updated).digest()
