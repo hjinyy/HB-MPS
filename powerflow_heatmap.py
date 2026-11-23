@@ -139,7 +139,7 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
                 )
 
     apply_paper_typography()
-    fig, axes = plt.subplots(3, 1, figsize=(15, 14), dpi=220, sharex=True)
+    fig, axes = plt.subplots(3, 1, figsize=(15, 12), dpi=220, sharex=True)
     voltage_limits = (min(base.min(), hb.min()), max(base.max(), hb.max()))
     panels = (
         (base, "Baseline (p.u.)", "viridis", voltage_limits),
@@ -175,6 +175,11 @@ def save_artifacts(base: np.ndarray, hb: np.ndarray, timestamps: list[str]) -> N
             artist,
             ax=axis,
             pad=0.012,
+        )
+        colorbar.set_ticks(
+            (0.0, 0.0025, 0.0050, 0.0075)
+            if axis is axes[2]
+            else (0.94, 0.96, 0.98, 1.00)
         )
         colorbar.set_label(title, fontsize=21)
         colorbar.ax.tick_params(labelsize=24)
