@@ -22,7 +22,7 @@ def save_fleet_timeline(
     injections: tuple[InjectionHour, ...],
     output_dir: Path,
 ) -> None:
-    """Color shows modeled bus; a black dot shows actual HFC/ESS dispatch."""
+    """Color shows modeled bus; a red dot shows actual HFC/ESS dispatch."""
     if len(trucks) != 168 * 5 or len(injections) != 168:
         raise ValueError("Timeline requires the complete 168-hour, five-truck P1 path")
     alpha = injections[0].alpha
@@ -50,32 +50,34 @@ def save_fleet_timeline(
         vmin=-0.5,
         vmax=1.5,
     )
-    axis.scatter(np.array(active_t) + 0.5, active_truck, color="black", marker="o", s=18, zorder=3)
+    axis.scatter(np.array(active_t) + 0.5, active_truck, color="#d62728", marker="o", s=24, zorder=3)
+    for boundary in (0.5, 1.5, 2.5, 3.5):
+        axis.axhline(boundary, color="white", linewidth=1.5, zorder=2)
     axis.set_yticks(range(5), ["Main\ntruck", "Aux 1", "Aux 2", "Aux 3", "Aux 4"])
     axis.set_xticks(np.arange(0, 169, 24))
     axis.set_xlim(0, 168)
-    axis.set_xlabel("Time[h]")
+    axis.set_xlabel("Time (h)")
     axis.set_ylabel("Vehicle")
     axis.grid(axis="x", color="white", alpha=0.45)
-    axis.legend(
+    fig.legend(
         handles=[
             Patch(color="#2574ac", label="Bus 18"),
             Patch(color="#32b16d", label="Bus 33"),
             Line2D(
                 [],
                 [],
-                color="black",
+                color="#d62728",
                 marker="o",
                 linestyle="None",
                 label="HFC or ESS active",
             ),
         ],
         loc="upper center",
-        bbox_to_anchor=(0.5, -0.18),
+        bbox_to_anchor=(0.5, 0.98),
         ncol=3,
         frameon=False,
     )
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 0.86))
     normalize_figure_text(fig)
     output_dir.mkdir(exist_ok=True)
     for extension in ("png", "pdf"):

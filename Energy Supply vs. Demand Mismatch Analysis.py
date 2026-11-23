@@ -97,19 +97,21 @@ def plot_supply_demand_mismatch(df):
     axes[0].plot(
         range(1, len(df) + 1),
         df["solar"] / 1000,
+        color="#2ca02c",
         linewidth=LINE_WIDTH,
-        label="PV Generation",
+        label="PV generation",
     )
 
     axes[0].plot(
         range(1, len(df) + 1),
         df["total_load"] / 1000,
+        color="#1f77b4",
         linewidth=LINE_WIDTH,
         linestyle="--",
-        label="Total Load",
+        label="Total load",
     )
 
-    axes[0].set_ylabel("Energy (MWh)")
+    axes[0].set_ylabel("Supply and demand (MWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Mismatch analysis
@@ -123,6 +125,7 @@ def plot_supply_demand_mismatch(df):
     axes[1].fill_between(
         x, mismatch, 0,
         where=mismatch >= 0,
+        color="#2ca02c",
         alpha=0.35,
         interpolate=True,
         label="Surplus PV",
@@ -131,20 +134,22 @@ def plot_supply_demand_mismatch(df):
     axes[1].fill_between(
         x, mismatch, 0,
         where=mismatch < 0,
+        color="#d62728",
         alpha=0.35,
         interpolate=True,
-        label="Energy Deficit",
+        label="Energy deficit",
     )
 
     axes[1].plot(
         x, mismatch,
+        color="#1f77b4",
         linewidth=2.8,
-        label="PV - Total Load",
+        label="_PV minus total load",
     )
 
     axes[1].set_ylabel("Mismatch (MWh)")
-    axes[0].set_xlabel("(a)")
-    axes[1].set_xlabel("Time[h]\n(b)")
+    axes[0].set_xlabel("Time (h)\n(a)")
+    axes[1].set_xlabel("Time (h)\n(b)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
     # Font and tick formatting
@@ -152,20 +157,21 @@ def plot_supply_demand_mismatch(df):
         ax.set_xlim(0, 168)
         ax.set_xticks(range(0, 169, 24))
         ax.tick_params(axis="both", labelsize=FONT_TICK)
+        ax.tick_params(axis="x", labelbottom=True)
 
     top_handles, top_labels = axes[0].get_legend_handles_labels()
     bottom_handles, bottom_labels = axes[1].get_legend_handles_labels()
     fig.legend(
         top_handles + bottom_handles,
         top_labels + bottom_labels,
-        loc="lower center",
-        bbox_to_anchor=(0.5, 0.0),
-        ncol=3,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.99),
+        ncol=4,
         frameon=False,
         prop={"weight": "normal", "size": FONT_LEGEND},
     )
     scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0.15, 1, 1], pad=2.0, h_pad=2.0)
+    fig.tight_layout(rect=[0, 0, 1, 0.88], pad=2.0, h_pad=2.5)
 
     # Save figures
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

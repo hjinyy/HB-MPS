@@ -30,7 +30,6 @@ if TYPE_CHECKING:
 def save_figure(
     results: list[ScenarioResult],
     output_path: Path,
-    minimum_voltage_pu: float,
     hb_bus_number: int,
 ) -> None:
     """Save time-series and nodal-voltage comparisons for all scenarios."""
@@ -40,44 +39,85 @@ def save_figure(
         records = result.records
         time_axis = np.arange(1, len(records) + 1)
         left, right = axes[row]
-        left.plot(time_axis, records["vmin_base"], color="#c6382b", label="Baseline")
-        left.plot(time_axis, records["vmin_hbmps"], color="#2574ac", label="HB-MPS")
+        minimum_bus = int(records["vminbus_base"].mode().iloc[0]) - 1
+        first_other_bus = True
+        for bus in range(result.base_voltage_profiles.shape[0]):
+            if bus != minimum_bus:
+                left.plot(
+                    time_axis, result.base_voltage_profiles[bus],
+                    color="#c6382b", alpha=0.12, linewidth=0.6,
+                    label="Other buses" if first_other_bus else "_nolegend_",
+                )
+                first_other_bus = False
+        left.plot(
+            time_axis, records["vmin_base"], color="#d62728",
+            linewidth=2.4, label="Baseline minimum",
+        )
+        left.plot(
+            time_axis, records["vmin_hbmps"], color="#1f77b4",
+            linewidth=1.2, label="HB-MPS minimum",
+        )
         active = records["mode2"].eq(1)
         left.scatter(
             time_axis[active.to_numpy()],
             records.loc[active, "vmin_base"],
-            color="#e68127",
-            s=18,
-            label="Mode 2",
+            color="#2ca02c",
+            s=8,
+            label="Mode 2 active",
             zorder=4,
         )
-        left.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
-        left.set_ylabel("Voltage (pu)")
+        load_axis = left.twinx()
+        load_axis.plot(
+            time_axis, result.industrial_load_mwh,
+            color="#6b7280", alpha=0.35, linewidth=1.0,
+            label="Industrial load",
+        )
+        # Mode 2 is triggered by industrial load, not by bus voltage.
+        load_axis.axhline(
+            result.mode2_trigger_mwh, color="#2ca02c",
+            linestyle="--", linewidth=1.2, label="Mode 2 trigger",
+        )
+        load_axis.set_ylim(0, 25)
+        load_axis.set_yticks((0, 10, 20))
+        load_axis.set_ylabel("Industrial load (MWh)")
+        left.set_ylabel("Voltage (p.u.)")
         left.set_yticks(
-            (0.93, 0.94, 0.95, 0.96),
-            labels=("0.93", "0.94", "0.95", "0.96"),
+            (0.92, 0.94, 0.96, 0.98, 1.00),
+            labels=("0.92", "0.94", "0.96", "0.98", "1.00"),
         )
         left.set_xlim(0, 168)
         left.set_xticks(range(0, 169, 24))
-        left.set_xlabel(f"Time[h]\n({'abcdef'[2 * row]})")
+        left.set_xlabel(f"Time (h)\n({'abcdef'[2 * row]})")
         left.grid(alpha=0.3)
-        left.legend(loc="best")
-
-        right.plot(bus_numbers, result.base_voltages, "o-", color="#c6382b", label="Baseline")
-        right.plot(
-            bus_numbers, result.hbmps_voltages, "s-", color="#2574ac", label="HB-MPS"
+        handles, labels = left.get_legend_handles_labels()
+        load_handles, load_labels = load_axis.get_legend_handles_labels()
+        left.legend(
+            handles + load_handles, labels + load_labels,
+            loc="lower center", bbox_to_anchor=(0.5, 1.02),
+            ncol=3, frameon=False, fontsize=10,
         )
-        right.axhline(minimum_voltage_pu, color="black", linestyle="--", linewidth=1.2)
-        right.axvline(hb_bus_number, color="#32b16d", linestyle=":", linewidth=1.4)
-        right.set_ylabel("Voltage (pu)")
+
+        right.plot(
+            bus_numbers, result.base_voltages, "o-", color="#d62728",
+            linewidth=2.4, markersize=2.5, label="Baseline",
+        )
+        right.plot(
+            bus_numbers, result.hbmps_voltages, "s-", color="#1f77b4",
+            linewidth=1.2, markersize=2.5, label="HB-MPS",
+        )
+        right.axvline(hb_bus_number, color="#2ca02c", linestyle=":", linewidth=1.4)
+        right.set_ylabel("Voltage (p.u.)")
         right.set_yticks(
             (0.92, 0.94, 0.96, 0.98, 1.00),
             labels=("0.92", "0.94", "0.96", "0.98", "1.00"),
         )
         right.grid(alpha=0.3)
-        right.legend(loc="best")
+        right.legend(
+            loc="lower center", bbox_to_anchor=(0.5, 1.02),
+            ncol=2, frameon=False,
+        )
         right.set_xlabel(f"IEEE bus number\n({'abcdef'[2 * row + 1]})")
 
-    fig.tight_layout(h_pad=2.5, w_pad=2.0)
+    fig.tight_layout(h_pad=5.0, w_pad=4.0)
     fig.savefig(output_path, bbox_inches="tight")
     plt.close(fig)

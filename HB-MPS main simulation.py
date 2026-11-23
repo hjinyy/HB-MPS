@@ -421,7 +421,7 @@ def draw_grid_resilience(ax, res, alpha):
         color="gray",
         alpha=0.55,
         linewidth=2.4,
-        label="Industrial Load"
+        label="Industrial load"
     )
 
     ax.axhline(
@@ -429,7 +429,7 @@ def draw_grid_resilience(ax, res, alpha):
         color="red",
         linestyle="--",
         linewidth=2.2,
-        label="Mode 2 Trigger"
+        label="Mode 2 trigger"
     )
 
     p2_mask = res["Mode"] == "PHASE 2"
@@ -440,7 +440,7 @@ def draw_grid_resilience(ax, res, alpha):
             color="red",
             s=60,
             zorder=5,
-            label="Mode 2 Active"
+            label="Mode 2 active"
         )
 
     ax_right = ax.twinx()
@@ -458,13 +458,13 @@ def draw_grid_resilience(ax, res, alpha):
             width=0.8,
             color="royalblue",
             alpha=0.6,
-            label="Additional Trucks"
+            label="Additional trucks"
         )
 
     ax.set_ylabel("Load (MWh)", fontsize=Config.FONT_LABEL)
     ax.grid(True, linestyle="--", alpha=0.35)
 
-    ax_right.set_ylabel("Additional Trucks", color="royalblue", fontsize=Config.FONT_LABEL)
+    ax_right.set_ylabel("Additional trucks (count)", color="royalblue", fontsize=Config.FONT_LABEL)
     ax_right.spines["right"].set_position(("outward", 12))
     ax_right.tick_params(axis="y", labelcolor="royalblue", labelsize=Config.FONT_TICK)
 
@@ -483,7 +483,7 @@ def draw_asset_status(ax, res, alpha):
     ax.plot(
         hours,
         res["ESS_SOC"],
-        label="Battery SOC (%)",
+        label="SOC",
         color="green",
         linewidth=2.4
     )
@@ -491,7 +491,7 @@ def draw_asset_status(ax, res, alpha):
     ax.plot(
         hours,
         res["H2_LOH"],
-        label="Hydrogen LOH (%)",
+        label="LOH",
         color="orange",
         linewidth=2.4
     )
@@ -506,6 +506,7 @@ def draw_asset_status(ax, res, alpha):
             s=170,
             edgecolors="black",
             linewidths=0.6,
+            zorder=6,
             label="External hydrogen refueling"
         )
 
@@ -522,7 +523,7 @@ def draw_asset_status(ax, res, alpha):
             label="Grid charging"
         )
 
-    ax.set_ylabel("SOC(%)", fontsize=Config.FONT_LABEL)
+    ax.set_ylabel("SOC (%)", fontsize=Config.FONT_LABEL)
     ax.set_ylim(-5, 105)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.grid(True, linestyle="--", alpha=0.35)
@@ -713,13 +714,13 @@ def create_grid_resilience_figure(scenario_results):
         ax.yaxis.set_major_formatter(FormatStrFormatter("%g"))
 
     for ax, letter in zip(axes, "abc"):
-        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
-    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
+        ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
+        ax.tick_params(axis="x", labelbottom=True)
     handles, labels = legends[0]
-    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
                ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
     scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=3.0)
+    fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=3.0)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
 
@@ -736,13 +737,13 @@ def create_asset_status_figure(scenario_results):
 
 
     for ax, letter in zip(axes, "abc"):
-        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
-    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
+        ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
+        ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
                ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
     scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=2.8)
+    fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=2.8)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
 

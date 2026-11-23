@@ -65,12 +65,18 @@ def main() -> None:
         3, 3
     )
     apply_paper_typography()
+    plt.rcParams.update({
+        "mathtext.fontset": "custom",
+        "mathtext.rm": "Times New Roman",
+        "mathtext.it": "Times New Roman:italic",
+        "mathtext.bf": "Times New Roman:bold",
+    })
     fig, axes = plt.subplots(1, 2, figsize=(24, 10), dpi=220)
     for ax, values, colorbar_label, cmap in zip(
         axes,
         (unserved, operating),
         ("Residual unserved energy (MWh)", "Operating net benefit (M KRW)"),
-        ("YlOrRd", "BrBG"),
+        ("YlOrRd", "YlOrRd"),
         strict=True,
     ):
         image = ax.imshow(values, origin="lower", cmap=cmap, aspect="equal")
@@ -87,14 +93,15 @@ def main() -> None:
             )
         ax.set_xticks(range(3), ("0.4", "0.6", "0.8"))
         ax.set_yticks(range(3), ("0.2", "0.3", "0.5"))
-        ax.set_xlabel(
-            r"Electricity value quantile ($q_{\mathrm{dis}}$)"
-            + f"\n({'a' if ax is axes[0] else 'b'})"
-        )
-        ax.set_ylabel("Mode 1 ESS SOC threshold")
+        ax.set_xlabel(r"$q_{\mathrm{dis}}$" + f"\n({'a' if ax is axes[0] else 'b'})")
+        ax.set_ylabel(r"$\mathrm{SOC}^{\mathrm{dis}}$ (%)")
+        ax.set_xticks(np.arange(-0.5, 3, 1), minor=True)
+        ax.set_yticks(np.arange(-0.5, 3, 1), minor=True)
+        ax.grid(which="minor", color="black", linewidth=1.0)
+        ax.tick_params(which="minor", bottom=False, left=False)
         fig.colorbar(image, ax=ax, label=colorbar_label, shrink=0.75)
     scale_figure_text(fig, 1.2)
-    fig.tight_layout()
+    fig.tight_layout(w_pad=4.5)
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(

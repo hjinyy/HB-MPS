@@ -66,6 +66,9 @@ class ScenarioResult:
     worst_hour: int
     base_voltages: np.ndarray
     hbmps_voltages: np.ndarray
+    base_voltage_profiles: np.ndarray
+    industrial_load_mwh: np.ndarray
+    mode2_trigger_mwh: float
     injection_rows: tuple[InjectionHour, ...]
     truck_rows: tuple[TruckHour, ...]
 
@@ -286,6 +289,9 @@ def simulate_scenario(
         worst_hour=worst_hour,
         base_voltages=base_profiles[worst_hour],
         hbmps_voltages=hbmps_profiles[worst_hour],
+        base_voltage_profiles=np.stack(base_profiles, axis=1),
+        industrial_load_mwh=industrial_raw / 1000,
+        mode2_trigger_mwh=threshold_raw / 1000,
         injection_rows=injection_rows,
         truck_rows=truck_rows,
     )
@@ -314,8 +320,8 @@ def main() -> None:
     pd.DataFrame(
         [asdict(row) for result in results for row in result.truck_rows]
     ).to_csv(TRUCK_PATH, index=False)
-    save_figure(results, FIGURE_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
-    save_figure(results, FIGURE_PDF_PATH, MIN_VOLTAGE_PU, HB_BUS_NUMBER)
+    save_figure(results, FIGURE_PATH, HB_BUS_NUMBER)
+    save_figure(results, FIGURE_PDF_PATH, HB_BUS_NUMBER)
     save_fleet_timeline(results[0].truck_rows, results[0].injection_rows, OUTPUT_DIR)
 
     benchmark = nw.case33bw()
