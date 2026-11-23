@@ -89,31 +89,31 @@ def plot_supply_demand_mismatch(df):
         gridspec_kw={"height_ratios": [1, 1]},
     )
     # Y축 눈금 간격 설정
-    axes[0].yaxis.set_major_locator(MultipleLocator(20000))
-    axes[1].yaxis.set_major_locator(MultipleLocator(20000))
+    axes[0].yaxis.set_major_locator(MultipleLocator(20))
+    axes[1].yaxis.set_major_locator(MultipleLocator(20))
 
     # (a) Supply and demand profiles
     axes[0].plot(
         range(1, len(df) + 1),
-        df["solar"],
+        df["solar"] / 1000,
         linewidth=LINE_WIDTH,
         label="PV Generation",
     )
 
     axes[0].plot(
         range(1, len(df) + 1),
-        df["total_load"],
+        df["total_load"] / 1000,
         linewidth=LINE_WIDTH,
         linestyle="--",
         label="Total Load",
     )
 
-    axes[0].set_ylabel("Energy (kWh)")
+    axes[0].set_ylabel("Energy (MWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Mismatch analysis
     x = range(1, len(df) + 1)
-    mismatch = df["mismatch"].to_numpy()
+    mismatch = df["mismatch"].to_numpy() / 1000
 
     axes[1].axhline(
         0, color="black", linewidth=1.8
@@ -141,7 +141,7 @@ def plot_supply_demand_mismatch(df):
         label="PV - Total Load",
     )
 
-    axes[1].set_ylabel("Mismatch (kWh)")
+    axes[1].set_ylabel("Mismatch (MWh)")
     axes[0].set_xlabel("(a)")
     axes[1].set_xlabel("Time[h]\n(b)")
     axes[1].grid(True, linestyle="--", alpha=0.4)

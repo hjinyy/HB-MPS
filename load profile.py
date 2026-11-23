@@ -93,35 +93,35 @@ def plot_load_profiles(df):
     # (a) Residential Load
     axes[0].plot(
         range(1, len(df) + 1),
-        df["load_A"],
+        df["load_A"] / 1000,
         color="royalblue",
         linewidth=LINE_WIDTH,
         label="Residential Load"
     )
 
-    axes[0].set_ylabel("Residential load (kWh)")
+    axes[0].set_ylabel("Residential load (MWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Industrial Load
     axes[1].plot(
         range(1, len(df) + 1),
-        df["load_B"],
+        df["load_B"] / 1000,
         color="darkorange",
         linewidth=LINE_WIDTH,
         label="Industrial Load"
     )
 
-    axes[1].set_ylabel("Industrial load (kWh)")
+    axes[1].set_ylabel("Industrial load (MWh)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
     axes[2].plot(
         range(1, len(df) + 1),
-        df["solar"],
+        df["solar"] / 1000,
         color="seagreen",
         linewidth=LINE_WIDTH,
         label="PV generation",
     )
-    axes[2].set_ylabel("PV generation (kWh)")
+    axes[2].set_ylabel("PV generation (MWh)")
     axes[2].set_xlabel("Time[h]\n(c)")
     axes[2].grid(True, linestyle="--", alpha=0.4)
 

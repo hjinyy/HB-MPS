@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use("Agg")  # 팝업 창 없이 저장만 수행
 
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import FormatStrFormatter, MaxNLocator
 
 plt.rcParams.update({"font.family": "Times New Roman", "font.weight": "normal"})
 plt.rcParams["axes.labelweight"] = "normal"
@@ -412,11 +412,11 @@ def format_time_axis(ax):
 def draw_grid_resilience(ax, res, alpha):
     hours = np.arange(1, len(res) + 1)
     max_trucks = res["Active_Trucks"].max()
-    threshold = res["Threshold"].iloc[0]
+    threshold = res["Threshold"].iloc[0] / 1000
 
     ax.plot(
         hours,
-        res["Load_B"],
+        res["Load_B"] / 1000,
         color="gray",
         alpha=0.55,
         linewidth=2.4,
@@ -435,7 +435,7 @@ def draw_grid_resilience(ax, res, alpha):
     if p2_mask.any():
         ax.scatter(
             hours[p2_mask.to_numpy()],
-            res[p2_mask]["Load_B"],
+            res[p2_mask]["Load_B"] / 1000,
             color="red",
             s=60,
             zorder=5,
@@ -460,7 +460,7 @@ def draw_grid_resilience(ax, res, alpha):
             label="Additional Trucks"
         )
 
-    ax.set_ylabel("Load (kWh)", fontsize=Config.FONT_LABEL)
+    ax.set_ylabel("Load (MWh)", fontsize=Config.FONT_LABEL)
     ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
             ha="right", va="top", fontsize=Config.FONT_TEXT,
             bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
@@ -571,6 +571,7 @@ def draw_financial_flow(ax, res, alpha):
     ax.axhline(0, color="black", linewidth=1.2)
 
     ax.set_ylabel("M KRW", fontsize=Config.FONT_LABEL)
+    ax.ticklabel_format(axis="y", style="plain", useOffset=False)
     ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
             ha="right", va="top", fontsize=Config.FONT_TEXT,
             bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
@@ -716,8 +717,9 @@ def create_grid_resilience_figure(scenario_results):
 
     # Y축 통일
     for ax in axes:
-        ax.set_ylim(7000, 19000)
-        ax.set_yticks([7500, 10000, 12500, 15000, 17500])
+        ax.set_ylim(7, 19)
+        ax.set_yticks([7.5, 10, 12.5, 15, 17.5])
+        ax.yaxis.set_major_formatter(FormatStrFormatter("%g"))
 
     for ax, letter in zip(axes, "abc"):
         ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
