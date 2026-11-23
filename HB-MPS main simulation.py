@@ -476,14 +476,8 @@ def draw_grid_resilience(ax, res, alpha):
 
     lines_1, labels_1 = ax.get_legend_handles_labels()
     lines_2, labels_2 = ax_right.get_legend_handles_labels()
-    ax.legend(
-        lines_1 + lines_2,
-        labels_1 + labels_2,
-        loc="upper left",
-        prop={"weight": "normal", "size": Config.FONT_LEGEND}
-    )
-
     format_time_axis(ax)
+    return lines_1 + lines_2, labels_1 + labels_2
 
 
 def draw_asset_status(ax, res, alpha):
@@ -572,9 +566,6 @@ def draw_financial_flow(ax, res, alpha):
 
     ax.set_ylabel("M KRW", fontsize=Config.FONT_LABEL)
     ax.ticklabel_format(axis="y", style="plain", useOffset=False)
-    ax.text(0.98, 0.95, f"α = {alpha}", transform=ax.transAxes,
-            ha="right", va="top", fontsize=Config.FONT_TEXT,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.85})
     ax.grid(True, linestyle="--", alpha=0.35)
     format_time_axis(ax)
 
@@ -712,8 +703,10 @@ def create_grid_resilience_figure(scenario_results):
         sharex=True
     )
 
-    for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
+    legends = [
         draw_grid_resilience(ax, scenario_results[alpha], alpha)
+        for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS)
+    ]
 
     # Y축 통일
     for ax in axes:
@@ -724,7 +717,10 @@ def create_grid_resilience_figure(scenario_results):
     for ax, letter in zip(axes, "abc"):
         ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
     axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
-    fig.tight_layout(h_pad=3.0)
+    handles, labels = legends[0]
+    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
+               ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+    fig.tight_layout(rect=[0, 0.10, 1, 1], h_pad=3.0)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
 

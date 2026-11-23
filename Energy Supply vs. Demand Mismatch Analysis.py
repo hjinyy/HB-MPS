@@ -146,18 +146,24 @@ def plot_supply_demand_mismatch(df):
     axes[1].set_xlabel("Time[h]\n(b)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
-    # Font and legend formatting
+    # Font and tick formatting
     for ax in axes:
         ax.set_xlim(0, 168)
         ax.set_xticks(range(0, 169, 24))
         ax.tick_params(axis="both", labelsize=FONT_TICK)
 
-        ax.legend(
-            loc="upper right",
-            prop={"weight": "normal", "size": FONT_LEGEND}
-        )
-
-    fig.tight_layout(pad=2.0, h_pad=2.0)
+    top_handles, top_labels = axes[0].get_legend_handles_labels()
+    bottom_handles, bottom_labels = axes[1].get_legend_handles_labels()
+    fig.legend(
+        top_handles + bottom_handles,
+        top_labels + bottom_labels,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.0),
+        ncol=3,
+        frameon=False,
+        prop={"weight": "normal", "size": FONT_LEGEND},
+    )
+    fig.tight_layout(rect=[0, 0.15, 1, 1], pad=2.0, h_pad=2.0)
 
     # Save figures
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
