@@ -159,7 +159,7 @@ def main() -> None:
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.98),
+        bbox_to_anchor=(0.5, 0.94),
         ncol=3,
         frameon=True,
         fancybox=False,
@@ -170,6 +170,12 @@ def main() -> None:
     )
     scale_figure_text(fig, 1.2)
     fig.tight_layout(rect=(0, 0, 1, 0.76), w_pad=2.0)
+    positions = [axis.get_position() for axis in axes]
+    reduced_gap = (positions[1].x0 - positions[0].x1) * 0.5
+    left = (1 - sum(position.width for position in positions) - 2 * reduced_gap) / 2
+    for axis, position in zip(axes, positions, strict=True):
+        axis.set_position((left, position.y0, position.width, position.height))
+        left += position.width + reduced_gap
     save(fig, "fig11_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)

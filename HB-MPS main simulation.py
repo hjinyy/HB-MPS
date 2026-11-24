@@ -678,7 +678,7 @@ def create_grid_resilience_figure(scenario_results):
         ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = legends[0]
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.977),
                ncol=4, frameon=True, fancybox=False, edgecolor="black",
                facecolor="white", framealpha=1.0,
                columnspacing=0.8, handletextpad=0.6,
@@ -704,7 +704,7 @@ def create_asset_status_figure(scenario_results):
         ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.977),
                ncol=4, frameon=True, fancybox=False, edgecolor="black",
                facecolor="white", framealpha=1.0,
                columnspacing=0.8, handletextpad=0.6,

@@ -138,9 +138,10 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
     axis.grid(axis="y", alpha=0.2)
     axis.set_axisbelow(True)
     axis.spines[["top", "right"]].set_visible(False)
-    axis.legend(
+    fig.legend(
+        *axis.get_legend_handles_labels(),
         loc="upper center",
-        bbox_to_anchor=(0.5, 1.15),
+        bbox_to_anchor=(0.5, 0.98),
         ncol=3,
         frameon=True,
         fancybox=False,
@@ -149,7 +150,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
         framealpha=1.0,
         fontsize=19,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.tight_layout(rect=(0, 0, 1, 0.89))
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(OUT / f"{FIGURE_STEM}.{suffix}", bbox_inches="tight")
