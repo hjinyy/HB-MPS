@@ -22,8 +22,8 @@ from dataclasses import dataclass
 from typing import Final
 
 import numpy as np
-import pandas as pd
 import pandapower as pp
+import pandas as pd
 
 from hb_inputs import INPUT, load_hours
 from powerflow_plot_severity import save_severity_figure
@@ -33,8 +33,8 @@ from powerflow_validation import (
     INPUT_PATH,
     MIN_VOLTAGE_PU,
     OUTPUT_DIR,
-    PV_COLUMN,
     PV_BUS_NUMBER,
+    PV_COLUMN,
     PV_PENETRATION,
     RESIDENTIAL_COLUMN,
     build_network,
@@ -45,7 +45,6 @@ from powerflow_validation import (
 )
 from severity_ac_dispatch import (
     BUS_INDICES,
-    MODE2_VOLTAGE_TRIGGER_PU,
     dispatch_hour,
 )
 from severity_fleet import (
@@ -89,10 +88,6 @@ class SeverityResult:
     @property
     def load_dispatch_hours(self) -> np.ndarray:
         return self.hourly["load_dispatch_active"].to_numpy(dtype=bool)
-
-    @property
-    def voltage_only_dispatch_hours(self) -> np.ndarray:
-        return self.hourly["voltage_only_dispatch_active"].to_numpy(dtype=bool)
 
     @property
     def injection_buses(self) -> tuple[tuple[int, ...], ...]:
@@ -208,10 +203,7 @@ def simulate(alpha: float) -> SeverityResult:
         baseline_voltage, baseline_loss = solve_network(baseline_net)
         demand = np.maximum(bus_loads[t] - bus_thresholds, 0.0)
         load_trigger = bool(np.any(demand > 1e-9))
-        voltage_trigger = bool(
-            np.any(baseline_voltage[BUS_INDICES] < MODE2_VOLTAGE_TRIGGER_PU)
-        )
-        mode2 = load_trigger or voltage_trigger
+        mode2 = load_trigger
         soc_start = state.soc
         h2_start = sum(state.h2_kg)
         h2_by_truck_start = tuple(state.h2_kg)
@@ -235,7 +227,6 @@ def simulate(alpha: float) -> SeverityResult:
             hfc_kwh = dispatch.hfc_kwh
             ess_kwh = dispatch.ess_kwh
             load_response_mw = dispatch.load_response_mw
-            voltage_only_mw = dispatch.voltage_only_mw
             consumed_h2 = dispatch.h2_consumed_kg
             ess_withdrawal = dispatch.ess_withdrawal_kwh
             vehicles = dispatch.trucks
@@ -258,7 +249,7 @@ def simulate(alpha: float) -> SeverityResult:
             injections = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
             residual = demand.copy()
             scores = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
-            hfc_kwh = ess_kwh = load_response_mw = voltage_only_mw = 0.0
+            hfc_kwh = ess_kwh = load_response_mw = 0.0
             consumed_h2 = idle.travel_h2_kg
             ess_withdrawal = 0.0
             vehicles = ()
@@ -272,7 +263,6 @@ def simulate(alpha: float) -> SeverityResult:
                 "timestamp": str(frame.at[t, "timestamp"]),
                 "mode2_trigger": mode2,
                 "load_excess_trigger": load_trigger,
-                "voltage_trigger": voltage_trigger,
                 "industrial_vmin_baseline": float(baseline_voltage[BUS_INDICES].min()),
                 "supply_active": supply_active,
                 "mode1_active": mode1_bus is not None,
@@ -285,9 +275,6 @@ def simulate(alpha: float) -> SeverityResult:
                 - pv_charging_mw
                 - grid_charging_mw,
                 "load_dispatch_active": supply_active and load_trigger,
-                "voltage_only_dispatch_active": supply_active
-                and not load_trigger
-                and voltage_trigger,
                 "industrial_load_mw": float(bus_loads[t].sum()),
                 "bus_excess_mw": float(demand.sum()),
                 "residual_excess_mw": float(residual.sum()),
@@ -295,7 +282,6 @@ def simulate(alpha: float) -> SeverityResult:
                 "ess_emergency_kwh": ess_kwh,
                 "emergency_supply_mw": float(injections.sum()),
                 "load_response_mw": load_response_mw,
-                "voltage_only_mw": voltage_only_mw,
                 "active_trucks": sum(vehicle.bus is not None for vehicle in vehicles),
                 "vmin_baseline": float(baseline_voltage.min()),
                 "vmin_supported": float(supported_voltage.min()),

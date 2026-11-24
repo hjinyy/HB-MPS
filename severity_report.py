@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
 import pandapower as pp
+import pandas as pd
 
 from emergency_dispatch import H2_CAPACITY_KG, run_scenario
 from emergency_dispatch_model import Scenario, Strategy
@@ -102,16 +102,13 @@ def _summary_row(
     mode2_hours: int,
     supply_hours: int,
     load_trigger_hours: int,
-    voltage_trigger_hours: int,
     load_response_hours: int,
-    voltage_only_response_hours: int,
     hfc_kwh: float,
     ess_kwh: float,
     mode1_hours: int,
     mode1_ess_kwh: float,
     charging_kwh: float,
     load_response_mwh_ac: float,
-    voltage_only_mwh_ac: float,
     residual_excess_mwh_ac: float,
     h2_consumed_kg: float,
     h2_refilled_kg: float,
@@ -135,9 +132,7 @@ def _summary_row(
         "mode2_trigger_hours": mode2_hours,
         "actual_supply_hours": supply_hours,
         "load_excess_trigger_hours": load_trigger_hours,
-        "voltage_trigger_hours": voltage_trigger_hours,
         "load_response_hours": load_response_hours,
-        "voltage_only_response_hours": voltage_only_response_hours,
         "hfc_mwh_raw": hfc_kwh / 1000,
         "ess_mwh_raw": ess_kwh / 1000,
         "mode1_hours": mode1_hours,
@@ -146,7 +141,6 @@ def _summary_row(
         "total_mwh_raw": (hfc_kwh + ess_kwh) / 1000,
         "ac_injection_mwh": (hfc_kwh + ess_kwh) * mw_per_raw_kwh,
         "load_response_mwh_ac": load_response_mwh_ac,
-        "voltage_only_mwh_ac": voltage_only_mwh_ac,
         "residual_bus_excess_mwh_ac": residual_excess_mwh_ac,
         "worst_baseline_voltage_pu": float(baseline.min()),
         "worst_supported_voltage_pu": float(supported.min()),
@@ -433,14 +427,12 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             alpha=alpha,
             baseline=old_baseline,
             baseline_losses=old_losses,
-            voltage_trigger_hours=int(dynamic.hourly.voltage_trigger.sum()),
             hfc_kwh=p1_hfc,
             ess_kwh=p1_ess,
             mode1_hours=0,
             mode1_ess_kwh=0.0,
             charging_kwh=0.0,
             load_response_mwh_ac=(p1_hfc + p1_ess) * factor,
-            voltage_only_mwh_ac=0.0,
             h2_consumed_kg=run.total("consumed_h2_kg"),
             h2_refilled_kg=run.total("external_h2_kg"),
             soc_min_pct=min(step.soc_end for step in run.steps) * 100,
@@ -476,7 +468,6 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                     supply_hours=p1_supply,
                     load_trigger_hours=p1_mode2,
                     load_response_hours=p1_supply,
-                    voltage_only_response_hours=0,
                     residual_excess_mwh_ac=residual,
                     positions=tuple(positions),
                     **common,
@@ -514,7 +505,6 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                     supply_hours=p1_supply,
                     load_trigger_hours=p1_mode2,
                     load_response_hours=p1_supply,
-                    voltage_only_response_hours=0,
                     residual_excess_mwh_ac=residual,
                     positions=tuple(positions),
                     **binary_common,
@@ -543,9 +533,7 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                 mode2_hours=int(h.mode2_trigger.sum()),
                 supply_hours=int(h.supply_active.sum()),
                 load_trigger_hours=int(h.load_excess_trigger.sum()),
-                voltage_trigger_hours=int(h.voltage_trigger.sum()),
                 load_response_hours=int(h.load_dispatch_active.sum()),
-                voltage_only_response_hours=int(h.voltage_only_dispatch_active.sum()),
                 hfc_kwh=float(h.hfc_kwh.sum()),
                 ess_kwh=float(h.ess_emergency_kwh.sum()),
                 mode1_hours=int(h.mode1_active.sum()),
@@ -556,7 +544,6 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                     + h.grid_ess_charge_kwh.sum()
                 ),
                 load_response_mwh_ac=float(h.load_response_mw.sum()),
-                voltage_only_mwh_ac=float(h.voltage_only_mw.sum()),
                 residual_excess_mwh_ac=float(h.residual_excess_mw.sum()),
                 h2_consumed_kg=float(h.h2_consumed_kg.sum()),
                 h2_refilled_kg=float(h.h2_refilled_kg.sum()),
@@ -594,13 +581,14 @@ def write_report(
         "정규화해 시간별 scaling에 적용한다.",
         "- 산업 모선별 임계값은 α×해당 모선의 168시간 평균 부하다. 초과량은 "
         "가정된 공급 허용량 대비 부족분이며 실제 미공급 전력은 아니다. 산업 "
-        "모선에서 초과량>0 또는 공급 전 전압<0.93 p.u.이면 Mode 2가 우선한다. "
-        "0.95 p.u.는 별도의 전압 **평가·지원 목표**이며 출동 임계가 아니다.",
-        "- Mode 2는 산업 모선 9개만 접속 후보로 삼는다. 초과량과 0.95 p.u. "
-        "위반량을 각각 시간별 최대값으로 정규화한 뒤 0.5씩 가중한다. HFC를 "
+        "모선에서 초과량>0일 때만 Mode 2가 우선한다. 저전압만으로는 "
+        "출동하지 않으며 0.95 p.u.는 전압 성능 평가 기준이다.",
+        "- Mode 2는 초과량이 있는 산업 모선만 접속 후보로 삼는다. 해당 "
+        "모선의 초과량과 0.95 p.u. 위반량을 각각 시간별 최대값으로 "
+        "정규화한 뒤 0.5씩 가중하여 배치 순위를 정한다. HFC를 "
         "차량별로 먼저 투입하고 매 주입 후 AC를 다시 계산한다. ESS는 주 차량의 "
-        "backup이다. 필요한 전력은 모선 잔여 초과량과 산업 모선 전압 지원량의 "
-        "최댓값으로 정해 중복 합산하지 않는다.",
+        "backup이다. 공급량은 모선별 잔여 초과량과 차량 가용 용량 중 작은 "
+        "값이며, 전압 개선만을 위한 추가 공급은 하지 않는다.",
         "- Mode 2가 없을 때에만 기존 P1의 가격·SOC 조건에 따른 Mode 1을 "
         "허용한다. 주 차량 ESS 출력은 주거부하 모선에 AC 주입한다. 주거 모선의 "
         "가격 신호가 같으므로 가장 낮은 기준 전압의 주거 모선을 접속 위치로 "
@@ -612,7 +600,8 @@ def write_report(
         "- HB-MPS의 원자료 kWh→IEEE 계통 MW 환산은 기존 검증과 동일하게 "
         "산업 모선 정격 MW/입력 산업부하 최대 kWh를 모든 공급·충전에 적용한다. "
         "HFC/ESS 정격, 효율, SOC·LOH, 수소 이동 소비·보충 및 Mode 1 가격 "
-        "조건은 기존 P1과 같다. 전압 전용 공급에는 VOLL 편익을 부여하지 않았다.",
+        "조건은 기존 P1과 같다. 계산상 부하 초과량을 물리적 미공급 전력으로 "
+        "간주하거나 그 전체에 VOLL 편익을 자동 부여하지 않는다.",
         "",
         "## 비교 기준",
         "",
@@ -656,7 +645,7 @@ def write_report(
             "",
             "## 새 이중 운용의 상세 결과",
             "",
-            "| α | 산업 초과/0.93 위반 h | Mode 2 실공급/Mode 1 공급 h | "
+            "| α | 산업 초과 h | Mode 2 실공급/Mode 1 공급 h | "
             "Mode 1 ESS/충전 원자료 MWh | 계산상 잔여 초과 MWh(AC) | "
             "SOC 최저→종료 % | 주 차량 LOH 최저→종료 % |",
             "|---:|---:|---:|---:|---:|---:|---:|",
@@ -664,8 +653,8 @@ def write_report(
     )
     for row in dynamic.itertuples(index=False):
         lines.append(
-            f"| {row.alpha:.1f} | {row.load_excess_trigger_hours}/"
-            f"{row.voltage_trigger_hours} | {row.actual_supply_hours}/"
+            f"| {row.alpha:.1f} | {row.load_excess_trigger_hours} | "
+            f"{row.actual_supply_hours}/"
             f"{row.mode1_hours} | {row.mode1_ess_mwh_raw:.3f}/"
             f"{row.charging_mwh_raw:.3f} | "
             f"{row.residual_bus_excess_mwh_ac:.3f} | "
@@ -716,9 +705,10 @@ def write_report(
     lines.extend(
         [
             "",
-            "두 그림의 왼쪽은 33개 모선 중 최저 전압과 연한 Other buses 선을, "
-            "오른쪽은 기준 최악 시간의 33개 전압과 실제 주입 모선을 표시한다. "
-            "0.93 p.u. 산업 출동 기준과 0.95 p.u. 전압 평가 기준은 구분했다.",
+            "두 그림의 왼쪽은 합산 산업부하·공급 허용량, 33개 모선의 전압, "
+            "Mode 1·2 운용 시간을 구분한다. 오른쪽은 기준 최악 시간의 33개 "
+            "전압과 실제 주입 모선을 표시한다. 0.95 p.u. 선은 출동 조건이 "
+            "아니라 전압 평가 기준이다.",
             "전체 33개 모선의 0.95 p.u. 미만 시간은 Mode 1·2 지원 후에도 "
             "남는다. 주거 저전압만으로 Mode 2가 발동하지 않으며, Mode 1은 "
             "경제성·SOC 조건이 맞을 때만 공급하므로 모든 저전압을 해소하지 않는다.",
@@ -733,12 +723,15 @@ def write_report(
             f"α=1.5에서 {second.load_excess_trigger_hours}시간이다. "
             f"α=1.5는 Mode 1을 {second.mode1_hours}시간 보여 주며 "
             f"α=1.3의 {first.mode1_hours}시간보다 많다. "
-            "누적 전압 위반도 "
+            "다만 누적 전압 위반은 α=1.5가 "
             f"{second.cumulative_voltage_deficit_supported_pu_bus_h:.3f} "
-            f"대 {first.cumulative_voltage_deficit_supported_pu_bus_h:.3f} "
-            "p.u.·bus·h로 소폭 낮다. 이중 운용의 대표 그림에는 α=1.5가 "
-            "더 적합하고, α=1.3은 가혹 조건 보조 분석에 적합하다. "
-            "두 경우 모두 남는 저전압을 명시해야 한다."
+            f"p.u.·bus·h로 α=1.3의 "
+            f"{first.cumulative_voltage_deficit_supported_pu_bus_h:.3f}보다 크다. "
+            f"비상 공급 원자료 에너지도 α=1.5는 {second.total_mwh_raw:.3f} MWh, "
+            f"α=1.3은 {first.total_mwh_raw:.3f} MWh이다. 이중 운용을 "
+            "적은 비상 출동과 자원 소비로 보여 주는 대표 그림에는 α=1.5가 "
+            "적합하고, 더 큰 전압 개선 효과를 검토할 때는 α=1.3을 함께 "
+            "제시해야 한다. 두 경우 모두 남는 저전압을 명시해야 한다."
         )
     else:
         better = min(

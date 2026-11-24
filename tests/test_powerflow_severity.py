@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 import pandapower as pp
+import pandas as pd
 
 from emergency_dispatch import (
     ESS_CAPACITY,
@@ -20,7 +20,7 @@ from powerflow_validation import (
     set_operating_point,
     solve_network,
 )
-from severity_ac_dispatch import dispatch_hour, required_supply_mw, severity_scores
+from severity_ac_dispatch import dispatch_hour, severity_scores
 from severity_fleet import ESS_MIN_SOC, FLEET_SIZE, FleetState
 
 
@@ -41,7 +41,7 @@ def test_severity_uses_industrial_demand_and_voltage_scale() -> None:
     assert np.isclose(scores[1], 1.0)
 
 
-def test_voltage_only_event_recomputes_supply_and_preserves_resources() -> None:
+def test_voltage_only_event_does_not_dispatch() -> None:
     # Given an AC feeder with undervoltage but no industrial-load excess.
     net = build_network()
     set_operating_point(net, 1.0, 1.0, 1.0, 0.0, 0.0)
@@ -56,21 +56,16 @@ def test_voltage_only_event_recomputes_supply_and_preserves_resources() -> None:
     state = FleetState.initial()
     initial_h2 = sum(state.h2_kg)
 
-    # When the independent five-truck rule assesses AC voltage support.
+    # When voltage is low but no industrial bus exceeds its load threshold.
     result = dispatch_hour(net, baseline, np.zeros(9), generators, state, 0.00006)
 
-    # Then it dispatches despite zero local excess and pays for fuel/ESS use.
-    assert result.hfc_kwh > 0
+    # Then Mode 2 uses no assets and the voltage is only evaluated.
+    assert result.hfc_kwh == 0
+    assert result.ess_kwh == 0
     assert result.load_response_mw == 0
-    assert result.voltage_only_mw > 0
-    assert np.isclose(
-        result.injections_mw.sum(), (result.hfc_kwh + result.ess_kwh) * 0.00006
-    )
-    assert (
-        np.maximum(0.95 - result.supported_voltage, 0).sum()
-        < np.maximum(0.95 - baseline, 0).sum()
-    )
-    assert np.isclose(initial_h2 - sum(state.h2_kg), result.h2_consumed_kg)
+    assert np.allclose(result.injections_mw, 0)
+    assert np.allclose(result.supported_voltage, baseline)
+    assert np.isclose(initial_h2, sum(state.h2_kg))
     assert state.soc >= ESS_MIN_SOC - 1e-9
     assert all(
         vehicle.bus in INDUSTRIAL_BUS_NUMBERS or vehicle.bus is None
@@ -78,30 +73,29 @@ def test_voltage_only_event_recomputes_supply_and_preserves_resources() -> None:
     )
 
 
-def test_ac_voltage_need_and_local_excess_are_not_added() -> None:
-    # Given a feeder just below 0.95 p.u. with a candidate Bus 18 connection.
+def test_emergency_supply_never_exceeds_local_excess() -> None:
+    # Given a low-voltage feeder with one industrial load excess.
     net = build_network()
-    low, high = 0.2, 1.0
-    for _ in range(22):
-        midpoint = (low + high) / 2
-        set_operating_point(net, midpoint, midpoint, midpoint, 0.0, 0.0)
-        voltage, _ = solve_network(net)
-        if voltage.min() < 0.9499:
-            high = midpoint
-        else:
-            low = midpoint
-    set_operating_point(net, high, high, high, 0.0, 0.0)
+    set_operating_point(net, 1.0, 1.0, 1.0, 0.0, 0.0)
     baseline, _ = solve_network(net)
-    generator = pp.create_sgen(net, 17, p_mw=0.0, q_mvar=0.0)
+    generators = np.array(
+        [
+            pp.create_sgen(net, bus - 1, p_mw=0.0, q_mvar=0.0)
+            for bus in INDUSTRIAL_BUS_NUMBERS
+        ]
+    )
+    demand = np.zeros(9)
+    demand[0] = 0.02
 
-    # When AC voltage-only need and a larger local excess are each evaluated.
-    voltage_need = required_supply_mw(net, generator, 0.0, 0.5, baseline)
-    combined_need = required_supply_mw(net, generator, 0.1, 0.5, baseline)
+    # When the fleet supplies the sole load-excess bus.
+    result = dispatch_hour(
+        net, baseline, demand, generators, FleetState.initial(), 0.00006
+    )
 
-    # Then the dispatch takes their maximum, not their sum, and probes revert.
-    assert 0 < voltage_need < 0.1
-    assert np.isclose(combined_need, 0.1)
-    assert net.sgen.at[generator, "p_mw"] == 0.0
+    # Then the output is limited by the shortage, regardless of low voltage.
+    assert 0 < result.injections_mw[0] <= demand[0] + 1e-9
+    assert np.allclose(result.injections_mw[1:], 0)
+    assert np.isclose(result.injections_mw.sum(), result.load_response_mw)
 
 
 def test_saved_hourly_bus_and_vehicle_energy_balances() -> None:
@@ -136,10 +130,8 @@ def test_saved_hourly_bus_and_vehicle_energy_balances() -> None:
         assert row.supply_active <= row.mode2_trigger
         assert not (row.mode1_active and row.mode2_trigger)
         industrial = bus_hour.loc[bus_hour.bus_type.eq("Industrial")]
-        assert row.mode2_trigger == bool(
-            industrial.excess_mw.gt(1e-9).any()
-            or industrial.baseline_voltage_pu.lt(0.93).any()
-        )
+        assert row.mode2_trigger == bool(industrial.excess_mw.gt(1e-9).any())
+        assert (industrial.mode2_injection_mw <= industrial.excess_mw + 1e-8).all()
         if row.mode1_active:
             receiving = bus_hour.loc[bus_hour.bus.eq(row.mode1_bus)].iloc[0]
             assert receiving.bus_type == "Residential"
@@ -161,9 +153,7 @@ def test_saved_hourly_bus_and_vehicle_energy_balances() -> None:
             assert grid_bus.supported_voltage_pu < grid_bus.baseline_voltage_pu
         assert row.soc_end_pct >= ESS_MIN_SOC * 100 - 1e-8
         assert (truck_hour.h2_end_kg >= -1e-8).all()
-        assert np.isclose(
-            row.emergency_supply_mw, row.load_response_mw + row.voltage_only_mw
-        )
+        assert np.isclose(row.emergency_supply_mw, row.load_response_mw)
         assert np.isclose(
             row.fleet_h2_end_kg,
             row.fleet_h2_start_kg
@@ -205,16 +195,12 @@ def test_saved_hourly_bus_and_vehicle_energy_balances() -> None:
     dynamic = comparison.loc[comparison.strategy.eq("Dynamic bus-level")]
     binary_fixed = comparison.loc[comparison.strategy.eq("Fixed P1 dual-mode (binary)")]
     assert (dynamic.actual_supply_hours > 0).all()
-    assert (dynamic.voltage_only_response_hours > 0).all()
+    assert (dynamic.load_response_hours == dynamic.actual_supply_hours).all()
     assert (dynamic.mode1_hours > 0).all()
     assert (binary_fixed.mode1_hours > 0).all()
     assert np.allclose(
         dynamic.worst_baseline_voltage_pu,
         binary_fixed.worst_baseline_voltage_pu,
     )
-    assert (
-        dynamic.total_mwh_raw
-        > comparison.loc[
-            comparison.strategy.eq("Existing Figure 15 (mixed)")
-        ].total_mwh_raw.to_numpy()
-    ).all()
+    assert (dynamic.mode2_trigger_hours == dynamic.load_excess_trigger_hours).all()
+    assert np.allclose(dynamic.load_response_mwh_ac, dynamic.ac_injection_mwh)

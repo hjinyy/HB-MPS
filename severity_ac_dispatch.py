@@ -19,8 +19,6 @@ from severity_fleet import (
 )
 
 BUS_INDICES = np.array(INDUSTRIAL_BUS_NUMBERS) - 1
-MODE2_VOLTAGE_TRIGGER_PU = 0.93
-AC_TOLERANCE_MW = 1e-5
 DISPATCH_TOLERANCE_MW = 1e-8
 
 
@@ -47,7 +45,6 @@ class HourDispatch:
     ess_withdrawal_kwh: float
     h2_consumed_kg: float
     load_response_mw: float
-    voltage_only_mw: float
 
 
 def severity_scores(demand_mw: np.ndarray, voltage: np.ndarray) -> np.ndarray:
@@ -56,64 +53,16 @@ def severity_scores(demand_mw: np.ndarray, voltage: np.ndarray) -> np.ndarray:
     demand_term = (
         demand_mw / demand_peak if demand_peak > 0 else np.zeros_like(demand_mw)
     )
-    local_deficit = np.maximum(MIN_VOLTAGE_PU - voltage[BUS_INDICES], 0.0)
+    local_deficit = np.where(
+        demand_mw > DISPATCH_TOLERANCE_MW,
+        np.maximum(MIN_VOLTAGE_PU - voltage[BUS_INDICES], 0.0),
+        0.0,
+    )
     deficit_peak = float(local_deficit.max())
     voltage_term = (
         local_deficit / deficit_peak if deficit_peak > 0 else np.zeros_like(demand_mw)
     )
     return 0.5 * demand_term + 0.5 * voltage_term
-
-
-def _trial_voltage(
-    net: pp.pandapowerNet, generator_index: int, extra_mw: float
-) -> np.ndarray:
-    """Probe a bus injection, restoring the generator to its committed level."""
-    previous = float(net.sgen.at[generator_index, "p_mw"])
-    net.sgen.at[generator_index, "p_mw"] = previous + extra_mw
-    voltage, _ = solve_network(net)
-    net.sgen.at[generator_index, "p_mw"] = previous
-    return voltage
-
-
-def required_supply_mw(
-    net: pp.pandapowerNet,
-    generator_index: int,
-    local_excess_mw: float,
-    capacity_mw: float,
-    current_voltage: np.ndarray,
-) -> float:
-    """Use max(local deficit, AC voltage need), never their sum.
-
-    A full-capacity AC trial checks the nine industrial service buses. All 33
-    bus voltages are still recorded for performance evaluation. If the trial
-    clears the service limit, bisection finds the minimum power;
-    otherwise available capacity is used when it reduces violation magnitude.
-    """
-    if capacity_mw <= DISPATCH_TOLERANCE_MW:
-        return 0.0
-    voltage_need_mw = 0.0
-    if float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU:
-        full_voltage = _trial_voltage(net, generator_index, capacity_mw)
-        before = float(
-            np.maximum(MIN_VOLTAGE_PU - current_voltage[BUS_INDICES], 0.0).sum()
-        )
-        after = float(np.maximum(MIN_VOLTAGE_PU - full_voltage[BUS_INDICES], 0.0).sum())
-        if after < before - 1e-9:
-            if float(full_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU:
-                voltage_need_mw = capacity_mw
-            else:
-                low, high = 0.0, capacity_mw
-                for _ in range(14):
-                    if high - low <= AC_TOLERANCE_MW:
-                        break
-                    midpoint = (low + high) / 2
-                    trial = _trial_voltage(net, generator_index, midpoint)
-                    if float(trial[BUS_INDICES].min()) >= MIN_VOLTAGE_PU:
-                        high = midpoint
-                    else:
-                        low = midpoint
-                voltage_need_mw = high
-    return min(capacity_mw, max(local_excess_mw, voltage_need_mw))
 
 
 def dispatch_hour(
@@ -135,7 +84,6 @@ def dispatch_hour(
     truck_ess = [0.0] * FLEET_SIZE
     h2_consumed = 0.0
     load_response_mw = 0.0
-    voltage_only_mw = 0.0
 
     def choose_bus() -> int:
         scores = severity_scores(remaining, current_voltage)
@@ -146,53 +94,33 @@ def dispatch_hour(
 
     main_choice = choose_bus()
     for truck in range(FLEET_SIZE):
-        if not (
-            np.any(remaining > DISPATCH_TOLERANCE_MW)
-            or float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU
-        ):
+        if not np.any(remaining > DISPATCH_TOLERANCE_MW):
             break
         capacity_kwh = hfc_capacity_kwh(state, truck)
         if capacity_kwh <= 1e-9:
             continue
         chosen = main_choice if truck == 0 else choose_bus()
-        output_mw = required_supply_mw(
-            net,
-            int(generator_indices[chosen]),
-            float(remaining[chosen]),
-            capacity_kwh * mw_per_raw_kwh,
-            current_voltage,
-        )
+        output_mw = min(float(remaining[chosen]), capacity_kwh * mw_per_raw_kwh)
         if output_mw <= DISPATCH_TOLERANCE_MW:
             continue
         output_kwh = output_mw / mw_per_raw_kwh
         h2_consumed += supply_hfc(state, truck, output_kwh)
         truck_buses[truck] = INDUSTRIAL_BUS_NUMBERS[chosen]
         truck_hfc[truck] = output_kwh
-        load_part = min(output_mw, float(remaining[chosen]))
-        load_response_mw += load_part
-        voltage_only_mw += output_mw - load_part
+        load_response_mw += output_mw
         remaining[chosen] = max(0.0, remaining[chosen] - output_mw)
         injections[chosen] += output_mw
         net.sgen.at[int(generator_indices[chosen]), "p_mw"] += output_mw
         current_voltage, _ = solve_network(net)
 
     ess_withdrawal = 0.0
-    if (
-        np.any(remaining > DISPATCH_TOLERANCE_MW)
-        or float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU
-    ):
+    if np.any(remaining > DISPATCH_TOLERANCE_MW):
         capacity_kwh = ess_capacity_kwh(state)
         # An ESS-only main deployment still needs the original travel allowance.
         can_travel = truck_buses[0] is not None or state.h2_kg[0] >= TRAVEL_H2_KG
         if capacity_kwh > 1e-9 and can_travel:
             chosen = main_choice
-            output_mw = required_supply_mw(
-                net,
-                int(generator_indices[chosen]),
-                float(remaining[chosen]),
-                capacity_kwh * mw_per_raw_kwh,
-                current_voltage,
-            )
+            output_mw = min(float(remaining[chosen]), capacity_kwh * mw_per_raw_kwh)
             if output_mw > DISPATCH_TOLERANCE_MW:
                 delivered_kwh = output_mw / mw_per_raw_kwh
                 ess_withdrawal = supply_ess(state, delivered_kwh)
@@ -201,9 +129,7 @@ def dispatch_hour(
                     h2_consumed += TRAVEL_H2_KG
                     truck_buses[0] = INDUSTRIAL_BUS_NUMBERS[chosen]
                 truck_ess[0] = delivered_kwh
-                load_part = min(output_mw, float(remaining[chosen]))
-                load_response_mw += load_part
-                voltage_only_mw += output_mw - load_part
+                load_response_mw += output_mw
                 remaining[chosen] = max(0.0, remaining[chosen] - output_mw)
                 injections[chosen] += output_mw
                 net.sgen.at[int(generator_indices[chosen]), "p_mw"] += output_mw
@@ -237,5 +163,4 @@ def dispatch_hour(
         ess_withdrawal_kwh=ess_withdrawal,
         h2_consumed_kg=h2_consumed,
         load_response_mw=load_response_mw,
-        voltage_only_mw=voltage_only_mw,
     )
