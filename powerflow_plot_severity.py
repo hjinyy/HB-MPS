@@ -152,7 +152,7 @@ def save_severity_figure(
         voltage_axis.legend(
             loc="lower left",
             bbox_to_anchor=(0, 1.01),
-            ncol=2,
+            ncol=4,
             frameon=False,
             columnspacing=1.3,
             handlelength=1.6,
@@ -161,17 +161,17 @@ def save_severity_figure(
         hourly = result.hourly
         timeline = (
             (
-                "Economic supply (Mode 1)",
+                "Economic supply\n(Mode 1)",
                 hourly.mode1_active.to_numpy(dtype=bool),
                 "#9467bd",
             ),
             (
-                "Emergency supply (Mode 2)",
+                "Emergency supply\n(Mode 2)",
                 hourly.supply_active.to_numpy(dtype=bool),
                 "#ff7f0e",
             ),
             (
-                "Requested but unavailable",
+                "Requested\nbut unavailable",
                 (hourly.mode2_trigger & ~hourly.supply_active).to_numpy(dtype=bool),
                 "#777777",
             ),
@@ -225,14 +225,7 @@ def save_severity_figure(
                 s=47,
                 marker="^",
                 zorder=5,
-            )
-            nodal_axis.annotate(
-                "HB-MPS connection",
-                xy=(selected[0], result.supported_profiles[worst, selected[0] - 1]),
-                xytext=(0.03, 0.08),
-                textcoords="axes fraction",
-                fontsize=9,
-                arrowprops={"arrowstyle": "-", "color": "#555555", "lw": 0.7},
+                label="HB-MPS connection",
             )
         else:
             nodal_axis.text(
@@ -251,7 +244,7 @@ def save_severity_figure(
         nodal_axis.set_ylabel("Voltage (p.u.)")
         nodal_axis.grid(color="#dedede", linewidth=0.6)
         nodal_axis.legend(
-            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=2, frameon=False
+            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=3, frameon=False
         )
         if final:
             gain = (result.supported_profiles - result.baseline_profiles).T
@@ -269,9 +262,9 @@ def save_severity_figure(
             gain_axis.set_xticks(np.arange(0, 169, 24))
             gain_axis.set_yticks((1, 9, 18, 25, 33))
             gain_axis.set_xlabel("Time (h)\n(d)")
-            gain_axis.set_ylabel("IEEE bus number")
+            gain_axis.set_ylabel("Bus number")
             fig.colorbar(image, ax=gain_axis, pad=0.015, fraction=0.055).set_label(
-                "Voltage gain (p.u.)"
+                "Nodal voltage difference (p.u.)"
             )
 
             deployed = result.trucks.loc[
@@ -300,8 +293,7 @@ def save_severity_figure(
                     color=bus_palette[index],
                     edgecolors="#252525",
                     linewidths=0.35,
-                    label=f"Bus {bus}"
-                    + (" (Mode 1)" if rows["mode"].eq("Mode 1").any() else ""),
+                    label=f"Bus {bus}",
                 )
             for boundary in (0.5, 1.5, 2.5, 3.5):
                 deployment_axis.axhline(
@@ -311,7 +303,7 @@ def save_severity_figure(
             deployment_axis.set_xticks(np.arange(0, 169, 24))
             deployment_axis.set_ylim(4.5, -0.5)
             deployment_axis.set_yticks(
-                range(5), ("Main truck", "Aux 1", "Aux 2", "Aux 3", "Aux 4")
+                range(5), ("Main\ntruck", "Aux 1", "Aux 2", "Aux 3", "Aux 4")
             )
             deployment_axis.set_xlabel("Time (h)\n(f)")
             deployment_axis.set_ylabel("Vehicle")
@@ -319,7 +311,7 @@ def save_severity_figure(
             deployment_axis.legend(
                 loc="lower left",
                 bbox_to_anchor=(0, 1.01),
-                ncol=3,
+                ncol=max(1, len(deployed.bus.unique())),
                 frameon=False,
                 columnspacing=0.8,
             )
