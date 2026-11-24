@@ -75,7 +75,7 @@ def main() -> None:
     for ax, values, colorbar_label, cmap in zip(
         axes,
         (unserved, operating),
-        ("Residual unserved energy (MWh)", "Operating net benefit (M KRW)"),
+        (r"$E_{\mathrm{unserved}}$ (MWh)", "Operating net benefit (M KRW)"),
         ("YlOrRd", "YlOrRd"),
         strict=True,
     ):
