@@ -130,11 +130,11 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
                     fontsize=20,
                 )
         bottom += values
-    labels = [f"{summary.condition}\n(α = {summary.alpha})" for summary in summaries]
+    labels = [f"{summary.condition} (α = {summary.alpha})" for summary in summaries]
     axis.set_xticks(x, labels)
     axis.set_ylim(0, 103)
     axis.set_ylabel("Time share (%)")
-    axis.set_xlabel("Grid condition\n(a)")
+    axis.set_xlabel("Grid condition\n(a)", labelpad=20)
     axis.grid(axis="y", alpha=0.2)
     axis.set_axisbelow(True)
     axis.spines[["top", "right"]].set_visible(False)

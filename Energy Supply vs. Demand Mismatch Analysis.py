@@ -110,7 +110,7 @@ def plot_supply_demand_mismatch(df):
         label="Total load",
     )
 
-    axes[0].set_ylabel("Supply and demand (MWh)")
+    axes[0].set_ylabel("Supply and demand\n(MWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Mismatch analysis

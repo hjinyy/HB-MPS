@@ -145,7 +145,7 @@ def is_non_dominated(row: AllocationResult, results: list[AllocationResult]) -> 
 
 def plot_results(results: list[AllocationResult]) -> None:
     """Show allocation sensitivity and the observed economic–resilience plane."""
-    apply_paper_typography(text_scale=0.78)
+    apply_paper_typography(text_scale=0.78 * 1.3, legend_scale=1.3)
     fig, (allocation_ax, tradeoff_ax) = plt.subplots(1, 2, figsize=(20, 8), dpi=220)
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
@@ -172,8 +172,8 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.set_xticks(range(0, 101, 20))
     allocation_ax.set_xlim(-3, 103)
     allocation_ax.set_xlabel("ESS share (%)\n(a)")
-    allocation_ax.set_ylabel("Operating net benefit (M KRW)")
-    supply_ax.set_ylabel("Emergency energy supply (MWh)")
+    allocation_ax.set_ylabel(r"$\Pi_{\mathrm{op}}$ (M KRW)")
+    supply_ax.set_ylabel(r"$E_{\mathrm{emg}}$ (MWh)")
     allocation_ax.grid(alpha=0.25)
     allocation_ax.spines["top"].set_visible(False)
     supply_ax.spines["top"].set_visible(False)
@@ -211,13 +211,13 @@ def plot_results(results: list[AllocationResult]) -> None:
             textcoords="offset points",
             ha="right" if share in (0, 100) else "left",
         )
-    tradeoff_ax.set_xlabel("Operating net benefit (M KRW)\n(b)")
-    tradeoff_ax.set_ylabel("Emergency energy supply (MWh)")
+    tradeoff_ax.set_xlabel("$\\Pi_{\\mathrm{op}}$ (M KRW)\n(b)")
+    tradeoff_ax.set_ylabel(r"$E_{\mathrm{emg}}$ (MWh)")
     tradeoff_ax.grid(alpha=0.25)
     tradeoff_ax.spines[["top", "right"]].set_visible(False)
     colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
     colorbar.set_label("ESS share (%)")
-    fig.tight_layout(w_pad=2.0)
+    fig.tight_layout(w_pad=2.2)
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(OUT / f"{FIGURE_STEM}.{suffix}", bbox_inches="tight")

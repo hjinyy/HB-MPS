@@ -11,6 +11,7 @@ from matplotlib.colors import TwoSlopeNorm
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.transforms import Bbox
 
 from powerflow_plot_severity import _intervals, _style_time_axis
 
@@ -38,6 +39,34 @@ _LEGEND = {
     "facecolor": "white",
     "framealpha": 1.0,
 }
+_PANEL_GAP_INCHES = 0.5
+
+
+def _align_panel_gaps(fig, top_axis: Axes, middle_axis: Axes, bottom_axis: Axes) -> None:
+    """Equalize visible panel gaps, including legends anchored above axes."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+
+    def visible_bbox(axis: Axes) -> Bbox:
+        boxes = [axis.get_tightbbox(renderer)]
+        legend = axis.get_legend()
+        if legend is not None:
+            boxes.append(legend.get_window_extent(renderer))
+        return Bbox.union(boxes)
+
+    top, middle, bottom = (
+        visible_bbox(axis) for axis in (top_axis, middle_axis, bottom_axis)
+    )
+    target = _PANEL_GAP_INCHES * fig.dpi
+    upper_gap = top.y0 - middle.y1
+    lower_gap = middle.y0 - bottom.y1
+
+    def move_up(axis: Axes, pixels: float) -> None:
+        position = axis.get_position()
+        axis.set_position(position.translated(0, pixels / fig.bbox.height))
+
+    move_up(middle_axis, target - lower_gap)
+    move_up(top_axis, 2 * target - upper_gap - lower_gap)
 
 
 def _draw_industrial_load(axis: Axes, result: SeverityResult) -> None:
@@ -143,6 +172,7 @@ def save_operation_figure(result: SeverityResult, output_path: Path) -> None:
         _draw_operation_timeline(timeline_axis, result)
         _draw_truck_deployment(deployment_axis, result)
         fig.subplots_adjust(left=0.19, right=0.965, bottom=0.07, top=0.91)
+        _align_panel_gaps(fig, load_axis, timeline_axis, deployment_axis)
         fig.savefig(output_path, bbox_inches="tight")
         plt.close(fig)
 
@@ -268,5 +298,6 @@ def save_voltage_figure(result: SeverityResult, output_path: Path) -> None:
             "Nodal voltage difference (p.u.)"
         )
         fig.subplots_adjust(left=0.12, right=0.94, bottom=0.07, top=0.91)
+        _align_panel_gaps(fig, nodal_axis, minimum_axis, gain_axis)
         fig.savefig(output_path, bbox_inches="tight")
         plt.close(fig)

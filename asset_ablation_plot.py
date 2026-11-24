@@ -62,7 +62,7 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         ax.set_xticks(x, names)
         ax.set_ylim(0, bottom.max() * 1.12)
         ax.set_xlim(-0.3225, 1.4225)
-        ax.set_xlabel(f"Configuration\n({letter})")
+        ax.set_xlabel(f"Configuration\n({letter})", labelpad=20)
         ax.set_ylabel("Energy (MWh)")
         ax.tick_params(axis="y", labelleft=True)
         ax.grid(axis="y", alpha=0.2)

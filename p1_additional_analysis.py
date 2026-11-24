@@ -154,7 +154,7 @@ def main() -> None:
         axis.axvline(break_even, color="black", linestyle=":", linewidth=1.3)
         axis.axvline(VOLL_KRW_PER_KWH, color="firebrick", linestyle="--", linewidth=1.3)
         axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
-        axis.set_ylabel("Net societal benefit (M KRW)")
+        axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
         axis.set_xticks((0, 5000, 10000))
@@ -174,7 +174,7 @@ def main() -> None:
     scale_figure_text(fig, 1.2)
     fig.tight_layout(rect=(0, 0, 1, 0.76), w_pad=2.0)
     positions = [axis.get_position() for axis in axes]
-    reduced_gap = (positions[1].x0 - positions[0].x1) * 0.5
+    reduced_gap = (positions[1].x0 - positions[0].x1) * 0.75
     left = (1 - sum(position.width for position in positions) - 2 * reduced_gap) / 2
     for axis, position in zip(axes, positions, strict=True):
         axis.set_position((left, position.y0, position.width, position.height))
