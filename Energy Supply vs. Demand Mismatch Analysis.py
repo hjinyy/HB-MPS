@@ -84,7 +84,7 @@ def load_data(file_path):
 def plot_supply_demand_mismatch(df):
     fig, axes = plt.subplots(
         2, 1,
-        figsize=(13, 11),
+        figsize=(13, 5.5),
         dpi=PAPER_DPI,
         sharex=True,
         gridspec_kw={"height_ratios": [1, 1]},
@@ -165,7 +165,7 @@ def plot_supply_demand_mismatch(df):
         top_handles + bottom_handles,
         top_labels + bottom_labels,
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.99),
+        bbox_to_anchor=(0.5, 1.08),
         ncol=4,
         frameon=True,
         fancybox=False,
@@ -176,8 +176,8 @@ def plot_supply_demand_mismatch(df):
         handletextpad=0.6,
         prop={"weight": "normal", "size": 28},
     )
-    scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0, 1, 0.88], pad=2.0, h_pad=2.5)
+    scale_figure_text(fig, 0.5)
+    fig.subplots_adjust(left=0.13, right=0.97, top=0.87, bottom=0.12, hspace=0.85)
 
     # Save figures
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)

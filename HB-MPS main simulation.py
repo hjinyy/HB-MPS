@@ -464,7 +464,7 @@ def draw_grid_resilience(ax, res, alpha):
     ax.set_ylabel("Load (MWh)", fontsize=Config.FONT_LABEL)
     ax.grid(True, linestyle="--", alpha=0.35)
 
-    ax_right.set_ylabel("Additional trucks (count)", color="royalblue", fontsize=Config.FONT_LABEL)
+    ax_right.set_ylabel("Additional\ntrucks (count)", color="royalblue", fontsize=Config.FONT_LABEL)
     ax_right.spines["right"].set_position(("outward", 12))
     ax_right.tick_params(axis="y", labelcolor="royalblue", labelsize=Config.FONT_TICK)
 
@@ -658,7 +658,7 @@ def draw_mode_distribution(ax, res, alpha):
 def create_grid_resilience_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 15),
+        figsize=(13, 7.5),
         dpi=300,
         sharex=True
     )
@@ -678,20 +678,20 @@ def create_grid_resilience_figure(scenario_results):
         ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = legends[0]
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.977),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.04),
                ncol=4, frameon=True, fancybox=False, edgecolor="black",
                facecolor="white", framealpha=1.0,
                columnspacing=0.8, handletextpad=0.6,
                prop={"size": 28})
-    scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=3.0)
+    scale_figure_text(fig, 0.5)
+    fig.subplots_adjust(left=0.12, right=0.85, top=0.88, bottom=0.10, hspace=0.75)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
 
 
 def create_asset_status_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 15),
+        figsize=(13, 7.5),
         dpi=300,
         sharex=True
     )
@@ -704,13 +704,13 @@ def create_asset_status_figure(scenario_results):
         ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.977),
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 1.04),
                ncol=4, frameon=True, fancybox=False, edgecolor="black",
                facecolor="white", framealpha=1.0,
                columnspacing=0.8, handletextpad=0.6,
                prop={"size": 28})
-    scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=2.8)
+    scale_figure_text(fig, 0.5)
+    fig.subplots_adjust(left=0.12, right=0.96, top=0.88, bottom=0.10, hspace=0.75)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
 
