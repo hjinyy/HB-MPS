@@ -123,17 +123,15 @@ def plot_load_profiles(df):
         label="PV generation",
     )
     axes[2].set_ylabel("PV generation (MWh)")
-    axes[2].set_xlabel("Time[h]\n(c)")
     axes[2].grid(True, linestyle="--", alpha=0.4)
 
-    axes[0].set_xlabel("(a)")
-    axes[1].set_xlabel("(b)")
-
     # Font and tick formatting
-    for ax in axes:
+    for ax, letter in zip(axes, "abc", strict=True):
         ax.set_xlim(0, 168)
         ax.set_xticks(range(0, 169, 24))
         ax.tick_params(axis="both", labelsize=FONT_TICK)
+        ax.tick_params(axis="x", labelbottom=True)
+        ax.set_xlabel(f"Time (h)\n({letter})")
         ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
 
     scale_figure_text(fig, 0.8)
