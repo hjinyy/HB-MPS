@@ -177,18 +177,6 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.grid(alpha=0.25)
     allocation_ax.spines["top"].set_visible(False)
     supply_ax.spines["top"].set_visible(False)
-    allocation_ax.legend(
-        handles=(operating_line, supply_line),
-        loc="upper center",
-        bbox_to_anchor=(0.5, 1.27),
-        ncol=2,
-        frameon=True,
-        fancybox=False,
-        edgecolor="black",
-        facecolor="white",
-        framealpha=1.0,
-    )
-
     tradeoff_ax.plot(operating, emergency, color="0.65", linestyle="--", linewidth=1.6)
     scatter = tradeoff_ax.scatter(
         operating,
@@ -218,7 +206,20 @@ def plot_results(results: list[AllocationResult]) -> None:
     tradeoff_ax.spines[["top", "right"]].set_visible(False)
     colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
     colorbar.set_label("ESS share (%)")
-    fig.tight_layout(pad=0.7, w_pad=0.8)
+    fig.tight_layout(rect=(0, 0, 1, 0.9), pad=0.7, w_pad=0.8)
+    fig.legend(
+        handles=(operating_line, supply_line),
+        loc="upper left",
+        bbox_to_anchor=(allocation_ax.get_position().x0, 0.985),
+        bbox_transform=fig.transFigure,
+        borderaxespad=0,
+        ncol=2,
+        frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
+    )
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(OUT / f"{FIGURE_STEM}.{suffix}", bbox_inches="tight")
