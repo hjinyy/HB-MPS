@@ -1,4 +1,3 @@
-from matplotlib.ticker import MultipleLocator
 from pathlib import Path
 
 import pandas as pd
@@ -90,8 +89,8 @@ def plot_supply_demand_mismatch(df):
         gridspec_kw={"height_ratios": [1, 1]},
     )
     # Y축 눈금 간격 설정
-    axes[0].yaxis.set_major_locator(MultipleLocator(20))
-    axes[1].yaxis.set_major_locator(MultipleLocator(20))
+    axes[0].set_yticks([0, 50, 100])
+    axes[1].set_yticks([-20, 0, 80])
 
     # (a) Supply and demand profiles
     axes[0].plot(
@@ -178,6 +177,10 @@ def plot_supply_demand_mismatch(df):
         prop={"weight": "normal", "size": FONT_TICK},
     )
     scale_figure_text(fig, 0.6)
+    for ax in axes:
+        ax.tick_params(axis="y", labelsize=FONT_TICK * 0.6)
+        ax.xaxis.label.set_fontsize(FONT_TICK * 0.6)
+        ax.yaxis.label.set_fontsize(FONT_TICK * 0.6)
     fig.subplots_adjust(left=0.13, right=0.97, top=0.87, bottom=0.12, hspace=0.85)
 
     # Save figures

@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator
 from paper_figure_style import scale_figure_text
 
 
@@ -86,7 +85,7 @@ def plot_load_profiles(df):
 
     fig, axes = plt.subplots(
         3, 1,
-        figsize=(13, 13.8),
+        figsize=(13, 13.8 * 2 / 3),
         dpi=PAPER_DPI,
         sharex=True
     )
@@ -100,7 +99,7 @@ def plot_load_profiles(df):
         label="Residential Load"
     )
 
-    axes[0].set_ylabel("Residential load (MWh)")
+    axes[0].set_ylabel("Residential\nload (MWh)")
     axes[0].grid(True, linestyle="--", alpha=0.4)
 
     # (b) Industrial Load
@@ -112,7 +111,7 @@ def plot_load_profiles(df):
         label="Industrial Load"
     )
 
-    axes[1].set_ylabel("Industrial load (MWh)")
+    axes[1].set_ylabel("Industrial\nload (MWh)")
     axes[1].grid(True, linestyle="--", alpha=0.4)
 
     axes[2].plot(
@@ -122,7 +121,7 @@ def plot_load_profiles(df):
         linewidth=LINE_WIDTH,
         label="PV generation",
     )
-    axes[2].set_ylabel("PV generation (MWh)")
+    axes[2].set_ylabel("PV generation\n(MWh)")
     axes[2].grid(True, linestyle="--", alpha=0.4)
 
     # Font and tick formatting
@@ -132,9 +131,15 @@ def plot_load_profiles(df):
         ax.tick_params(axis="both", labelsize=FONT_TICK)
         ax.tick_params(axis="x", labelbottom=True)
         ax.set_xlabel(f"Time (h)\n({letter})")
-        ax.yaxis.set_major_locator(MaxNLocator(nbins=6))
+    axes[0].set_yticks([4, 6, 8])
+    axes[1].set_yticks([8, 12, 16])
+    axes[2].set_yticks([0, 50, 100])
 
     scale_figure_text(fig, 0.8)
+    for ax in axes:
+        ax.tick_params(axis="y", labelsize=FONT_TICK * 0.8)
+        ax.xaxis.label.set_fontsize(FONT_TICK * 0.8)
+        ax.yaxis.label.set_fontsize(FONT_TICK * 0.8)
     fig.tight_layout(pad=2.0, h_pad=3.0)
 
     # -----------------------------------------------------
