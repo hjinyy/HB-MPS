@@ -146,7 +146,7 @@ def is_non_dominated(row: AllocationResult, results: list[AllocationResult]) -> 
 def plot_results(results: list[AllocationResult]) -> None:
     """Show allocation sensitivity and the observed economic–resilience plane."""
     apply_paper_typography(text_scale=0.78 * 1.3, legend_scale=1.3)
-    fig, (allocation_ax, tradeoff_ax) = plt.subplots(1, 2, figsize=(20, 8), dpi=220)
+    fig, (allocation_ax, tradeoff_ax) = plt.subplots(1, 2, figsize=(20, 8.8), dpi=220)
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
     emergency = [row.emergency_energy_mwh for row in results]
@@ -180,7 +180,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.legend(
         handles=(operating_line, supply_line),
         loc="upper center",
-        bbox_to_anchor=(0.5, 1.32),
+        bbox_to_anchor=(0.5, 1.27),
         ncol=2,
         frameon=True,
         fancybox=False,
@@ -218,7 +218,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     tradeoff_ax.spines[["top", "right"]].set_visible(False)
     colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
     colorbar.set_label("ESS share (%)")
-    fig.tight_layout(w_pad=2.2)
+    fig.tight_layout(pad=0.7, w_pad=0.8)
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(OUT / f"{FIGURE_STEM}.{suffix}", bbox_inches="tight")
