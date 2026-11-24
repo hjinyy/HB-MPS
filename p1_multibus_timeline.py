@@ -22,7 +22,7 @@ def save_fleet_timeline(
     injections: tuple[InjectionHour, ...],
     output_dir: Path,
 ) -> None:
-    """Color shows modeled bus; a red dot shows actual HFC/ESS dispatch."""
+    """Color shows modeled bus; an orange dot shows actual HFC/ESS dispatch."""
     if len(trucks) != 168 * 5 or len(injections) != 168:
         raise ValueError("Timeline requires the complete 168-hour, five-truck P1 path")
     alpha = injections[0].alpha
@@ -50,7 +50,7 @@ def save_fleet_timeline(
         vmin=-0.5,
         vmax=1.5,
     )
-    axis.scatter(np.array(active_t) + 0.5, active_truck, color="#d62728", marker="o", s=24, zorder=3)
+    axis.scatter(np.array(active_t) + 0.5, active_truck, color="#ff7f0e", marker="o", s=24, zorder=3)
     for boundary in (0.5, 1.5, 2.5, 3.5):
         axis.axhline(boundary, color="white", linewidth=1.5, zorder=2)
     axis.set_yticks(range(5), ["Main\ntruck", "Aux 1", "Aux 2", "Aux 3", "Aux 4"])
@@ -66,7 +66,7 @@ def save_fleet_timeline(
             Line2D(
                 [],
                 [],
-                color="#d62728",
+                color="#ff7f0e",
                 marker="o",
                 linestyle="None",
                 label="HFC or ESS active",

@@ -32,7 +32,7 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
     groups = (original_ratings, equal_capacity)
     x = np.arange(3) * 0.55
     names = ("ESS-only", "HFC-only", "Proposed")
-    supply_colors = ("#1f77b4", "#d62728")
+    supply_colors = ("#1f77b4", "#ff7f0e")
     fig, axes = plt.subplots(1, 2, figsize=(17.6, 8), dpi=200, sharey=True)
     for ax, group, letter in zip(axes, groups, "ab", strict=True):
         bottom = np.zeros(3)
@@ -82,7 +82,7 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
             (-0.16, 0.0, 0.16),
             ("operating_net_krw", "avoided_outage_krw", "total_value_krw"),
             ("Operating net benefit", "Avoided interruption benefit", "Net societal benefit"),
-            ("#1f77b4", "#d62728", "#2ca02c"),
+            ("#1f77b4", "#ff7f0e", "#2ca02c"),
             strict=True,
         ):
             ax.bar(x + offset, [float(row[field]) / 1e6 for row in group],

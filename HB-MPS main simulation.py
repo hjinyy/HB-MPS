@@ -718,7 +718,8 @@ def create_grid_resilience_figure(scenario_results):
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = legends[0]
     fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+               ncol=4, frameon=False, columnspacing=0.8, handletextpad=0.6,
+               prop={"size": 28})
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=3.0)
     save_figure(fig, "fig5_mode_2_activation_and_auxiliary_truck_deployment")
@@ -741,7 +742,8 @@ def create_asset_status_figure(scenario_results):
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=2, frameon=False, prop={"size": Config.FONT_LEGEND})
+               ncol=4, frameon=False, columnspacing=0.8, handletextpad=0.6,
+               prop={"size": 28})
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=2.8)
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")

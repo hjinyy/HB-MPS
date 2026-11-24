@@ -97,7 +97,7 @@ def plot_supply_demand_mismatch(df):
     axes[0].plot(
         range(1, len(df) + 1),
         df["solar"] / 1000,
-        color="#2ca02c",
+        color="#1f77b4",
         linewidth=LINE_WIDTH,
         label="PV generation",
     )
@@ -105,7 +105,7 @@ def plot_supply_demand_mismatch(df):
     axes[0].plot(
         range(1, len(df) + 1),
         df["total_load"] / 1000,
-        color="#1f77b4",
+        color="#ff7f0e",
         linewidth=LINE_WIDTH,
         linestyle="--",
         label="Total load",
@@ -125,7 +125,7 @@ def plot_supply_demand_mismatch(df):
     axes[1].fill_between(
         x, mismatch, 0,
         where=mismatch >= 0,
-        color="#2ca02c",
+        color="#1f77b4",
         alpha=0.35,
         interpolate=True,
         label="Surplus PV",
@@ -134,7 +134,7 @@ def plot_supply_demand_mismatch(df):
     axes[1].fill_between(
         x, mismatch, 0,
         where=mismatch < 0,
-        color="#d62728",
+        color="#ff7f0e",
         alpha=0.35,
         interpolate=True,
         label="Energy deficit",
@@ -168,7 +168,9 @@ def plot_supply_demand_mismatch(df):
         bbox_to_anchor=(0.5, 0.99),
         ncol=4,
         frameon=False,
-        prop={"weight": "normal", "size": FONT_LEGEND},
+        columnspacing=0.8,
+        handletextpad=0.6,
+        prop={"weight": "normal", "size": 28},
     )
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.88], pad=2.0, h_pad=2.5)

@@ -93,7 +93,7 @@ def main() -> None:
             )
         ax.set_xticks(range(3), ("0.4", "0.6", "0.8"))
         ax.set_yticks(range(3), ("0.2", "0.3", "0.5"))
-        ax.set_xlabel(r"$q_{\mathrm{dis}}$" + f"\n({'a' if ax is axes[0] else 'b'})")
+        ax.set_xlabel(r"$q^{\mathrm{dis}}$" + f"\n({'a' if ax is axes[0] else 'b'})")
         ax.set_ylabel(r"$\mathrm{SOC}^{\mathrm{dis}}$ (%)")
         ax.set_xticks(np.arange(-0.5, 3, 1), minor=True)
         ax.set_yticks(np.arange(-0.5, 3, 1), minor=True)
