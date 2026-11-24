@@ -23,10 +23,10 @@ if TYPE_CHECKING:
 _STYLE = {
     "font.family": "Times New Roman",
     "font.weight": "normal",
-    "axes.labelsize": 13,
-    "xtick.labelsize": 11,
-    "ytick.labelsize": 11,
-    "legend.fontsize": 10,
+    "axes.labelsize": 26,
+    "xtick.labelsize": 22,
+    "ytick.labelsize": 22,
+    "legend.fontsize": 20,
     "pdf.fonttype": 42,
 }
 _LEGEND = {
@@ -67,17 +67,17 @@ def _draw_operation_timeline(axis: Axes, result: SeverityResult) -> None:
     hourly = result.hourly
     states = (
         (
-            "Economic supply\n(Mode 1)",
+            "Mode 1",
             hourly.mode1_active.to_numpy(dtype=bool),
             "#9467bd",
         ),
         (
-            "Emergency supply\n(Mode 2)",
+            "Mode 2",
             hourly.supply_active.to_numpy(dtype=bool),
             "#ff7f0e",
         ),
         (
-            "Requested\nbut unavailable",
+            "unserved\nenergy",
             (hourly.mode2_trigger & ~hourly.supply_active).to_numpy(dtype=bool),
             "#777777",
         ),
@@ -134,8 +134,8 @@ def _draw_truck_deployment(axis: Axes, result: SeverityResult) -> None:
 def save_operation_figure(result: SeverityResult, output_path: Path) -> None:
     """Save load trigger, operation timeline, and truck locations as Fig. 13."""
     with plt.rc_context(_STYLE):
-        fig = plt.figure(figsize=(13.5, 10.5), dpi=220)
-        grid = fig.add_gridspec(3, 1, height_ratios=(1.15, 0.95, 1.15), hspace=0.70)
+        fig = plt.figure(figsize=(13.5, 12), dpi=220)
+        grid = fig.add_gridspec(3, 1, height_ratios=(1.15, 0.95, 1.15), hspace=1.0)
         load_axis = fig.add_subplot(grid[0])
         timeline_axis = fig.add_subplot(grid[1])
         deployment_axis = fig.add_subplot(grid[2])
@@ -186,7 +186,7 @@ def _draw_nodal_profile(axis: Axes, result: SeverityResult) -> None:
     else:
         axis.text(
             0.03, 0.07, "No HB-MPS connection at this hour",
-            transform=axis.transAxes, fontsize=9,
+            transform=axis.transAxes, fontsize=18,
         )
     axis.axhline(0.95, color="#222222", linewidth=1.0, linestyle="--")
     axis.set_xlim(1, 33)
@@ -235,14 +235,14 @@ def _draw_minimum_voltage(axis: Axes, result: SeverityResult) -> None:
     axis.set_xlabel("Time (h)\n(b)")
     _style_time_axis(axis, show_ticks=True)
     axis.grid(axis="y", color="#dedede", linewidth=0.6)
-    axis.legend(ncol=4, columnspacing=1.3, handlelength=1.6, **_LEGEND)
+    axis.legend(ncol=2, columnspacing=1.3, handlelength=1.6, **_LEGEND)
 
 
 def save_voltage_figure(result: SeverityResult, output_path: Path) -> None:
     """Save nodal, temporal, and spatiotemporal voltage effects as Fig. 14."""
     with plt.rc_context(_STYLE):
-        fig = plt.figure(figsize=(13.5, 11.5), dpi=220)
-        grid = fig.add_gridspec(3, 1, height_ratios=(1.15, 1.45, 1.35), hspace=0.72)
+        fig = plt.figure(figsize=(13.5, 13.5), dpi=220)
+        grid = fig.add_gridspec(3, 1, height_ratios=(1.15, 1.45, 1.35), hspace=1.1)
         nodal_axis = fig.add_subplot(grid[0])
         minimum_axis = fig.add_subplot(grid[1])
         gain_axis = fig.add_subplot(grid[2])
