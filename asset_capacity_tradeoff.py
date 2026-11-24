@@ -206,7 +206,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     tradeoff_ax.spines[["top", "right"]].set_visible(False)
     colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
     colorbar.set_label("ESS share (%)")
-    fig.tight_layout(rect=(0, 0, 1, 0.9), pad=0.7, w_pad=0.8)
+    fig.tight_layout(rect=(0, 0, 1, 0.9), pad=0.7, w_pad=1.6)
     fig.legend(
         handles=(operating_line, supply_line),
         loc="upper left",
