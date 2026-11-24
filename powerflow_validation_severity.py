@@ -10,27 +10,27 @@
 # 3. Or: chmod +x powerflow_validation_severity.py && ./powerflow_validation_severity.py
 # ──────────────────
 
-"""Validate severity-ranked placement of unchanged P1 emergency supply."""
+"""Independent bus-level dynamic HB-MPS dispatch and IEEE 33-bus validation.
+
+This replaces only the additional Fig. 15(1)/(2) experiment. The original
+Figure 15 and operational P1 simulation are read but never modified.
+"""
 
 from __future__ import annotations
 
-from collections import Counter
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Final
 
 import numpy as np
+import pandas as pd
 import pandapower as pp
 
-from emergency_dispatch import run_scenario
-from emergency_dispatch_model import Scenario, Strategy
 from hb_inputs import INPUT, load_hours
-from p1_multibus_dispatch import allocate_p1_supply, validate_main_reference
+from powerflow_plot_severity import save_severity_figure
 from powerflow_validation import (
     INDUSTRIAL_BUS_NUMBERS,
     INDUSTRIAL_COLUMN,
     INPUT_PATH,
-    MAIN_REFERENCE_PATH,
     MIN_VOLTAGE_PU,
     OUTPUT_DIR,
     PV_COLUMN,
@@ -43,26 +43,31 @@ from powerflow_validation import (
     set_operating_point,
     solve_network,
 )
-from powerflow_plot_severity import save_severity_figure
+from severity_ac_dispatch import dispatch_hour
+from severity_fleet import (
+    FLEET_SIZE,
+    H2_CAPACITY_KG,
+    FleetState,
+    advance_idle,
+    price_quantiles,
+)
 
 ALPHAS: Final = (1.3, 1.5)
-WEIGHT_DEMAND: Final = 0.5
-WEIGHT_VOLTAGE: Final = 0.5
 SUMMARY_PATH: Final = OUTPUT_DIR / "FIG15_SEVERITY_DISPATCH_SUMMARY.md"
+HOURLY_PATH: Final = OUTPUT_DIR / "fig15_severity_dynamic_hourly.csv"
+BUS_PATH: Final = OUTPUT_DIR / "fig15_severity_dynamic_bus_hourly.csv"
+TRUCK_PATH: Final = OUTPUT_DIR / "fig15_severity_dynamic_trucks.csv"
+COMPARISON_PATH: Final = OUTPUT_DIR / "fig15_strategy_comparison.csv"
 
 
 @dataclass(frozen=True, slots=True)
 class SeverityResult:
     alpha: float
+    hourly: pd.DataFrame
+    buses: pd.DataFrame
+    trucks: pd.DataFrame
     baseline_profiles: np.ndarray
     supported_profiles: np.ndarray
-    baseline_losses_mw: np.ndarray
-    supported_losses_mw: np.ndarray
-    active_hours: np.ndarray
-    main_buses: tuple[int | None, ...]
-    injection_buses: tuple[tuple[int, ...], ...]
-    supplied_raw_kwh: float
-    supplied_ac_mwh: float
     worst_hour: int
 
     @property
@@ -73,230 +78,268 @@ class SeverityResult:
     def supported_minimum(self) -> np.ndarray:
         return self.supported_profiles.min(axis=1)
 
+    @property
+    def active_hours(self) -> np.ndarray:
+        return self.hourly["supply_active"].to_numpy(dtype=bool)
 
-def severity_scores(demand_mw: np.ndarray, baseline_voltage: np.ndarray) -> np.ndarray:
-    """Score each industrial bus using local excess demand and voltage deficit."""
-    demand_scale = max(float(demand_mw.max()), 1e-12)
-    voltage_deficit = np.maximum(MIN_VOLTAGE_PU - baseline_voltage, 0.0)
-    return (
-        WEIGHT_DEMAND * demand_mw / demand_scale
-        + WEIGHT_VOLTAGE * voltage_deficit / MIN_VOLTAGE_PU
-    )
+    @property
+    def load_dispatch_hours(self) -> np.ndarray:
+        return self.hourly["load_dispatch_active"].to_numpy(dtype=bool)
 
+    @property
+    def voltage_only_dispatch_hours(self) -> np.ndarray:
+        return self.hourly["voltage_only_dispatch_active"].to_numpy(dtype=bool)
 
-def place_trucks(
-    demand_mw: np.ndarray,
-    scores: np.ndarray,
-    truck_hfc_mw: np.ndarray,
-    ess_mw: float,
-) -> tuple[np.ndarray, int | None, tuple[int, ...]]:
-    """Place each active truck at one ranked bus; keep ESS with the main truck.
-
-    Existing P1 output is injected in full. Remaining local excess demand only
-    guides the next location; it does not alter the operational energy balance.
-    """
-    injections = np.zeros(len(INDUSTRIAL_BUS_NUMBERS), dtype=float)
-    remaining = demand_mw.copy()
-    ranked = sorted(
-        range(len(remaining)),
-        key=lambda index: (-scores[index], INDUSTRIAL_BUS_NUMBERS[index]),
-    )
-    selected: list[int] = []
-    main_bus: int | None = None
-    for truck, hfc_mw in enumerate(truck_hfc_mw):
-        supply = float(hfc_mw) + (ess_mw if truck == 0 else 0.0)
-        if supply <= 0:
-            continue
-        candidates = [index for index in ranked if remaining[index] > 1e-12]
-        chosen = candidates[0] if candidates else ranked[0]
-        injections[chosen] += supply
-        remaining[chosen] = max(0.0, remaining[chosen] - supply)
-        bus_number = INDUSTRIAL_BUS_NUMBERS[chosen]
-        selected.append(bus_number)
-        if truck == 0:
-            main_bus = bus_number
-    if not np.isclose(injections.sum(), truck_hfc_mw.sum() + ess_mw):
-        raise AssertionError("Severity placement changed P1 emergency supply")
-    return injections, main_bus, tuple(selected)
+    @property
+    def injection_buses(self) -> tuple[tuple[int, ...], ...]:
+        rows = self.trucks.loc[self.trucks.bus.notna()]
+        return tuple(
+            tuple(rows.loc[rows.t.eq(t), "bus"].astype(int))
+            for t in range(len(self.hourly))
+        )
 
 
-def simulate(alpha: float) -> SeverityResult:
-    """Run 168 hourly baseline and severity-supported AC power flows."""
-    frame = load_profiles(INPUT_PATH)
-    industrial_fraction = profile_fraction(frame[INDUSTRIAL_COLUMN])
-    residential_fraction = profile_fraction(frame[RESIDENTIAL_COLUMN])
-    pv_fraction = profile_fraction(frame[PV_COLUMN])
-    hours = load_hours(INPUT)
-    run = run_scenario(hours, Scenario(alpha, 5, Strategy.P1))
-    validate_main_reference(run, MAIN_REFERENCE_PATH)
-    if len(frame) != 168 or len(run.steps) != len(frame):
-        raise AssertionError("Severity experiment requires aligned 168-hour profiles")
-
-    base_net = build_network()
-    support_net = build_network()
-    industrial_indices = {number - 1 for number in INDUSTRIAL_BUS_NUMBERS}
-    residential_indices = {number - 1 for number in RESIDENTIAL_BUS_NUMBERS}
-    industrial_rating = float(
-        base_net.load.loc[base_net.load.bus.isin(industrial_indices), "p_mw"].sum()
-    )
-    residential_rating = float(
-        base_net.load.loc[base_net.load.bus.isin(residential_indices), "p_mw"].sum()
-    )
-    bus_ratings = np.array(
+def _bus_ratings(net: pp.pandapowerNet) -> np.ndarray:
+    return np.array(
         [
-            float(base_net.load.loc[base_net.load.bus.eq(bus - 1), "p_mw"].sum())
+            float(net.load.loc[net.load.bus.eq(bus - 1), "p_mw"].sum())
             for bus in INDUSTRIAL_BUS_NUMBERS
         ]
     )
-    bus_loads = industrial_fraction[:, None] * bus_ratings[None, :]
-    bus_thresholds = alpha * bus_loads.mean(axis=0)
-    pv_rating = float(base_net.load.p_mw.sum()) * PV_PENETRATION
+
+
+def simulate(alpha: float) -> SeverityResult:
+    """Recompute dispatch, SOC, LOH and sequential AC support for 168 hours."""
+    frame = load_profiles(INPUT_PATH)
+    hours = load_hours(INPUT)
+    if len(frame) != 168 or len(hours) != len(frame):
+        raise AssertionError("Dynamic experiment requires aligned 168-hour inputs")
+    industrial_fraction = profile_fraction(frame[INDUSTRIAL_COLUMN])
+    residential_fraction = profile_fraction(frame[RESIDENTIAL_COLUMN])
+    pv_fraction = profile_fraction(frame[PV_COLUMN])
+    baseline_net = build_network()
+    support_net = build_network()
+    bus_ratings = _bus_ratings(baseline_net)
+    industrial_rating = float(bus_ratings.sum())
+    residential_indices = {bus - 1 for bus in RESIDENTIAL_BUS_NUMBERS}
+    residential_rating = float(
+        baseline_net.load.loc[
+            baseline_net.load.bus.isin(residential_indices), "p_mw"
+        ].sum()
+    )
+    pv_rating = float(baseline_net.load.p_mw.sum()) * PV_PENETRATION
     raw_peak = float(frame[INDUSTRIAL_COLUMN].max())
     mw_per_raw_kwh = industrial_rating / raw_peak
-    bus18_rating = bus_ratings[INDUSTRIAL_BUS_NUMBERS.index(18)]
-    bus33_rating = bus_ratings[INDUSTRIAL_BUS_NUMBERS.index(33)]
-    _, truck_rows = allocate_p1_supply(
-        hours, run, bus18_rating / (bus18_rating + bus33_rating)
-    )
-    generator_indices = np.array(
+    bus_loads = industrial_fraction[:, None] * bus_ratings[None, :]
+    bus_thresholds = alpha * bus_loads.mean(axis=0)
+    generators = np.array(
         [
             pp.create_sgen(
-                support_net, bus - 1, p_mw=0.0, q_mvar=0.0,
-                name=f"Severity-{bus}",
+                support_net,
+                bus - 1,
+                p_mw=0.0,
+                q_mvar=0.0,
+                name=f"Dynamic-{bus}",
             )
             for bus in INDUSTRIAL_BUS_NUMBERS
         ]
     )
-
+    state = FleetState.initial()
+    high_lcoe, low_smp = price_quantiles(hours)
+    hourly_rows: list[dict[str, float | int | str | bool]] = []
+    bus_rows: list[dict[str, float | int | str | bool]] = []
+    truck_rows: list[dict[str, float | int | str | bool | None]] = []
     baseline_profiles: list[np.ndarray] = []
     supported_profiles: list[np.ndarray] = []
-    baseline_losses: list[float] = []
-    supported_losses: list[float] = []
-    active_hours: list[bool] = []
-    main_buses: list[int | None] = []
-    injection_buses: list[tuple[int, ...]] = []
-    for t, step in enumerate(run.steps):
+    industrial_by_bus = {bus: index for index, bus in enumerate(INDUSTRIAL_BUS_NUMBERS)}
+
+    for t, hour in enumerate(hours):
         mixed_scale = (
             industrial_rating * industrial_fraction[t]
             + residential_rating * residential_fraction[t]
         ) / (industrial_rating + residential_rating)
         operating_point = (
-            industrial_fraction[t], residential_fraction[t], mixed_scale,
-            pv_fraction[t] * pv_rating, 0.0,
+            industrial_fraction[t],
+            residential_fraction[t],
+            mixed_scale,
+            pv_fraction[t] * pv_rating,
+            0.0,
         )
-        set_operating_point(base_net, *operating_point)
+        set_operating_point(baseline_net, *operating_point)
         set_operating_point(support_net, *operating_point)
-        baseline, baseline_loss = solve_network(base_net)
+        support_net.sgen.loc[generators, "p_mw"] = 0.0
+        baseline_voltage, baseline_loss = solve_network(baseline_net)
         demand = np.maximum(bus_loads[t] - bus_thresholds, 0.0)
-        bus_voltage = baseline[np.array(INDUSTRIAL_BUS_NUMBERS) - 1]
-        scores = severity_scores(demand, bus_voltage)
-        truck_hfc = np.array(
-            [row.hfc_kwh for row in truck_rows[t * 5 : (t + 1) * 5]]
-        ) * mw_per_raw_kwh
-        ess_mw = step.ess_emergency_kwh * mw_per_raw_kwh
-        if truck_hfc.sum() + ess_mw > 0 and not np.any(demand > 0):
-            raise AssertionError("P1 emergency output occurred without local demand")
-        injections, main_bus, selected = place_trucks(
-            demand, scores, truck_hfc, ess_mw
+        load_trigger = bool(np.any(demand > 1e-9))
+        voltage_trigger = bool(np.any(baseline_voltage < MIN_VOLTAGE_PU))
+        mode2 = load_trigger or voltage_trigger
+        soc_start = state.soc
+        h2_start = sum(state.h2_kg)
+        h2_by_truck_start = tuple(state.h2_kg)
+        idle = None
+        if mode2:
+            dispatch = dispatch_hour(
+                support_net,
+                baseline_voltage,
+                demand,
+                generators,
+                state,
+                mw_per_raw_kwh,
+            )
+            supported_voltage = dispatch.supported_voltage
+            supported_loss = dispatch.supported_loss_mw
+            injections = dispatch.injections_mw
+            residual = dispatch.remaining_excess_mw
+            scores = dispatch.initial_severity
+            hfc_kwh = dispatch.hfc_kwh
+            ess_kwh = dispatch.ess_kwh
+            load_response_mw = dispatch.load_response_mw
+            voltage_only_mw = dispatch.voltage_only_mw
+            consumed_h2 = dispatch.h2_consumed_kg
+            ess_withdrawal = dispatch.ess_withdrawal_kwh
+            vehicles = dispatch.trucks
+        else:
+            idle = advance_idle(state, hour, high_lcoe, low_smp)
+            supported_voltage, supported_loss = solve_network(support_net)
+            injections = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
+            residual = demand.copy()
+            scores = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
+            hfc_kwh = ess_kwh = load_response_mw = voltage_only_mw = 0.0
+            consumed_h2 = idle.travel_h2_kg
+            ess_withdrawal = 0.0
+            vehicles = ()
+        supply_active = bool(hfc_kwh + ess_kwh > 1e-7)
+        baseline_deficit = np.maximum(MIN_VOLTAGE_PU - baseline_voltage, 0.0)
+        supported_deficit = np.maximum(MIN_VOLTAGE_PU - supported_voltage, 0.0)
+        hourly_rows.append(
+            {
+                "alpha": alpha,
+                "t": t,
+                "timestamp": str(frame.at[t, "timestamp"]),
+                "mode2_trigger": mode2,
+                "load_excess_trigger": load_trigger,
+                "voltage_trigger": voltage_trigger,
+                "supply_active": supply_active,
+                "load_dispatch_active": supply_active and load_trigger,
+                "voltage_only_dispatch_active": supply_active
+                and not load_trigger
+                and voltage_trigger,
+                "industrial_load_mw": float(bus_loads[t].sum()),
+                "bus_excess_mw": float(demand.sum()),
+                "residual_excess_mw": float(residual.sum()),
+                "hfc_kwh": hfc_kwh,
+                "ess_emergency_kwh": ess_kwh,
+                "emergency_supply_mw": float(injections.sum()),
+                "load_response_mw": load_response_mw,
+                "voltage_only_mw": voltage_only_mw,
+                "active_trucks": sum(vehicle.bus is not None for vehicle in vehicles),
+                "vmin_baseline": float(baseline_voltage.min()),
+                "vmin_supported": float(supported_voltage.min()),
+                "voltage_violating_buses_baseline": int(
+                    np.count_nonzero(baseline_deficit)
+                ),
+                "voltage_violating_buses_supported": int(
+                    np.count_nonzero(supported_deficit)
+                ),
+                "voltage_deficit_baseline_pu": float(baseline_deficit.sum()),
+                "voltage_deficit_supported_pu": float(supported_deficit.sum()),
+                "line_loss_baseline_mw": baseline_loss,
+                "line_loss_supported_mw": supported_loss,
+                "soc_start_pct": soc_start * 100,
+                "soc_end_pct": state.soc * 100,
+                "main_loh_end_pct": state.h2_kg[0] / H2_CAPACITY_KG * 100,
+                "fleet_h2_start_kg": h2_start,
+                "fleet_h2_end_kg": sum(state.h2_kg),
+                "h2_consumed_kg": consumed_h2,
+                "h2_refilled_kg": idle.external_h2_kg if idle else 0.0,
+                "phase1_ess_kwh": idle.phase1_ess_kwh if idle else 0.0,
+                "pv_ess_charge_kwh": idle.pv_ess_charge_kwh if idle else 0.0,
+                "grid_ess_charge_kwh": idle.grid_ess_charge_kwh if idle else 0.0,
+                "pv_p2g_kwh": idle.pv_p2g_kwh if idle else 0.0,
+                "ess_withdrawal_kwh": ess_withdrawal,
+            }
         )
-        support_net.sgen.loc[generator_indices, "p_mw"] = injections
-        supported, supported_loss = solve_network(support_net)
-        baseline_profiles.append(baseline)
-        supported_profiles.append(supported)
-        baseline_losses.append(baseline_loss)
-        supported_losses.append(supported_loss)
-        active_hours.append(bool(injections.sum() > 0))
-        main_buses.append(main_bus)
-        injection_buses.append(selected)
+        for bus in range(1, 34):
+            index = industrial_by_bus.get(bus)
+            bus_rows.append(
+                {
+                    "alpha": alpha,
+                    "t": t,
+                    "bus": bus,
+                    "industrial_candidate": index is not None,
+                    "industrial_load_mw": float(bus_loads[t, index])
+                    if index is not None
+                    else 0.0,
+                    "threshold_mw": float(bus_thresholds[index])
+                    if index is not None
+                    else 0.0,
+                    "excess_mw": float(demand[index]) if index is not None else 0.0,
+                    "initial_severity": float(scores[index])
+                    if index is not None
+                    else 0.0,
+                    "injection_mw": float(injections[index])
+                    if index is not None
+                    else 0.0,
+                    "residual_excess_mw": float(residual[index])
+                    if index is not None
+                    else 0.0,
+                    "baseline_voltage_pu": float(baseline_voltage[bus - 1]),
+                    "supported_voltage_pu": float(supported_voltage[bus - 1]),
+                }
+            )
+        for truck in range(FLEET_SIZE):
+            vehicle = vehicles[truck] if vehicles else None
+            truck_rows.append(
+                {
+                    "alpha": alpha,
+                    "t": t,
+                    "truck": truck,
+                    "bus": vehicle.bus if vehicle else None,
+                    "hfc_kwh": vehicle.hfc_kwh if vehicle else 0.0,
+                    "ess_kwh": vehicle.ess_kwh if vehicle else 0.0,
+                    "h2_start_kg": h2_by_truck_start[truck],
+                    "h2_end_kg": state.h2_kg[truck],
+                    "loh_end_pct": state.h2_kg[truck] / H2_CAPACITY_KG * 100,
+                }
+            )
+        baseline_profiles.append(baseline_voltage)
+        supported_profiles.append(supported_voltage)
 
     baseline_array = np.stack(baseline_profiles)
-    supported_array = np.stack(supported_profiles)
     return SeverityResult(
         alpha=alpha,
+        hourly=pd.DataFrame.from_records(hourly_rows),
+        buses=pd.DataFrame.from_records(bus_rows),
+        trucks=pd.DataFrame.from_records(truck_rows),
         baseline_profiles=baseline_array,
-        supported_profiles=supported_array,
-        baseline_losses_mw=np.array(baseline_losses),
-        supported_losses_mw=np.array(supported_losses),
-        active_hours=np.array(active_hours),
-        main_buses=tuple(main_buses),
-        injection_buses=tuple(injection_buses),
-        supplied_raw_kwh=sum(
-            step.hfc_kwh + step.ess_emergency_kwh for step in run.steps
-        ),
-        supplied_ac_mwh=sum(
-            step.hfc_kwh + step.ess_emergency_kwh for step in run.steps
-        ) * mw_per_raw_kwh,
+        supported_profiles=np.stack(supported_profiles),
         worst_hour=int(np.argmin(baseline_array.min(axis=1))),
     )
 
 
-def write_summary(results: tuple[SeverityResult, ...], path: Path) -> None:
-    """Record the experiment's assumptions and comparable case statistics."""
-    lines = [
-        "# Figure 15 severity dispatch validation",
-        "",
-        "The original Figure 15 and its validation workflow remain unchanged.",
-        "Each industrial bus uses P_i,th = α × mean(P_i) over 168 h and "
-        "D_i(t) = max(0, P_i(t) − P_i,th).",
-        "Severity is S_i = 0.5 D_i/max_j(D_j) + "
-        "0.5 max(0, 0.95 − V_i,base)/0.95 (zero demand term if all D_i = 0).",
-        "Baseline AC voltage is calculated before the hourly ranking. "
-        "Active trucks are placed at the highest-ranked bus with remaining local "
-        "excess demand; if all demands are covered, the highest-ranked bus is used. "
-        "One truck occupies one bus per hour, and ESS support stays with the main "
-        "truck. Multiple trucks may use the same bus.",
-        "P1 HFC and ESS emergency outputs, fuel inventories, and financial results "
-        "are unchanged. Raw operational kWh is converted to benchmark-feeder MW "
-        "using industrial benchmark MW / peak raw industrial kWh, as in the "
-        "existing validation. A one-hour interval makes injected MW numerically "
-        "equal to benchmark MWh. Voltage violations count hours whose minimum "
-        "bus voltage is strictly below 0.95 p.u.",
-        "",
-        "| α | Active hours | Worst minimum voltage, baseline → support (p.u.) "
-        "| Hours V < 0.95, baseline → support | Emergency supply, P1 raw "
-        "(MWh) | AC-scaled injection (MWh) | Line losses, baseline → support "
-        "(MWh) | Main injection bus frequency |",
-        "|---:|---:|---:|---:|---:|---:|---:|---|",
-    ]
-    for result in results:
-        frequencies = Counter(bus for bus in result.main_buses if bus is not None)
-        frequency_text = ", ".join(
-            f"Bus {bus}: {count} h" for bus, count in frequencies.most_common()
-        ) or "None"
-        lines.append(
-            f"| {result.alpha:.1f} | {int(result.active_hours.sum())} "
-            f"| {result.baseline_minimum.min():.4f} → "
-            f"{result.supported_minimum.min():.4f} "
-            f"| {int((result.baseline_minimum < MIN_VOLTAGE_PU).sum())} → "
-            f"{int((result.supported_minimum < MIN_VOLTAGE_PU).sum())} "
-            f"| {result.supplied_raw_kwh / 1000:.3f} "
-            f"| {result.supplied_ac_mwh:.3f} "
-            f"| {result.baseline_losses_mw.sum():.3f} → "
-            f"{result.supported_losses_mw.sum():.3f} "
-            f"| {frequency_text} |"
-        )
-    lines.extend([
-        "",
-        "For illustrating voltage support, α = 1.3 is the clearer paper "
-        "candidate: it dispatches more often and has the larger minimum-voltage "
-        "improvement. α = 1.5 is a less aggressive operating case, but its "
-        "voltage effect is small. Neither case reduces the number of hours "
-        "below 0.95 p.u.; neither figure should be presented as restoring "
-        "full voltage compliance.",
-        "",
-    ])
-    path.write_text("\n".join(lines), encoding="utf-8")
-
-
 def main() -> None:
-    """Generate only the additional α = 1.3 and 1.5 validation artifacts."""
+    """Generate both dynamic experiments, comparisons, figures, CSV and report."""
+    from severity_report import compare_strategies, write_report
+
     results = tuple(simulate(alpha) for alpha in ALPHAS)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    pd.concat([result.hourly for result in results], ignore_index=True).to_csv(
+        HOURLY_PATH, index=False
+    )
+    pd.concat([result.buses for result in results], ignore_index=True).to_csv(
+        BUS_PATH, index=False
+    )
+    pd.concat([result.trucks for result in results], ignore_index=True).to_csv(
+        TRUCK_PATH, index=False
+    )
     for index, result in enumerate(results, start=1):
-        stem = f"fig15_{index}_severity_dispatch_alpha_{str(result.alpha).replace('.', '_')}"
+        alpha_label = str(result.alpha).replace(".", "_")
+        stem = f"fig15_{index}_severity_dispatch_alpha_{alpha_label}"
         for suffix in ("png", "pdf"):
             save_severity_figure(result, OUTPUT_DIR / f"{stem}.{suffix}")
-    write_summary(results, SUMMARY_PATH)
+    comparison = compare_strategies(results)
+    comparison.to_csv(COMPARISON_PATH, index=False)
+    write_report(results, comparison, SUMMARY_PATH)
     print(SUMMARY_PATH.read_text(encoding="utf-8"))
 
 

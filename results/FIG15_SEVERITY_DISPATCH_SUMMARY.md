@@ -1,14 +1,62 @@
-# Figure 15 severity dispatch validation
+# Fig. 15(1)·(2): 모선별 동적 HB-MPS 비상운용 검증
 
-The original Figure 15 and its validation workflow remain unchanged.
-Each industrial bus uses P_i,th = α × mean(P_i) over 168 h and D_i(t) = max(0, P_i(t) − P_i,th).
-Severity is S_i = 0.5 D_i/max_j(D_j) + 0.5 max(0, 0.95 − V_i,base)/0.95 (zero demand term if all D_i = 0).
-Baseline AC voltage is calculated before the hourly ranking. Active trucks are placed at the highest-ranked bus with remaining local excess demand; if all demands are covered, the highest-ranked bus is used. One truck occupies one bus per hour, and ESS support stays with the main truck. Multiple trucks may use the same bus.
-P1 HFC and ESS emergency outputs, fuel inventories, and financial results are unchanged. Raw operational kWh is converted to benchmark-feeder MW using industrial benchmark MW / peak raw industrial kWh, as in the existing validation. A one-hour interval makes injected MW numerically equal to benchmark MWh. Voltage violations count hours whose minimum bus voltage is strictly below 0.95 p.u.
+기존 Figure 15 및 메인 P1 시뮬레이션은 수정하지 않았다. 직전 위치 재배치 실험의 Fig. 15(1)·(2) 출력만 새 동적 운용 결과로 교체했다.
 
-| α | Active hours | Worst minimum voltage, baseline → support (p.u.) | Hours V < 0.95, baseline → support | Emergency supply, P1 raw (MWh) | AC-scaled injection (MWh) | Line losses, baseline → support (MWh) | Main injection bus frequency |
-|---:|---:|---:|---:|---:|---:|---:|---|
-| 1.3 | 22 | 0.9236 → 0.9265 | 99 → 99 | 30.963 | 1.915 | 14.263 → 14.079 | Bus 32: 22 h |
-| 1.5 | 8 | 0.9236 → 0.9239 | 99 → 99 | 1.570 | 0.097 | 14.263 → 14.253 | Bus 32: 8 h |
+## 계산 규칙과 단위
 
-For illustrating voltage support, α = 1.3 is the clearer paper candidate: it dispatches more often and has the larger minimum-voltage improvement. α = 1.5 is a less aggressive operating case, but its voltage effect is small. Neither case reduces the number of hours below 0.95 p.u.; neither figure should be presented as restoring full voltage compliance.
+- 9개 산업 모선마다 168시간 평균 부하를 구하고 임계값을 α배로 정했다. 초과분 D_i=max(0,P_i−α mean(P_i))는 **가정된 공급 허용량 대비 부족분**이며 실측 미공급 전력과 다르다.
+- 매 시간 공급 전 33개 모선의 AC 전압을 확인한다. 산업 모선 초과 또는 어느 모선의 전압이 0.95 p.u. 미만이면 Mode 2 조건이다. 접속은 산업 모선 9개로 제한한다.
+- 심각도는 0.5×(모선 초과량/해당 시간 최대 초과량) + 0.5×(모선 전압 위반량/33개 모선 최대 위반량)이다. 후보 모선에 위반이 없지만 다른 모선에 위반이 있으면 후보 전압의 낮은 순서를 사용한다.
+- 차량별로 심각도가 가장 높은 모선에 최대 1곳 접속하고 HFC를 먼저 투입한다. 투입 후 AC를 다시 풀어 남은 부하 초과와 저전압을 평가한다. ESS는 HFC 다음에 주 차량의 접속 모선에서만 사용한다. 같은 모선에 여러 차량이 접속할 수 있다.
+- 전압 지원 필요량은 해당 모선에서 차량 가용 출력으로 AC 시험하고, 0.95를 달성할 수 있으면 이분 탐색으로 최소 출력을 찾는다. 한 차량으로 달성하지 못하면 위반량을 줄이는 경우 가용 출력을 쓴다. 공급량은 max(남은 해당 모선 초과분, 전압 지원 필요량)으로 정해 두 요구량을 더하지 않는다.
+- IEEE 33-bus MW와 운용 kWh의 환산은 기존 검증과 같은 (산업 모선 정격 MW)/(입력 산업부하 최대 kWh)이다. 1시간 주입 MW의 수치는 MWh와 같다.
+- HFC 정격, 수소·이동 소비, 보충 순서, ESS 효율·SOC 하한, 비상 외 시간의 Mode 1/충전 규칙은 원 P1과 같다. ESS만 출동하는 주 차량에도 이동 수소를 차감한다. 차량은 1시간 단위로 재배치하며 이동 시간은 별도로 모델링하지 않는다. 전압 전용 공급에는 VOLL 회피편익을 계산하지 않았다.
+- 부하 대응/전압 전용 에너지는 각 접속 모선의 계산상 초과분을 먼저 충당한 것으로 회계상 구분했다. 동일 주입이 전압에도 기여하므로 물리적으로 독립된 두 종류의 전력이 아니다.
+
+## 세 방식 비교
+
+기존 Figure 15는 두 고정 모선 주입, 직전 실험은 P1 공급량을 고정한 채 위치만 재배치, 새 실험은 출동·공급량·상태를 AC 결과에 따라 매시간 다시 계산한다.
+
+공통 무지원 기준: 최저 0.9236 p.u., 저전압 99 h, 발생 모선 17개, 모선·시간 1117, 누적 위반 11.217 p.u.·bus·h, 선로손실 14.263 MWh.
+
+| α | 방식 | Mode 2 조건/실공급 h | HFC/ESS 원자료 MWh | 최저 전압 p.u. | 저전압 시간/모선 수/모선·시간 | 누적 위반 p.u.·bus·h | 선로손실 MWh |
+|---:|---|---:|---:|---:|---:|---:|---:|
+| 1.3 | Existing Figure 15 | 39/22 | 26.403/4.560 | 0.9270 | 99/16/1110 | 10.222 | 14.061 |
+| 1.3 | Location-only severity | 39/22 | 26.403/4.560 | 0.9265 | 99/16/1110 | 10.466 | 14.079 |
+| 1.3 | Dynamic bus-level | 99/34 | 38.032/5.643 | 0.9236 | 80/17/1014 | 10.266 | 14.028 |
+| 1.5 | Existing Figure 15 | 8/8 | 1.570/0.000 | 0.9248 | 99/16/1116 | 11.157 | 14.251 |
+| 1.5 | Location-only severity | 8/8 | 1.570/0.000 | 0.9239 | 99/17/1117 | 11.180 | 14.253 |
+| 1.5 | Dynamic bus-level | 99/34 | 38.032/5.643 | 0.9236 | 80/17/1012 | 10.220 | 14.024 |
+
+두 기준 방식은 산업부하 초과 시에만 출동한다. 새 방식의 부하 초과/저전압 조건과 실제 저전압 전용 공급 시간은 비교 CSV에 별도로 기록했다. 원자료 에너지 MWh와 AC 환산 MWh는 서로 다른 스케일이므로 혼용하지 않았다.
+
+## 동적 운용 상세
+
+| α | 부하 초과/저전압 조건 h | 부하 초과/저전압 전용 공급 h | AC 주입/남은 모선 초과 MWh | 부하 대응/전압 전용 MWh | 수소 소비/보충 kg | SOC 초기→최저→종료 % | 주 차량 LOH 초기→최저→종료 % | 차량 출동 회수 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 1.3 | 39/99 | 8/26 | 2.702/3.322 | 0.448/2.253 | 2297.688/2324.171 | 40.0→10.0→10.0 | 80.0→0.0→90.0 | 95 |
+| 1.5 | 8/99 | 2/32 | 2.702/0.078 | 0.019/2.683 | 2297.688/2324.171 | 40.0→10.0→10.0 | 80.0→0.0→90.0 | 95 |
+
+차량별 배치 원자료는 `fig15_severity_dynamic_trucks.csv`에 있으며, 전체 접속 빈도는 다음과 같다.
+
+- α=1.3: 전체 모선:횟수 14:7; 18:46; 30:8; 31:8; 32:9; 33:17; 주 차량 18:24; 32:7.
+- α=1.5: 전체 모선:횟수 14:2; 18:53; 30:2; 31:2; 32:2; 33:34; 주 차량 18:29; 32:2.
+- α=1.3 차량별 접속 빈도:
+  - 차량 0 (주 차량): Bus 18 24회, Bus 32 7회
+  - 차량 1 (보조 HFC): Bus 18 7회, Bus 30 6회, Bus 32 1회, Bus 33 5회
+  - 차량 2 (보조 HFC): Bus 18 4회, Bus 30 1회, Bus 31 6회, Bus 32 1회, Bus 33 3회
+  - 차량 3 (보조 HFC): Bus 14 1회, Bus 18 8회, Bus 30 1회, Bus 31 1회, Bus 33 4회
+  - 차량 4 (보조 HFC): Bus 14 6회, Bus 18 3회, Bus 31 1회, Bus 33 5회
+- α=1.5 차량별 접속 빈도:
+  - 차량 0 (주 차량): Bus 18 29회, Bus 32 2회
+  - 차량 1 (보조 HFC): Bus 18 7회, Bus 30 2회, Bus 33 10회
+  - 차량 2 (보조 HFC): Bus 18 5회, Bus 31 2회, Bus 33 8회
+  - 차량 3 (보조 HFC): Bus 14 2회, Bus 18 8회, Bus 33 5회
+  - 차량 4 (보조 HFC): Bus 18 4회, Bus 33 11회
+
+원 P1과 위치 재배치는 공급량·SOC·LOH·수소 사용량이 같다. 새 방식은 저전압 대응으로 더 많은 시간 출동할 수 있으므로 전압 효과를 비교할 때 공급 에너지와 연료 소비 차이를 반드시 함께 봐야 한다. 잔여 모선 초과량은 계산상 임계 초과의 미충족분이며 물리적 미공급 전력을 뜻하지 않는다.
+
+- α=1.3: Mode 2 조건인데 공급하지 못한 시간 65 h. 기준 최악 시간 t=107에는 전압 0.9236 p.u., 공급 0.000 MW, SOC 10.0%, 함대 수소 0.0 kg이었다. 기존 P1처럼 Mode 2 중 외부 수소 보충을 하지 않아 자원이 소진된 결과다.
+- α=1.5: Mode 2 조건인데 공급하지 못한 시간 65 h. 기준 최악 시간 t=107에는 전압 0.9236 p.u., 공급 0.000 MW, SOC 10.0%, 함대 수소 0.0 kg이었다. 기존 P1처럼 Mode 2 중 외부 수소 보충을 하지 않아 자원이 소진된 결과다.
+
+**논문 조건 선택:** 0.95 p.u. 전압 조건이 출동을 지배하여 두 α의 Mode 2 조건(99 h), 실제 공급(34 h), 에너지·수소 사용량이 같다. 누적 전압 위반량은 α=1.3의 10.266에서 α=1.5의 10.220 p.u.·bus·h로 소폭 달라졌고, 두 조건 모두 저전압 시간이 80 h다. α=1.5는 완화된 부하 허용 조건의 대표 사례로 사용할 수 있지만 전압 성과 우월성을 주장할 근거는 약하다. α=1.3은 더 큰 계산상 모선 초과·잔여량을 보여 주는 가혹 조건이다. 어느 쪽도 완전한 전압 준수를 보여 주지 않으므로 논문에서는 이 한계를 명시해야 한다.
