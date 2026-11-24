@@ -28,7 +28,8 @@ OUT: Final = Path(__file__).resolve().parent / "results"
 FIGURE_STEM: Final = "fig7_distribution_of_hb_mps_operating_modes"
 SCENARIOS: Final = ((1.3, "Tight"), (1.5, "Standard"), (1.8, "Robust"))
 MODE_NAMES: Final = ("Mode 1", "Mode 2", "Standby")
-MODE_COLORS: Final = ("#1f77b4", "#ff7f0e", "#b3b3b3")
+MODE_COLORS: Final = ("#1f77b4", "#ff7f0e", "black")
+MODE_HATCHES: Final = (None, r"\\", "//")
 
 
 @dataclass(frozen=True, slots=True)
@@ -99,7 +100,9 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
     fig, axis = plt.subplots(figsize=(12, 8), dpi=220)
     x = np.arange(len(summaries))
     bottom = np.zeros(len(summaries))
-    for index, (name, color) in enumerate(zip(MODE_NAMES, MODE_COLORS, strict=True)):
+    for index, (name, color, hatch) in enumerate(
+        zip(MODE_NAMES, MODE_COLORS, MODE_HATCHES, strict=True)
+    ):
         values = np.array(
             [summary.mode_hours[index] / summary.hours * 100 for summary in summaries]
         )
@@ -108,9 +111,10 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
             values,
             bottom=bottom,
             width=0.62,
-            color=color,
-            edgecolor="black",
+            facecolor="white" if hatch else color,
+            edgecolor=color if hatch else "black",
             linewidth=0.8,
+            hatch=hatch,
             label=name,
         )
         for position, start, value in zip(x, bottom, values, strict=True):
@@ -121,7 +125,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
                     f"{value:.1f}%",
                     ha="center",
                     va="center",
-                    color="white" if index < 2 else "black",
+                    color="black" if hatch else "white",
                     fontsize=20,
                 )
         bottom += values
@@ -134,7 +138,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
     axis.set_axisbelow(True)
     axis.legend(
         loc="upper center",
-        bbox_to_anchor=(0.5, 1.13),
+        bbox_to_anchor=(0.5, 1.15),
         ncol=3,
         frameon=True,
         fancybox=False,
