@@ -164,7 +164,7 @@ def plot_supply_demand_mismatch(df):
         top_handles + bottom_handles,
         top_labels + bottom_labels,
         loc="upper center",
-        bbox_to_anchor=(0.5, 1.08),
+        bbox_to_anchor=(0.53, 1.08),
         ncol=4,
         frameon=True,
         fancybox=False,
@@ -176,11 +176,11 @@ def plot_supply_demand_mismatch(df):
         handlelength=1.2,
         prop={"weight": "normal", "size": FONT_TICK},
     )
-    scale_figure_text(fig, 0.6)
+    scale_figure_text(fig, 0.8)
     for ax in axes:
-        ax.tick_params(axis="y", labelsize=FONT_TICK * 0.6)
-        ax.xaxis.label.set_fontsize(FONT_TICK * 0.6)
-        ax.yaxis.label.set_fontsize(FONT_TICK * 0.6)
+        ax.tick_params(axis="y", labelsize=FONT_TICK * 0.8)
+        ax.xaxis.label.set_fontsize(FONT_TICK * 0.8)
+        ax.yaxis.label.set_fontsize(FONT_TICK * 0.8)
     fig.subplots_adjust(left=0.13, right=0.97, top=0.87, bottom=0.12, hspace=0.85)
 
     # Save figures
