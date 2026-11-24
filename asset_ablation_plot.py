@@ -47,16 +47,16 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
             visible = values > 0
             ax.bar(
                 x[visible], values[visible], bottom=bottom[visible], width=0.39,
-                label=label, facecolor="white" if hatch else color,
-                edgecolor=color if hatch else "black", linewidth=1.2,
-                hatch=hatch,
+                label=label, facecolor=color,
+                edgecolor="black", linewidth=1.2,
+                hatch=hatch, hatchcolor="white",
             )
             for x_position, start, value in zip(x, bottom, values, strict=True):
                 if value > 0:
                     ax.text(
                         x_position, start + value / 2, f"{value:.1f}",
                         ha="center", va="center",
-                        color="black" if hatch else "white",
+                        color="white",
                     )
             bottom += values
         ax.set_xticks(x, names)
@@ -97,9 +97,9 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         ):
             ax.bar(x + offset, [float(row[field]) / 1e6 for row in group],
                    width=0.15, label=label,
-                   facecolor="white" if hatch else color,
-                   edgecolor=color if hatch else "black", linewidth=1.2,
-                   hatch=hatch)
+                   facecolor=color,
+                   edgecolor="black", linewidth=1.2,
+                   hatch=hatch, hatchcolor="white")
         ax.set_xticks(x, names)
         ax.set_xlim(-0.3425, 1.4425)
         ax.set_xlabel(f"Configuration\n({letter})")

@@ -28,7 +28,7 @@ OUT: Final = Path(__file__).resolve().parent / "results"
 FIGURE_STEM: Final = "fig7_distribution_of_hb_mps_operating_modes"
 SCENARIOS: Final = ((1.3, "Tight"), (1.5, "Standard"), (1.8, "Robust"))
 MODE_NAMES: Final = ("Mode 1", "Mode 2", "Standby")
-MODE_COLORS: Final = ("#1f77b4", "#ff7f0e", "black")
+MODE_COLORS: Final = ("#1f77b4", "#ff7f0e", "#808080")
 MODE_HATCHES: Final = (None, r"\\", "//")
 
 
@@ -111,10 +111,11 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
             values,
             bottom=bottom,
             width=0.62,
-            facecolor="white" if hatch else color,
-            edgecolor=color if hatch else "black",
+            facecolor=color,
+            edgecolor="black",
             linewidth=0.8,
             hatch=hatch,
+            hatchcolor="white",
             label=name,
         )
         for position, start, value in zip(x, bottom, values, strict=True):
@@ -125,7 +126,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
                     f"{value:.1f}%",
                     ha="center",
                     va="center",
-                    color="black" if hatch else "white",
+                    color="white",
                     fontsize=20,
                 )
         bottom += values
