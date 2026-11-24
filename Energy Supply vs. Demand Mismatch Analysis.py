@@ -84,7 +84,7 @@ def load_data(file_path):
 def plot_supply_demand_mismatch(df):
     fig, axes = plt.subplots(
         2, 1,
-        figsize=(13, 5.5),
+        figsize=(13, 11 * 2 / 3),
         dpi=PAPER_DPI,
         sharex=True,
         gridspec_kw={"height_ratios": [1, 1]},
@@ -172,11 +172,12 @@ def plot_supply_demand_mismatch(df):
         edgecolor="black",
         facecolor="white",
         framealpha=1.0,
-        columnspacing=0.8,
-        handletextpad=0.6,
-        prop={"weight": "normal", "size": 28},
+        columnspacing=0.45,
+        handletextpad=0.35,
+        handlelength=1.2,
+        prop={"weight": "normal", "size": FONT_TICK},
     )
-    scale_figure_text(fig, 0.5)
+    scale_figure_text(fig, 0.6)
     fig.subplots_adjust(left=0.13, right=0.97, top=0.87, bottom=0.12, hspace=0.85)
 
     # Save figures
