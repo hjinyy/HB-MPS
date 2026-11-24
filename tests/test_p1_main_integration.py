@@ -47,7 +47,7 @@ def test_hybrid_ablation_uses_one_truck_p1_core() -> None:
     # Given the original component configuration and full measured week.
     hours = load_hours(INPUT)
 
-    # When the retained Figure 10–11 wrapper and P1 engine run.
+    # When the retained Figure 8–9 wrapper and P1 engine run.
     _, summary = run_configuration(hours, CONFIGURATIONS[2], Policy())
     run = run_scenario(hours, Scenario(1.3, 1, Strategy.P1))
 

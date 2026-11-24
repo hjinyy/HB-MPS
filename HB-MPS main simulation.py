@@ -530,45 +530,6 @@ def draw_asset_status(ax, res, alpha):
     format_time_axis(ax)
 
 
-def draw_financial_flow(ax, res, alpha):
-    hours = np.arange(1, len(res) + 1)
-    revenue_cum = res["Revenue"].cumsum() / 1e6
-    cost_cum = -res["Op_Cost"].cumsum() / 1e6
-    profit_cum = res["Net_Step_Profit"].cumsum() / 1e6
-
-    ax.plot(
-        hours,
-        revenue_cum,
-        label="Internal valuation benefit",
-        color="gold",
-        linewidth=2.4
-    )
-
-    ax.plot(
-        hours,
-        cost_cum,
-        label="Operating cost",
-        color="red",
-        linestyle="--",
-        linewidth=2.4
-    )
-
-    ax.plot(
-        hours,
-        profit_cum,
-        label="Operating net benefit",
-        color="blue",
-        linewidth=3.0
-    )
-
-    ax.axhline(0, color="black", linewidth=1.2)
-
-    ax.set_ylabel("M KRW", fontsize=Config.FONT_LABEL)
-    ax.ticklabel_format(axis="y", style="plain", useOffset=False)
-    ax.grid(True, linestyle="--", alpha=0.35)
-    format_time_axis(ax)
-
-
 def draw_economic_value(ax, res, alpha):
     total_base_penalty = res["Base_Penalty"].sum()
     total_avoided = res["Avoided_Penalty"].sum()
@@ -753,30 +714,6 @@ def create_asset_status_figure(scenario_results):
     save_figure(fig, "fig6_ess_soc_and_hydrogen_loh_profiles")
 
 
-def create_financial_flow_figure(scenario_results):
-    fig, axes = plt.subplots(
-        3, 1,
-        figsize=(13, 15),
-        dpi=300,
-        sharex=True
-    )
-
-    for ax, alpha in zip(axes, Config.SCENARIO_MULTIPLIERS):
-        draw_financial_flow(ax, scenario_results[alpha], alpha)
-
-    for ax, letter in zip(axes, "abc"):
-        ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
-        ax.tick_params(axis="x", labelbottom=True)
-    handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.98),
-               ncol=3, frameon=True, fancybox=False, edgecolor="black",
-               facecolor="white", framealpha=1.0,
-               prop={"size": Config.FONT_LEGEND})
-    scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0, 1, 0.92], h_pad=2.8)
-    save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
-
-
 def create_economic_value_figure(scenario_results):
     fig, axes = plt.subplots(
         3, 1,
@@ -814,7 +751,6 @@ def main():
 
     create_grid_resilience_figure(scenario_results)
     create_asset_status_figure(scenario_results)
-    create_financial_flow_figure(scenario_results)
     create_mode_distribution_figure()
 
     print("\nAll multi-scenario figures have been saved successfully.")

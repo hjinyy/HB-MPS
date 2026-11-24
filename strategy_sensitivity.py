@@ -105,7 +105,7 @@ def main() -> None:
     normalize_figure_text(fig)
     for suffix in ("png", "pdf"):
         fig.savefig(
-            OUT / f"fig11_sensitivity_of_residual_unserved_energy_and_operating_net_benefit.{suffix}",
+            OUT / f"fig10_sensitivity_of_residual_unserved_energy_and_operating_net_benefit.{suffix}",
             bbox_inches="tight",
         )
     plt.close(fig)

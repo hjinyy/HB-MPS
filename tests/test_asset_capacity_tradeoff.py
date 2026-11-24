@@ -1,4 +1,4 @@
-"""Reproduce the existing Fig. 9–10 anchors in the 11-case capacity sweep."""
+"""Reproduce the existing Fig. 8–9 anchors in the 11-case capacity sweep."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def test_capacity_sweep_recovers_existing_asset_comparisons() -> None:
     # When the full 0–100% ESS sweep is simulated at α=1.3.
     results = calculate_results()
 
-    # Then its original endpoint and 50:50 results match Fig. 9–10 exactly.
+    # Then its original endpoint and 50:50 results match Fig. 8–9 exactly.
     for index, summary in ((0, expected[1]), (5, expected[2]), (10, expected[0])):
         row = results[index]
         assert math.isclose(row.ess_capacity_mwh + row.hfc_capacity_mwh, 3.0)

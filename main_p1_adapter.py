@@ -11,7 +11,7 @@ from hb_inputs import Hour
 
 
 def mode_and_action(step: Step) -> tuple[str, str]:
-    """Retain the six legacy Mode 1/2 categories used by Figure 9."""
+    """Retain the six legacy Mode 1/2 categories used by Figure 8."""
     if step.mode2:
         action = "HFC_DISCHARGE"
         if step.ess_emergency_kwh > 0:

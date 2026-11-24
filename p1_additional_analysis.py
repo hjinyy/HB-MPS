@@ -170,7 +170,7 @@ def main() -> None:
     )
     scale_figure_text(fig, 1.2)
     fig.tight_layout(rect=(0, 0, 1, 0.76), w_pad=2.0)
-    save(fig, "fig12_voll_sensitivity_of_net_societal_benefit")
+    save(fig, "fig11_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)
 
@@ -222,7 +222,7 @@ def main() -> None:
     axis.axvline(0, color="black", linewidth=0.9)
     axis.set_xlabel("Difference between P1 and P0 (M KRW)")
     axis.grid(axis="x", alpha=0.2)
-    save(fig, "fig13_decomposition_of_economic_opportunity_costs_and_avoided_interruption_benefits")
+    save(fig, "fig12_decomposition_of_economic_opportunity_costs_and_avoided_interruption_benefits")
     print(
         f"Fleet rows={len(fleet)}; break-even VOLL={[round(row['break_even_voll_krw_per_kwh'], 2) for row in break_even_rows]}"
     )

@@ -137,6 +137,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
     axis.set_xlabel("Grid condition\n(a)")
     axis.grid(axis="y", alpha=0.2)
     axis.set_axisbelow(True)
+    axis.spines[["top", "right"]].set_visible(False)
     axis.legend(
         loc="upper center",
         bbox_to_anchor=(0.5, 1.15),

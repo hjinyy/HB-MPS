@@ -16,7 +16,7 @@ def apply_paper_typography(
     *, text_scale: float = 1.0, legend_scale: float = 1.0,
     y_tick_scale: float | None = None,
 ) -> None:
-    """Use the Figure 11 type sizes with regular Times New Roman."""
+    """Use the Figure 10 type sizes with regular Times New Roman."""
     if y_tick_scale is None:
         y_tick_scale = text_scale
     plt.rcParams.update(

@@ -30,7 +30,7 @@ from paper_figure_style import apply_paper_typography, normalize_figure_text
 
 OUT: Final = Path(__file__).resolve().parent / "results"
 FIGURE_STEM: Final = (
-    "fig10_1_economic_resilience_trade_off_by_ess_hfc_capacity_allocation"
+    "fig9_1_economic_resilience_trade_off_by_ess_hfc_capacity_allocation"
 )
 TOTAL_CAPACITY_KWH: Final = 3000.0
 ALPHA: Final = 1.3
@@ -225,7 +225,7 @@ def plot_results(results: list[AllocationResult]) -> None:
 
 
 def main() -> None:
-    """Save audited metrics and Figure 10_1 for all eleven allocations."""
+    """Save audited metrics and Figure 9_1 for all eleven allocations."""
     results = calculate_results()
     OUT.mkdir(exist_ok=True)
     rows = [
