@@ -36,7 +36,7 @@ def _style_time_axis(axis: Axes, *, show_ticks: bool) -> None:
 def save_severity_figure(
     result: SeverityResult, output_path: Path, *, final: bool = False
 ) -> None:
-    """Save the two-panel comparison or final six-panel α=1.5 figure."""
+    """Save a six-panel validation figure, with an optional legacy layout."""
     with plt.rc_context(
         {
             "font.family": "Times New Roman",

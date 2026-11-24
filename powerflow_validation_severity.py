@@ -431,9 +431,7 @@ def main() -> None:
         alpha_label = str(result.alpha).replace(".", "_")
         stem = f"fig15_{index}_severity_dispatch_alpha_{alpha_label}"
         for suffix in ("png", "pdf"):
-            save_severity_figure(
-                result, OUTPUT_DIR / f"{stem}.{suffix}", final=index == 2
-            )
+            save_severity_figure(result, OUTPUT_DIR / f"{stem}.{suffix}", final=True)
     comparison = compare_strategies(results)
     comparison.to_csv(COMPARISON_PATH, index=False)
     write_report(results, comparison, SUMMARY_PATH)
