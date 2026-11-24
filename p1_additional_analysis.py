@@ -113,13 +113,15 @@ def main() -> None:
     )
     for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
         p0 = runs[1.3, trucks, Strategy.P0]
-        p1 = runs[1.3, trucks, Strategy.P1]
+        proposed = runs[1.3, trucks, Strategy.P1]
         op0 = sum(step.operating_net_krw for step in p0.steps)
-        op1 = sum(step.operating_net_krw for step in p1.steps)
+        op_proposed = sum(step.operating_net_krw for step in proposed.steps)
         extra_supply = (
-            p1.total("hfc_kwh") + p1.total("ess_emergency_kwh") - p0.total("hfc_kwh")
+            proposed.total("hfc_kwh")
+            + proposed.total("ess_emergency_kwh")
+            - p0.total("hfc_kwh")
         )
-        break_even = (op0 - op1) / extra_supply
+        break_even = (op0 - op_proposed) / extra_supply
         break_even_rows.append(
             {
                 "alpha": 1.3,
@@ -127,22 +129,23 @@ def main() -> None:
                 "break_even_voll_krw_per_kwh": break_even,
             }
         )
-        for strategy, color, marker, linestyle in (
-            (Strategy.P0, "#6C7890", "o", "-"),
-            (Strategy.P1, "#2775B6", "^", "--"),
-            (Strategy.P2, "#D9904A", "s", ":"),
+        # Manuscript P1 is the former P2; proposed P2 is the former P1.
+        for label, strategy, color, marker, linestyle in (
+            ("P0", Strategy.P0, "#6C7890", "o", "-"),
+            ("P1", Strategy.P2, "#2775B6", "^", "--"),
+            ("P2", Strategy.P1, "#D9904A", "s", ":"),
         ):
             run = runs[1.3, trucks, strategy]
             x = np.array(MULTIPLIERS) * VOLL_KRW_PER_KWH
             y = np.array([societal(run, voll) / 1e6 for voll in x])
             axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
-                      linewidth=3.5, label=strategy.value)
+                      linewidth=3.5, label=label)
             for multiple, voll, value in zip(MULTIPLIERS, x, y, strict=True):
                 sensitivity.append(
                     {
                         "alpha": 1.3,
                         "available_trucks": trucks,
-                        "strategy": strategy.value,
+                        "strategy": label,
                         "voll_multiplier": multiple,
                         "voll_krw_per_kwh": voll,
                         "net_societal_million_krw": value,
