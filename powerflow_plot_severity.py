@@ -1,4 +1,4 @@
-"""Load, voltage, and operation panels for the separate Figure 14 experiment."""
+"""Load, voltage, and operation panels for the separate Figure 13 experiment."""
 
 from __future__ import annotations
 

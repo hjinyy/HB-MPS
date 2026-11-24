@@ -1,6 +1,6 @@
 # Fig. 9_1: ESS–HFC capacity allocation trade-off
 
-This proposed figure replaces the earlier grid-margin comparison. Following the removal of the former Fig. 8, it is numbered Fig. 9_1 and the IEEE 33-bus validation is Fig. 14_1. The reproducible source is `../asset_capacity_tradeoff.py`; the full 11-case results are in `fig9_1_economic_resilience_trade_off_by_ess_hfc_capacity_allocation.csv`.
+This proposed figure replaces the earlier grid-margin comparison. Following the removal of the former Fig. 8, it is numbered Fig. 9_1 and the IEEE 33-bus validation is Fig. 13_1. The reproducible source is `../asset_capacity_tradeoff.py`; the full 11-case results are in `fig9_1_economic_resilience_trade_off_by_ess_hfc_capacity_allocation.csv`.
 
 ## Controlled experiment
 

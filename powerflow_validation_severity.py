@@ -12,8 +12,8 @@
 
 """Independent bus-level dynamic HB-MPS dispatch and IEEE 33-bus validation.
 
-This replaces only the additional Fig. 14(1)/(2) experiment. The original
-Figure 14 and operational P1 simulation are read but never modified.
+This replaces only the additional Fig. 13(1)/(2) experiment. The original
+Figure 13 and operational P1 simulation are read but never modified.
 """
 
 from __future__ import annotations
@@ -56,11 +56,11 @@ from severity_fleet import (
 )
 
 ALPHAS: Final = (1.3, 1.5)
-SUMMARY_PATH: Final = OUTPUT_DIR / "FIG14_SEVERITY_DISPATCH_SUMMARY.md"
-HOURLY_PATH: Final = OUTPUT_DIR / "fig14_severity_dynamic_hourly.csv"
-BUS_PATH: Final = OUTPUT_DIR / "fig14_severity_dynamic_bus_hourly.csv"
-TRUCK_PATH: Final = OUTPUT_DIR / "fig14_severity_dynamic_trucks.csv"
-COMPARISON_PATH: Final = OUTPUT_DIR / "fig14_strategy_comparison.csv"
+SUMMARY_PATH: Final = OUTPUT_DIR / "FIG13_SEVERITY_DISPATCH_SUMMARY.md"
+HOURLY_PATH: Final = OUTPUT_DIR / "fig13_severity_dynamic_hourly.csv"
+BUS_PATH: Final = OUTPUT_DIR / "fig13_severity_dynamic_bus_hourly.csv"
+TRUCK_PATH: Final = OUTPUT_DIR / "fig13_severity_dynamic_trucks.csv"
+COMPARISON_PATH: Final = OUTPUT_DIR / "fig13_strategy_comparison.csv"
 
 
 @dataclass(frozen=True, slots=True)
@@ -429,7 +429,7 @@ def main() -> None:
     )
     for index, result in enumerate(results, start=1):
         alpha_label = str(result.alpha).replace(".", "_")
-        stem = f"fig14_{index}_severity_dispatch_alpha_{alpha_label}"
+        stem = f"fig13_{index}_severity_dispatch_alpha_{alpha_label}"
         for suffix in ("png", "pdf"):
             save_severity_figure(result, OUTPUT_DIR / f"{stem}.{suffix}", final=True)
     comparison = compare_strategies(results)

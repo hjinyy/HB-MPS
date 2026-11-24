@@ -98,8 +98,8 @@ def test_saved_ac_injection_and_figure_csvs_close_to_p1() -> None:
         assert math.isfinite(float(row["vmin_hbmps"]))
         assert math.isfinite(float(row["ploss_hbmps_mw"]))
     assert any(row["bus"] == "33" and float(row["hfc_kwh"]) > 0 for row in trucks)
-    assert (RESULTS / "fig16_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.png").is_file()
-    assert (RESULTS / "fig16_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.pdf").is_file()
+    assert (RESULTS / "fig15_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.png").is_file()
+    assert (RESULTS / "fig15_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.pdf").is_file()
 
 
 def test_timeline_activity_matches_main_fleet_count() -> None:

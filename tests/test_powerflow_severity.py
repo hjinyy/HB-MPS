@@ -100,10 +100,10 @@ def test_emergency_supply_never_exceeds_local_excess() -> None:
 
 def test_saved_hourly_bus_and_vehicle_energy_balances() -> None:
     # Given the generated 168-hour CSV outputs for both requested α cases.
-    hourly = pd.read_csv(OUTPUT_DIR / "fig14_severity_dynamic_hourly.csv")
-    buses = pd.read_csv(OUTPUT_DIR / "fig14_severity_dynamic_bus_hourly.csv")
-    trucks = pd.read_csv(OUTPUT_DIR / "fig14_severity_dynamic_trucks.csv")
-    comparison = pd.read_csv(OUTPUT_DIR / "fig14_strategy_comparison.csv")
+    hourly = pd.read_csv(OUTPUT_DIR / "fig13_severity_dynamic_hourly.csv")
+    buses = pd.read_csv(OUTPUT_DIR / "fig13_severity_dynamic_bus_hourly.csv")
+    trucks = pd.read_csv(OUTPUT_DIR / "fig13_severity_dynamic_trucks.csv")
+    comparison = pd.read_csv(OUTPUT_DIR / "fig13_strategy_comparison.csv")
 
     # When the rows are grouped at each real experiment hour.
     groups = hourly.groupby(["alpha", "t"], sort=False)
