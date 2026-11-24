@@ -180,7 +180,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.legend(
         handles=(operating_line, supply_line),
         loc="upper center",
-        bbox_to_anchor=(0.5, 1.17),
+        bbox_to_anchor=(0.5, 1.32),
         ncol=2,
         frameon=True,
         fancybox=False,
@@ -202,15 +202,16 @@ def plot_results(results: list[AllocationResult]) -> None:
         linewidths=0.6,
         zorder=3,
     )
-    for share, offset in ((0, (-12, 10)), (50, (9, 10)), (100, (-10, 10))):
-        row = results[share // 10]
-        tradeoff_ax.annotate(
-            f"{share}%" + (" Hybrid" if share == 50 else ""),
-            (row.operating_net_benefit_mkrw, row.emergency_energy_mwh),
-            xytext=offset,
-            textcoords="offset points",
-            ha="right" if share in (0, 100) else "left",
-        )
+    hybrid = results[5]
+    tradeoff_ax.annotate(
+        "50% Hybrid",
+        (hybrid.operating_net_benefit_mkrw, hybrid.emergency_energy_mwh),
+        xytext=(9, 10),
+        textcoords="offset points",
+        ha="left",
+        color=scatter.cmap(scatter.norm(50)),
+        fontsize=plt.rcParams["font.size"] * 0.5,
+    )
     tradeoff_ax.set_xlabel("$\\Pi_{\\mathrm{op}}$ (M KRW)\n(b)")
     tradeoff_ax.set_ylabel(r"$E_{\mathrm{emg}}$ (MWh)")
     tradeoff_ax.grid(alpha=0.25)
