@@ -19,6 +19,7 @@ from severity_fleet import (
 )
 
 BUS_INDICES = np.array(INDUSTRIAL_BUS_NUMBERS) - 1
+MODE2_VOLTAGE_TRIGGER_PU = 0.93
 AC_TOLERANCE_MW = 1e-5
 DISPATCH_TOLERANCE_MW = 1e-8
 
@@ -50,24 +51,16 @@ class HourDispatch:
 
 
 def severity_scores(demand_mw: np.ndarray, voltage: np.ndarray) -> np.ndarray:
-    """Normalize local excess and voltage violation on comparable 0..1 scales.
-
-    All 33 bus voltages set the voltage scale. If only nonindustrial buses
-    violate, candidate proximity to undervoltage supplies the tie break.
-    """
+    """Normalize industrial-bus excess and 0.95 p.u. deficits separately."""
     demand_peak = float(demand_mw.max())
     demand_term = (
         demand_mw / demand_peak if demand_peak > 0 else np.zeros_like(demand_mw)
     )
-    global_deficit = np.maximum(MIN_VOLTAGE_PU - voltage, 0.0)
-    local_deficit = global_deficit[BUS_INDICES]
-    if global_deficit.max() > 0 and local_deficit.max() > 0:
-        voltage_term = local_deficit / float(global_deficit.max())
-    elif global_deficit.max() > 0:
-        proximity = np.maximum(1.0 - voltage[BUS_INDICES], 0.0)
-        voltage_term = proximity / max(float(proximity.max()), 1e-12)
-    else:
-        voltage_term = np.zeros_like(demand_mw)
+    local_deficit = np.maximum(MIN_VOLTAGE_PU - voltage[BUS_INDICES], 0.0)
+    deficit_peak = float(local_deficit.max())
+    voltage_term = (
+        local_deficit / deficit_peak if deficit_peak > 0 else np.zeros_like(demand_mw)
+    )
     return 0.5 * demand_term + 0.5 * voltage_term
 
 
@@ -91,19 +84,22 @@ def required_supply_mw(
 ) -> float:
     """Use max(local deficit, AC voltage need), never their sum.
 
-    A full-capacity AC trial checks whether this bus can help all monitored
-    voltages. If it can clear the limit, bisection finds the minimum power;
+    A full-capacity AC trial checks the nine industrial service buses. All 33
+    bus voltages are still recorded for performance evaluation. If the trial
+    clears the service limit, bisection finds the minimum power;
     otherwise available capacity is used when it reduces violation magnitude.
     """
     if capacity_mw <= DISPATCH_TOLERANCE_MW:
         return 0.0
     voltage_need_mw = 0.0
-    if float(current_voltage.min()) < MIN_VOLTAGE_PU:
+    if float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU:
         full_voltage = _trial_voltage(net, generator_index, capacity_mw)
-        before = float(np.maximum(MIN_VOLTAGE_PU - current_voltage, 0.0).sum())
-        after = float(np.maximum(MIN_VOLTAGE_PU - full_voltage, 0.0).sum())
+        before = float(
+            np.maximum(MIN_VOLTAGE_PU - current_voltage[BUS_INDICES], 0.0).sum()
+        )
+        after = float(np.maximum(MIN_VOLTAGE_PU - full_voltage[BUS_INDICES], 0.0).sum())
         if after < before - 1e-9:
-            if float(full_voltage.min()) < MIN_VOLTAGE_PU:
+            if float(full_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU:
                 voltage_need_mw = capacity_mw
             else:
                 low, high = 0.0, capacity_mw
@@ -112,7 +108,7 @@ def required_supply_mw(
                         break
                     midpoint = (low + high) / 2
                     trial = _trial_voltage(net, generator_index, midpoint)
-                    if float(trial.min()) >= MIN_VOLTAGE_PU:
+                    if float(trial[BUS_INDICES].min()) >= MIN_VOLTAGE_PU:
                         high = midpoint
                     else:
                         low = midpoint
@@ -152,7 +148,7 @@ def dispatch_hour(
     for truck in range(FLEET_SIZE):
         if not (
             np.any(remaining > DISPATCH_TOLERANCE_MW)
-            or float(current_voltage.min()) < MIN_VOLTAGE_PU
+            or float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU
         ):
             break
         capacity_kwh = hfc_capacity_kwh(state, truck)
@@ -183,7 +179,7 @@ def dispatch_hour(
     ess_withdrawal = 0.0
     if (
         np.any(remaining > DISPATCH_TOLERANCE_MW)
-        or float(current_voltage.min()) < MIN_VOLTAGE_PU
+        or float(current_voltage[BUS_INDICES].min()) < MIN_VOLTAGE_PU
     ):
         capacity_kwh = ess_capacity_kwh(state)
         # An ESS-only main deployment still needs the original travel allowance.

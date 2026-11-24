@@ -105,6 +105,18 @@ def save_severity_figure(result: SeverityResult, output_path: Path) -> None:
             label="Voltage-only dispatch",
             zorder=5,
         )
+        mode1 = result.hourly["mode1_active"].to_numpy(dtype=bool)
+        time_axis_plot.scatter(
+            hours[mode1],
+            np.full(int(mode1.sum()), 0.096),
+            transform=time_axis_plot.get_xaxis_transform(),
+            color="#9467bd",
+            s=11,
+            marker="|",
+            linewidths=1.6,
+            label="Mode 1 residential supply",
+            zorder=5,
+        )
         time_axis_plot.set_xlim(0, 168)
         time_axis_plot.set_xticks(np.arange(0, 169, 24))
         time_axis_plot.set_ylim(0.915, 1.005)

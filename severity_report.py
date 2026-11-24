@@ -61,6 +61,37 @@ def _previous_location_assignment(
     return injections, tuple(positions)
 
 
+def _dual_mode_assets(
+    net: pp.pandapowerNet, residential_buses: tuple[int, ...]
+) -> tuple[dict[int, int], int, int]:
+    """Add identical residential supply and charging interfaces to a control."""
+    generators = {
+        bus: pp.create_sgen(net, bus - 1, p_mw=0.0, q_mvar=0.0)
+        for bus in residential_buses
+    }
+    pv_load = pp.create_load(net, 6, p_mw=0.0, q_mvar=0.0)
+    grid_load = pp.create_load(net, 8, p_mw=0.0, q_mvar=0.0)
+    return generators, pv_load, grid_load
+
+
+def _set_dual_mode_assets(
+    net: pp.pandapowerNet,
+    assets: tuple[dict[int, int], int, int],
+    mode1_bus: int,
+    mode1_mw: float,
+    pv_charging_mw: float,
+    grid_charging_mw: float,
+) -> None:
+    """Apply a P1 Mode 1 step at the same residential bus as the dynamic case."""
+    generators, pv_load, grid_load = assets
+    net.sgen.loc[list(generators.values()), "p_mw"] = 0.0
+    if mode1_mw > 0:
+        net.sgen.at[generators[mode1_bus], "p_mw"] = mode1_mw
+    net.load.at[pv_load, "p_mw"] = pv_charging_mw
+    net.load.at[grid_load, "p_mw"] = grid_charging_mw
+    net.load.loc[[pv_load, grid_load], "scaling"] = 1.0
+
+
 def _summary_row(
     alpha: float,
     strategy: str,
@@ -76,6 +107,9 @@ def _summary_row(
     voltage_only_response_hours: int,
     hfc_kwh: float,
     ess_kwh: float,
+    mode1_hours: int,
+    mode1_ess_kwh: float,
+    charging_kwh: float,
     load_response_mwh_ac: float,
     voltage_only_mwh_ac: float,
     residual_excess_mwh_ac: float,
@@ -106,6 +140,9 @@ def _summary_row(
         "voltage_only_response_hours": voltage_only_response_hours,
         "hfc_mwh_raw": hfc_kwh / 1000,
         "ess_mwh_raw": ess_kwh / 1000,
+        "mode1_hours": mode1_hours,
+        "mode1_ess_mwh_raw": mode1_ess_kwh / 1000,
+        "charging_mwh_raw": charging_kwh / 1000,
         "total_mwh_raw": (hfc_kwh + ess_kwh) / 1000,
         "ac_injection_mwh": (hfc_kwh + ess_kwh) * mw_per_raw_kwh,
         "load_response_mwh_ac": load_response_mwh_ac,
@@ -153,8 +190,20 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
         alpha = dynamic.alpha
         run = run_scenario(hours, Scenario(alpha, 5, Strategy.P1))
         validate_main_reference(run, MAIN_REFERENCE_PATH)
+        old_base_net = build_network()
         reference_net = build_network()
         location_net = build_network()
+        binary_fixed_net = build_network()
+        binary_location_net = build_network()
+        residential_buses = tuple(
+            sorted(
+                int(bus) + 1
+                for bus in reference_net.load.bus.unique()
+                if bus not in {number - 1 for number in INDUSTRIAL_BUS_NUMBERS}
+            )
+        )
+        fixed_assets = _dual_mode_assets(binary_fixed_net, residential_buses)
+        location_assets = _dual_mode_assets(binary_location_net, residential_buses)
         bus_ratings = np.array(
             [
                 float(
@@ -191,14 +240,33 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                 for bus in INDUSTRIAL_BUS_NUMBERS
             ]
         )
-        baseline = dynamic.baseline_profiles
+        binary_generators = np.array(
+            [
+                pp.create_sgen(
+                    binary_location_net,
+                    bus - 1,
+                    p_mw=0.0,
+                    q_mvar=0.0,
+                    name=f"Binary old severity-{bus}",
+                )
+                for bus in INDUSTRIAL_BUS_NUMBERS
+            ]
+        )
+        old_baseline_profiles: list[np.ndarray] = []
+        old_baseline_losses: list[float] = []
         fixed_profiles: list[np.ndarray] = []
         location_profiles: list[np.ndarray] = []
+        binary_fixed_profiles: list[np.ndarray] = []
+        binary_location_profiles: list[np.ndarray] = []
         fixed_losses: list[float] = []
         location_losses: list[float] = []
+        binary_fixed_losses: list[float] = []
+        binary_location_losses: list[float] = []
         fixed_positions: list[tuple[int | None, ...]] = []
         location_positions: list[tuple[int | None, ...]] = []
+        binary_location_positions: list[tuple[int | None, ...]] = []
         fixed_residual = location_residual = 0.0
+        binary_location_residual = 0.0
         saved_alpha = saved_reference.loc[saved_reference.alpha.eq(alpha)].sort_values(
             "t"
         )
@@ -216,6 +284,17 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             ) / (industrial_rating + residential_rating)
             pv_mw = hours[t].solar / pv_peak * pv_rating
             allocation = fixed_injection[t]
+            set_operating_point(
+                old_base_net,
+                industrial_scale,
+                residential_scale,
+                mixed_scale,
+                pv_mw,
+                0.0,
+            )
+            old_voltage, old_loss = solve_network(old_base_net)
+            old_baseline_profiles.append(old_voltage)
+            old_baseline_losses.append(old_loss)
             fixed_mw = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
             fixed_mw[INDUSTRIAL_BUS_NUMBERS.index(18)] = (
                 allocation.hfc18_kwh + allocation.ess18_kwh
@@ -260,7 +339,13 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             hfc = np.array([row.hfc_kwh for row in rows]) * factor
             placed, positions = _previous_location_assignment(
                 demand,
-                baseline[t, np.array(INDUSTRIAL_BUS_NUMBERS) - 1],
+                old_voltage[np.array(INDUSTRIAL_BUS_NUMBERS) - 1],
+                hfc,
+                step.ess_emergency_kwh * factor,
+            )
+            binary_placed, binary_positions = _previous_location_assignment(
+                demand,
+                dynamic.baseline_profiles[t, np.array(INDUSTRIAL_BUS_NUMBERS) - 1],
                 hfc,
                 step.ess_emergency_kwh * factor,
             )
@@ -277,8 +362,58 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             location_profiles.append(location_voltage)
             location_losses.append(location_loss)
             location_positions.append(positions)
+            binary_location_positions.append(binary_positions)
             fixed_residual += float(np.maximum(demand - fixed_mw, 0.0).sum())
             location_residual += float(np.maximum(demand - placed, 0.0).sum())
+            binary_location_residual += float(
+                np.maximum(demand - binary_placed, 0.0).sum()
+            )
+
+            # Fair controls use the new binary-load feeder and inject the
+            # existing P1 Mode 1 output / charging at the same sites.
+            mode1_bus = min(
+                residential_buses,
+                key=lambda bus: (dynamic.baseline_profiles[t, bus - 1], bus),
+            )
+            mode1_mw = step.phase1_ess_kwh * factor
+            pv_charging_mw = (step.pv_ess_charge_kwh + step.pv_p2g_kwh) * factor
+            grid_charging_mw = step.grid_ess_charge_kwh * factor
+            for binary_net, assets, hbmps18, hbmps33, distributed in (
+                (
+                    binary_fixed_net,
+                    fixed_assets,
+                    fixed_mw[0],
+                    fixed_mw[INDUSTRIAL_BUS_NUMBERS.index(33)],
+                    None,
+                ),
+                (binary_location_net, location_assets, 0.0, 0.0, binary_placed),
+            ):
+                set_operating_point(
+                    binary_net,
+                    industrial_scale,
+                    residential_scale,
+                    residential_scale,
+                    pv_mw,
+                    hbmps18,
+                    hbmps33,
+                )
+                _set_dual_mode_assets(
+                    binary_net,
+                    assets,
+                    mode1_bus,
+                    mode1_mw,
+                    pv_charging_mw,
+                    grid_charging_mw,
+                )
+                if distributed is not None:
+                    binary_net.sgen.loc[binary_generators, "p_mw"] = distributed
+                binary_voltage, binary_loss = solve_network(binary_net)
+                if distributed is None:
+                    binary_fixed_profiles.append(binary_voltage)
+                    binary_fixed_losses.append(binary_loss)
+                else:
+                    binary_location_profiles.append(binary_voltage)
+                    binary_location_losses.append(binary_loss)
 
         p1_mode2 = sum(step.mode2 for step in run.steps)
         p1_supply = sum(
@@ -286,14 +421,24 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
         )
         p1_hfc = sum(step.hfc_kwh for step in run.steps)
         p1_ess = sum(step.ess_emergency_kwh for step in run.steps)
+        p1_mode1 = sum(step.phase1_ess_kwh for step in run.steps)
+        p1_charging = sum(
+            step.pv_ess_charge_kwh + step.pv_p2g_kwh + step.grid_ess_charge_kwh
+            for step in run.steps
+        )
+        old_baseline = np.stack(old_baseline_profiles)
+        old_losses = np.array(old_baseline_losses)
         baseline_losses = dynamic.hourly.line_loss_baseline_mw.to_numpy(dtype=float)
         common = dict(
             alpha=alpha,
-            baseline=baseline,
-            baseline_losses=baseline_losses,
+            baseline=old_baseline,
+            baseline_losses=old_losses,
             voltage_trigger_hours=int(dynamic.hourly.voltage_trigger.sum()),
             hfc_kwh=p1_hfc,
             ess_kwh=p1_ess,
+            mode1_hours=0,
+            mode1_ess_kwh=0.0,
+            charging_kwh=0.0,
             load_response_mwh_ac=(p1_hfc + p1_ess) * factor,
             voltage_only_mwh_ac=0.0,
             h2_consumed_kg=run.total("consumed_h2_kg"),
@@ -324,7 +469,7 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
         ):
             records.append(
                 _summary_row(
-                    strategy=label,
+                    strategy=f"{label} (mixed)",
                     supported=np.stack(profiles),
                     supported_losses=np.array(losses),
                     mode2_hours=p1_mode2,
@@ -337,10 +482,52 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                     **common,
                 )
             )
+        for label, profiles, losses, residual, positions in (
+            (
+                "Fixed P1 dual-mode (binary)",
+                binary_fixed_profiles,
+                binary_fixed_losses,
+                fixed_residual,
+                fixed_positions,
+            ),
+            (
+                "Location-only dual-mode (binary)",
+                binary_location_profiles,
+                binary_location_losses,
+                binary_location_residual,
+                binary_location_positions,
+            ),
+        ):
+            binary_common = common | {
+                "baseline": dynamic.baseline_profiles,
+                "baseline_losses": baseline_losses,
+                "mode1_hours": sum(step.phase1_ess_kwh > 0 for step in run.steps),
+                "mode1_ess_kwh": p1_mode1,
+                "charging_kwh": p1_charging,
+            }
+            records.append(
+                _summary_row(
+                    strategy=label,
+                    supported=np.stack(profiles),
+                    supported_losses=np.array(losses),
+                    mode2_hours=p1_mode2,
+                    supply_hours=p1_supply,
+                    load_trigger_hours=p1_mode2,
+                    load_response_hours=p1_supply,
+                    voltage_only_response_hours=0,
+                    residual_excess_mwh_ac=residual,
+                    positions=tuple(positions),
+                    **binary_common,
+                )
+            )
         dynamic_positions = tuple(
             tuple(
-                int(bus) if pd.notna(bus) else None
-                for bus in dynamic.trucks.loc[dynamic.trucks.t.eq(t), "bus"]
+                int(vehicle.bus)
+                if vehicle.mode == "Mode 2" and pd.notna(vehicle.bus)
+                else None
+                for vehicle in dynamic.trucks.loc[dynamic.trucks.t.eq(t)].itertuples(
+                    index=False
+                )
             )
             for t in range(len(dynamic.hourly))
         )
@@ -349,7 +536,7 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             _summary_row(
                 alpha=alpha,
                 strategy="Dynamic bus-level",
-                baseline=baseline,
+                baseline=dynamic.baseline_profiles,
                 supported=dynamic.supported_profiles,
                 baseline_losses=baseline_losses,
                 supported_losses=h.line_loss_supported_mw.to_numpy(dtype=float),
@@ -361,6 +548,13 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
                 voltage_only_response_hours=int(h.voltage_only_dispatch_active.sum()),
                 hfc_kwh=float(h.hfc_kwh.sum()),
                 ess_kwh=float(h.ess_emergency_kwh.sum()),
+                mode1_hours=int(h.mode1_active.sum()),
+                mode1_ess_kwh=float(h.phase1_ess_kwh.sum()),
+                charging_kwh=float(
+                    h.pv_ess_charge_kwh.sum()
+                    + h.pv_p2g_kwh.sum()
+                    + h.grid_ess_charge_kwh.sum()
+                ),
                 load_response_mwh_ac=float(h.load_response_mw.sum()),
                 voltage_only_mwh_ac=float(h.voltage_only_mw.sum()),
                 residual_excess_mwh_ac=float(h.residual_excess_mw.sum()),
@@ -380,180 +574,181 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
 def write_report(
     results: tuple[SeverityResult, ...], comparison: pd.DataFrame, path: Path
 ) -> None:
-    """Write assumptions, three-way quantitative results, and limitations."""
+    """Document the binary feeder, dual-mode interfaces and honest comparisons."""
+    mixed = comparison.loc[comparison.strategy.eq("Existing Figure 15 (mixed)")].iloc[0]
+    dynamic = comparison.loc[comparison.strategy.eq("Dynamic bus-level")].sort_values(
+        "alpha"
+    )
+    binary = dynamic.iloc[0]
     lines = [
-        "# Fig. 15(1)·(2): 모선별 동적 HB-MPS 비상운용 검증",
+        "# Fig. 15(1)·(2): 산업·주거 모선별 HB-MPS 이중 운용",
         "",
-        "기존 Figure 15 및 메인 P1 시뮬레이션은 수정하지 않았다. "
-        "직전 위치 재배치 실험의 "
-        "Fig. 15(1)·(2) 출력만 새 동적 운용 결과로 교체했다.",
+        "기존 Figure 15와 메인 P1 코드는 변경하지 않았다. 이 보고서는 추가 실험인 "
+        "Fig. 15(1)·(2)의 재계산 결과다.",
         "",
-        "## 계산 규칙과 단위",
+        "## 모선 구성과 운용 규칙",
         "",
-        "- 9개 산업 모선마다 168시간 평균 부하를 구하고 임계값을 α배로 정했다. "
-        "초과분 D_i=max(0,P_i−α mean(P_i))는 **가정된 공급 허용량 대비 부족분**이며 "
-        "실측 미공급 전력과 다르다.",
-        "- 매 시간 공급 전 33개 모선의 AC 전압을 확인한다. 산업 모선 초과 또는 어느 "
-        "모선의 전압이 0.95 p.u. 미만이면 Mode 2 조건이다. "
-        "접속은 산업 모선 9개로 제한한다.",
-        "- 심각도는 0.5×(모선 초과량/해당 시간 최대 초과량) + "
-        "0.5×(모선 전압 위반량/33개 모선 최대 위반량)이다. 후보 모선에 위반이 "
-        "없지만 다른 모선에 위반이 있으면 후보 전압의 낮은 순서를 사용한다.",
-        "- 차량별로 심각도가 가장 높은 모선에 최대 1곳 접속하고 HFC를 먼저 투입한다. "
-        "투입 후 AC를 다시 풀어 남은 부하 초과와 저전압을 평가한다. ESS는 HFC 다음에 "
-        "주 차량의 접속 모선에서만 사용한다. 같은 모선에 여러 차량이 접속할 수 있다.",
-        "- 전압 지원 필요량은 해당 모선에서 차량 가용 출력으로 AC 시험하고, 0.95를 "
-        "달성할 수 있으면 이분 탐색으로 최소 출력을 찾는다. "
-        "한 차량으로 달성하지 못하면 "
-        "위반량을 줄이는 경우 가용 출력을 쓴다. 공급량은 max(남은 해당 모선 초과분, "
-        "전압 지원 필요량)으로 정해 두 요구량을 더하지 않는다.",
-        "- IEEE 33-bus MW와 운용 kWh의 환산은 기존 검증과 같은 "
-        "(산업 모선 정격 MW)/(입력 산업부하 최대 kWh)이다. "
-        "1시간 주입 MW의 수치는 MWh와 같다.",
-        "- HFC 정격, 수소·이동 소비, 보충 순서, ESS 효율·SOC 하한, 비상 외 시간의 "
-        "Mode 1/충전 규칙은 원 P1과 같다. ESS만 출동하는 주 차량에도 이동 수소를 "
-        "차감한다. 차량은 1시간 단위로 재배치하며 이동 시간은 별도로 모델링하지 "
-        "않는다. 전압 전용 공급에는 VOLL 회피편익을 계산하지 않았다.",
-        "- 부하 대응/전압 전용 에너지는 각 접속 모선의 계산상 초과분을 먼저 충당한 "
-        "것으로 회계상 구분했다. 동일 주입이 전압에도 기여하므로 물리적으로 독립된 "
-        "두 종류의 전력이 아니다.",
+        "- IEEE 33-bus의 산업부하 모선 9개를 유지하고, 나머지 부하 모선 23개는 "
+        "주거부하로 설정했다. 혼합부하는 사용하지 않는다. Slack 1개 모선, 선로, "
+        "모선별 정격 P·Q는 유지한다. 산업·주거 부하는 각각의 실측 프로파일로 "
+        "정규화해 시간별 scaling에 적용한다.",
+        "- 산업 모선별 임계값은 α×해당 모선의 168시간 평균 부하다. 초과량은 "
+        "가정된 공급 허용량 대비 부족분이며 실제 미공급 전력은 아니다. 산업 "
+        "모선에서 초과량>0 또는 공급 전 전압<0.93 p.u.이면 Mode 2가 우선한다. "
+        "0.95 p.u.는 별도의 전압 **평가·지원 목표**이며 출동 임계가 아니다.",
+        "- Mode 2는 산업 모선 9개만 접속 후보로 삼는다. 초과량과 0.95 p.u. "
+        "위반량을 각각 시간별 최대값으로 정규화한 뒤 0.5씩 가중한다. HFC를 "
+        "차량별로 먼저 투입하고 매 주입 후 AC를 다시 계산한다. ESS는 주 차량의 "
+        "backup이다. 필요한 전력은 모선 잔여 초과량과 산업 모선 전압 지원량의 "
+        "최댓값으로 정해 중복 합산하지 않는다.",
+        "- Mode 2가 없을 때에만 기존 P1의 가격·SOC 조건에 따른 Mode 1을 "
+        "허용한다. 주 차량 ESS 출력은 주거부하 모선에 AC 주입한다. 주거 모선의 "
+        "가격 신호가 같으므로 가장 낮은 기준 전압의 주거 모선을 접속 위치로 "
+        "정했다. Mode 1 발동에 주거 전압 임계는 사용하지 않는다.",
+        "- PV ESS 충전과 P2G 소비는 PV 연결 Bus 7의 부하로, 계통 ESS 충전은 "
+        "주거 Bus 9의 부하로 반영한다. 충전 부하는 별도 요소로 두어 시간별 "
+        "주거 scaling을 중복 적용하지 않았다. 차량은 매시간 재배치할 수 있으며 "
+        "실제 이동 시간은 모델링하지 않았다.",
+        "- HB-MPS의 원자료 kWh→IEEE 계통 MW 환산은 기존 검증과 동일하게 "
+        "산업 모선 정격 MW/입력 산업부하 최대 kWh를 모든 공급·충전에 적용한다. "
+        "HFC/ESS 정격, 효율, SOC·LOH, 수소 이동 소비·보충 및 Mode 1 가격 "
+        "조건은 기존 P1과 같다. 전압 전용 공급에는 VOLL 편익을 부여하지 않았다.",
         "",
-        "## 세 방식 비교",
+        "## 비교 기준",
         "",
-        "기존 Figure 15는 두 고정 모선 주입, 직전 실험은 P1 공급량을 고정한 채 "
-        "위치만 재배치, 새 실험은 출동·공급량·상태를 AC 결과에 따라 "
-        "매시간 다시 계산한다.",
+        f"기존 혼합부하 계통 무지원 기준: 최저 {mixed.worst_baseline_voltage_pu:.4f} "
+        f"p.u., 0.95 미만 {mixed.violation_hours_baseline}시간, "
+        f"누적 위반 {mixed.cumulative_voltage_deficit_baseline_pu_bus_h:.3f} "
+        "p.u.·bus·h.",
+        f"새 산업·주거 계통 무지원 기준: 최저 {binary.worst_baseline_voltage_pu:.4f} "
+        f"p.u., 0.95 미만 {binary.violation_hours_baseline}시간, "
+        f"누적 위반 {binary.cumulative_voltage_deficit_baseline_pu_bus_h:.3f} "
+        "p.u.·bus·h.",
+        "기존 혼합부하 Figure 15와 새 이중 운용을 직접 비교하면 부하 구성의 "
+        "영향이 섞인다. 이를 분리하려고 같은 산업·주거 계통에 기존 P1 고정 "
+        "배치와 직전 위치 재배치를 적용하고, 두 대조군 모두 Mode 1 공급과 "
+        "충전도 AC에 반영했다. 기존 혼합부하 결과는 보존용 참고다. 표의 혼합부하 "
+        "Mode 1 0시간은 운용량이 0이라는 뜻이 아니라 당시 AC 그림에 Mode 1을 "
+        "반영하지 않았다는 뜻이다.",
         "",
-        f"공통 무지원 기준: 최저 {comparison.iloc[0].worst_baseline_voltage_pu:.4f} "
-        f"p.u., 저전압 {comparison.iloc[0].violation_hours_baseline} h, "
-        f"발생 모선 {comparison.iloc[0].unique_violating_buses_baseline}개, "
-        f"모선·시간 {comparison.iloc[0].violating_bus_hours_baseline}, "
-        "누적 위반 "
-        f"{comparison.iloc[0].cumulative_voltage_deficit_baseline_pu_bus_h:.3f} "
-        f"p.u.·bus·h, 선로손실 {comparison.iloc[0].line_losses_baseline_mwh:.3f} MWh.",
-        "",
-        "| α | 방식 | Mode 2 조건/실공급 h | HFC/ESS 원자료 MWh | "
-        "최저 전압 p.u. | 저전압 시간/모선 수/모선·시간 | 누적 위반 p.u.·bus·h | "
-        "선로손실 MWh |",
-        "|---:|---|---:|---:|---:|---:|---:|---:|",
+        "| α | 계통·전략 | Mode 1 h | Mode 2 조건/실공급 h | "
+        "HFC/비상 ESS/Mode 1 ESS 원자료 MWh | 최저 전압 p.u. | "
+        "0.95 미만 h | 누적 위반 p.u.·bus·h | 선로손실 MWh |",
+        "|---:|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in comparison.itertuples(index=False):
         lines.append(
-            f"| {row.alpha:.1f} | {row.strategy} | "
+            f"| {row.alpha:.1f} | {row.strategy} | {row.mode1_hours} | "
             f"{row.mode2_trigger_hours}/{row.actual_supply_hours} | "
-            f"{row.hfc_mwh_raw:.3f}/{row.ess_mwh_raw:.3f} | "
+            f"{row.hfc_mwh_raw:.3f}/{row.ess_mwh_raw:.3f}/"
+            f"{row.mode1_ess_mwh_raw:.3f} | "
             f"{row.worst_supported_voltage_pu:.4f} | "
-            f"{row.violation_hours_supported}/{row.unique_violating_buses_supported}/"
-            f"{row.violating_bus_hours_supported} | "
+            f"{row.violation_hours_supported} | "
             f"{row.cumulative_voltage_deficit_supported_pu_bus_h:.3f} | "
             f"{row.line_losses_supported_mwh:.3f} |"
         )
     lines.extend(
         [
             "",
-            "두 기준 방식은 산업부하 초과 시에만 출동한다. 새 방식의 부하 초과/저전압 "
-            "조건과 실제 저전압 전용 공급 시간은 비교 CSV에 별도로 기록했다. "
-            "원자료 에너지 "
-            "MWh와 AC 환산 MWh는 서로 다른 스케일이므로 혼용하지 않았다.",
+            "비교 CSV에는 저전압 발생 고유 모선 수·모선시간, AC 주입 에너지, "
+            "수소 사용·보충, SOC·LOH 및 차량별 접속 횟수도 포함했다. 공급 에너지와 "
+            "자원 소비가 다르므로 전압 개선을 동일 에너지 효율로 해석하지 않는다.",
             "",
-            "## 동적 운용 상세",
+            "## 새 이중 운용의 상세 결과",
             "",
-            "| α | 부하 초과/저전압 조건 h | 부하 초과/저전압 전용 공급 h | "
-            "AC 주입/남은 모선 초과 MWh | 부하 대응/전압 전용 MWh | "
-            "수소 소비/보충 kg | SOC 초기→최저→종료 % | "
-            "주 차량 LOH 초기→최저→종료 % | 차량 출동 회수 |",
-            "|---:|---:|---:|---:|---:|---:|---:|---:|",
+            "| α | 산업 초과/0.93 위반 h | Mode 2 실공급/Mode 1 공급 h | "
+            "Mode 1 ESS/충전 원자료 MWh | 계산상 잔여 초과 MWh(AC) | "
+            "SOC 최저→종료 % | 주 차량 LOH 최저→종료 % |",
+            "|---:|---:|---:|---:|---:|---:|---:|",
         ]
     )
-    dynamic_rows = comparison.loc[comparison.strategy.eq("Dynamic bus-level")]
-    for row in dynamic_rows.itertuples(index=False):
+    for row in dynamic.itertuples(index=False):
         lines.append(
             f"| {row.alpha:.1f} | {row.load_excess_trigger_hours}/"
-            f"{row.voltage_trigger_hours} | {row.load_response_hours}/"
-            f"{row.voltage_only_response_hours} | {row.ac_injection_mwh:.3f}/"
+            f"{row.voltage_trigger_hours} | {row.actual_supply_hours}/"
+            f"{row.mode1_hours} | {row.mode1_ess_mwh_raw:.3f}/"
+            f"{row.charging_mwh_raw:.3f} | "
             f"{row.residual_bus_excess_mwh_ac:.3f} | "
-            f"{row.load_response_mwh_ac:.3f}/{row.voltage_only_mwh_ac:.3f} | "
-            f"{row.h2_consumed_kg:.3f}/{row.h2_refilled_kg:.3f} | "
-            f"40.0→{row.soc_min_pct:.1f}→{row.soc_end_pct:.1f} | "
-            f"80.0→{row.main_loh_min_pct:.1f}→{row.main_loh_end_pct:.1f} | "
-            f"{row.truck_dispatches} |"
+            f"{row.soc_min_pct:.1f}→{row.soc_end_pct:.1f} | "
+            f"{row.main_loh_min_pct:.1f}→{row.main_loh_end_pct:.1f} |"
         )
     lines.extend(
         [
             "",
-            "차량별 배치 원자료는 `fig15_severity_dynamic_trucks.csv`에 있으며, 전체 "
-            "접속 빈도는 다음과 같다.",
+            "차량 위치(모선:출동 횟수)는 비상 Mode 2 기준이며, Mode 1 주 차량 "
+            "및 충전 위치는 시간별 차량 CSV에도 기록했다.",
             "",
         ]
     )
-    for row in dynamic_rows.itertuples(index=False):
-        lines.append(
-            f"- α={row.alpha:.1f}: 전체 모선:횟수 {row.truck_bus_frequency}; "
-            f"주 차량 {row.main_bus_frequency}."
-        )
     for result in results:
-        lines.append(f"- α={result.alpha:.1f} 차량별 접속 빈도:")
-        active = result.trucks.loc[result.trucks.bus.notna()]
+        active = result.trucks.loc[result.trucks["mode"].eq("Mode 2")]
+        mode1 = result.trucks.loc[result.trucks["mode"].eq("Mode 1")]
+        mode1_buses = Counter(mode1.bus.astype(int))
+        lines.append(f"- α={result.alpha:.1f}:")
+        lines.append(
+            "  - Mode 1 주거 접속: "
+            + (
+                ", ".join(
+                    f"Bus {bus} {count}회" for bus, count in sorted(mode1_buses.items())
+                )
+                or "없음"
+            )
+            + "; PV·P2G 충전 Bus 7, 계통 충전 Bus 9."
+        )
         for truck in range(5):
-            vehicle_rows = active.loc[active.truck.eq(truck)]
-            frequencies = Counter(vehicle_rows.bus.astype(int))
+            frequencies = Counter(active.loc[active.truck.eq(truck), "bus"].astype(int))
             detail = (
                 ", ".join(
                     f"Bus {bus} {count}회" for bus, count in sorted(frequencies.items())
                 )
-                or "0회"
+                or "출동 없음"
             )
-            role = "주 차량" if truck == 0 else "보조 HFC"
-            lines.append(f"  - 차량 {truck} ({role}): {detail}")
+            lines.append(f"  - 차량 {truck}: {detail}")
+        worst = result.hourly.iloc[result.worst_hour]
+        lines.append(
+            f"  - 기준 최악 시간 t={result.worst_hour}: "
+            f"{worst.vmin_baseline:.4f}→{worst.vmin_supported:.4f} p.u., "
+            f"Mode 2 공급 {worst.emergency_supply_mw:.3f} MW, "
+            f"Mode 1 공급 {worst.mode1_supply_mw:.3f} MW, "
+            f"SOC {worst.soc_start_pct:.1f}%, "
+            f"함대 수소 {worst.fleet_h2_start_kg:.1f} kg."
+        )
     lines.extend(
         [
             "",
-            "원 P1과 위치 재배치는 공급량·SOC·LOH·수소 사용량이 같다. 새 방식은 저전압 "
-            "대응으로 더 많은 시간 출동할 수 있으므로 전압 효과를 비교할 때 "
-            "공급 에너지와 연료 소비 차이를 반드시 함께 봐야 한다. "
-            "잔여 모선 초과량은 계산상 임계 초과의 "
-            "미충족분이며 물리적 미공급 전력을 뜻하지 않는다.",
+            "두 그림의 왼쪽은 33개 모선 중 최저 전압과 연한 Other buses 선을, "
+            "오른쪽은 기준 최악 시간의 33개 전압과 실제 주입 모선을 표시한다. "
+            "0.93 p.u. 산업 출동 기준과 0.95 p.u. 전압 평가 기준은 구분했다.",
+            "전체 33개 모선의 0.95 p.u. 미만 시간은 Mode 1·2 지원 후에도 "
+            "남는다. 주거 저전압만으로 Mode 2가 발동하지 않으며, Mode 1은 "
+            "경제성·SOC 조건이 맞을 때만 공급하므로 모든 저전압을 해소하지 않는다.",
             "",
         ]
     )
-    for result in results:
-        worst = result.hourly.iloc[result.worst_hour]
-        no_supply = int(
-            (result.hourly.mode2_trigger & ~result.hourly.supply_active).sum()
-        )
+    first, second = dynamic.iloc[0], dynamic.iloc[1]
+    if first.violation_hours_supported == second.violation_hours_supported:
         lines.append(
-            f"- α={result.alpha:.1f}: Mode 2 조건인데 공급하지 못한 시간 "
-            f"{no_supply} h. 기준 최악 시간 t={result.worst_hour}에는 "
-            f"전압 {worst.vmin_baseline:.4f} p.u., 공급 "
-            f"{worst.emergency_supply_mw:.3f} MW, SOC {worst.soc_start_pct:.1f}%, "
-            f"함대 수소 {worst.fleet_h2_start_kg:.1f} kg이었다. "
-            "기존 P1처럼 Mode 2 중 외부 수소 보충을 하지 않아 자원이 소진된 결과다."
-        )
-    lines.append("")
-    first, second = (dynamic_rows.iloc[0], dynamic_rows.iloc[1])
-    if np.isclose(first.ac_injection_mwh, second.ac_injection_mwh):
-        lines.append(
-            "**논문 조건 선택:** 0.95 p.u. 전압 조건이 출동을 지배하여 두 α의 "
-            "Mode 2 조건(99 h), 실제 공급(34 h), 에너지·수소 사용량이 같다. "
-            "누적 전압 위반량은 α=1.3의 "
-            f"{first.cumulative_voltage_deficit_supported_pu_bus_h:.3f}에서 "
-            f"α=1.5의 {second.cumulative_voltage_deficit_supported_pu_bus_h:.3f} "
-            "p.u.·bus·h로 소폭 달라졌고, 두 조건 모두 저전압 시간이 80 h다. "
-            "α=1.5는 완화된 부하 허용 조건의 대표 사례로 사용할 수 있지만 "
-            "전압 성과 우월성을 주장할 근거는 약하다. α=1.3은 더 큰 계산상 모선 "
-            "초과·잔여량을 보여 주는 가혹 조건이다. 어느 쪽도 완전한 전압 준수를 "
-            "보여 주지 않으므로 논문에서는 이 한계를 명시해야 한다."
+            "**논문 조건 선택:** 두 α의 전체 저전압 시간은 같다. "
+            f"산업 초과 조건은 α=1.3에서 {first.load_excess_trigger_hours}시간, "
+            f"α=1.5에서 {second.load_excess_trigger_hours}시간이다. "
+            f"α=1.5는 Mode 1을 {second.mode1_hours}시간 보여 주며 "
+            f"α=1.3의 {first.mode1_hours}시간보다 많다. "
+            "누적 전압 위반도 "
+            f"{second.cumulative_voltage_deficit_supported_pu_bus_h:.3f} "
+            f"대 {first.cumulative_voltage_deficit_supported_pu_bus_h:.3f} "
+            "p.u.·bus·h로 소폭 낮다. 이중 운용의 대표 그림에는 α=1.5가 "
+            "더 적합하고, α=1.3은 가혹 조건 보조 분석에 적합하다. "
+            "두 경우 모두 남는 저전압을 명시해야 한다."
         )
     else:
-        better = (
-            first
-            if first.cumulative_voltage_deficit_supported_pu_bus_h
-            < second.cumulative_voltage_deficit_supported_pu_bus_h
-            else second
+        better = min(
+            dynamic.itertuples(index=False),
+            key=lambda row: row.violation_hours_supported,
         )
         lines.append(
-            f"**논문 조건 선택:** 누적 전압 위반량은 α={better.alpha:.1f}가 더 작다. "
-            "단, 공급 에너지·수소 소비 차이와 함께 해석해야 한다."
+            f"**논문 조건 선택:** α={better.alpha:.1f}에서 저전압 시간이 "
+            "더 적다. 공급 에너지·수소 소비·충전량을 함께 해석하고 남는 "
+            "전압 위반을 명시해야 한다."
         )
     lines.append("")
     path.write_text("\n".join(lines), encoding="utf-8")

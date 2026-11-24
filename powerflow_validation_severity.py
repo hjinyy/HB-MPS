@@ -34,8 +34,8 @@ from powerflow_validation import (
     MIN_VOLTAGE_PU,
     OUTPUT_DIR,
     PV_COLUMN,
+    PV_BUS_NUMBER,
     PV_PENETRATION,
-    RESIDENTIAL_BUS_NUMBERS,
     RESIDENTIAL_COLUMN,
     build_network,
     load_profiles,
@@ -43,7 +43,11 @@ from powerflow_validation import (
     set_operating_point,
     solve_network,
 )
-from severity_ac_dispatch import dispatch_hour
+from severity_ac_dispatch import (
+    BUS_INDICES,
+    MODE2_VOLTAGE_TRIGGER_PU,
+    dispatch_hour,
+)
 from severity_fleet import (
     FLEET_SIZE,
     H2_CAPACITY_KG,
@@ -92,7 +96,12 @@ class SeverityResult:
 
     @property
     def injection_buses(self) -> tuple[tuple[int, ...], ...]:
-        rows = self.trucks.loc[self.trucks.bus.notna()]
+        rows = self.trucks.loc[
+            self.trucks.bus.notna()
+            & (
+                self.trucks.hfc_kwh + self.trucks.ess_kwh + self.trucks.mode1_ess_kwh
+            ).gt(0)
+        ]
         return tuple(
             tuple(rows.loc[rows.t.eq(t), "bus"].astype(int))
             for t in range(len(self.hourly))
@@ -121,12 +130,16 @@ def simulate(alpha: float) -> SeverityResult:
     support_net = build_network()
     bus_ratings = _bus_ratings(baseline_net)
     industrial_rating = float(bus_ratings.sum())
-    residential_indices = {bus - 1 for bus in RESIDENTIAL_BUS_NUMBERS}
-    residential_rating = float(
-        baseline_net.load.loc[
-            baseline_net.load.bus.isin(residential_indices), "p_mw"
-        ].sum()
+    industrial_indices = set(BUS_INDICES)
+    residential_bus_numbers = tuple(
+        sorted(
+            int(bus) + 1
+            for bus in baseline_net.load.bus.unique()
+            if bus not in industrial_indices
+        )
     )
+    if len(residential_bus_numbers) != 23:
+        raise AssertionError("Expected 9 industrial and 23 residential load buses")
     pv_rating = float(baseline_net.load.p_mw.sum()) * PV_PENETRATION
     raw_peak = float(frame[INDUSTRIAL_COLUMN].max())
     mw_per_raw_kwh = industrial_rating / raw_peak
@@ -144,6 +157,31 @@ def simulate(alpha: float) -> SeverityResult:
             for bus in INDUSTRIAL_BUS_NUMBERS
         ]
     )
+    mode1_generators = {
+        bus: pp.create_sgen(
+            support_net,
+            bus - 1,
+            p_mw=0.0,
+            q_mvar=0.0,
+            name=f"Mode1 residential-{bus}",
+        )
+        for bus in residential_bus_numbers
+    }
+    pv_charge_load = pp.create_load(
+        support_net,
+        PV_BUS_NUMBER - 1,
+        p_mw=0.0,
+        q_mvar=0.0,
+        name="HB PV charging and P2G",
+    )
+    grid_charge_bus = 9
+    grid_charge_load = pp.create_load(
+        support_net,
+        grid_charge_bus - 1,
+        p_mw=0.0,
+        q_mvar=0.0,
+        name="HB grid charging depot",
+    )
     state = FleetState.initial()
     high_lcoe, low_smp = price_quantiles(hours)
     hourly_rows: list[dict[str, float | int | str | bool]] = []
@@ -154,29 +192,32 @@ def simulate(alpha: float) -> SeverityResult:
     industrial_by_bus = {bus: index for index, bus in enumerate(INDUSTRIAL_BUS_NUMBERS)}
 
     for t, hour in enumerate(hours):
-        mixed_scale = (
-            industrial_rating * industrial_fraction[t]
-            + residential_rating * residential_fraction[t]
-        ) / (industrial_rating + residential_rating)
         operating_point = (
             industrial_fraction[t],
             residential_fraction[t],
-            mixed_scale,
+            residential_fraction[t],
             pv_fraction[t] * pv_rating,
             0.0,
         )
         set_operating_point(baseline_net, *operating_point)
         set_operating_point(support_net, *operating_point)
         support_net.sgen.loc[generators, "p_mw"] = 0.0
+        support_net.sgen.loc[list(mode1_generators.values()), "p_mw"] = 0.0
+        support_net.load.loc[[pv_charge_load, grid_charge_load], "p_mw"] = 0.0
+        support_net.load.loc[[pv_charge_load, grid_charge_load], "scaling"] = 1.0
         baseline_voltage, baseline_loss = solve_network(baseline_net)
         demand = np.maximum(bus_loads[t] - bus_thresholds, 0.0)
         load_trigger = bool(np.any(demand > 1e-9))
-        voltage_trigger = bool(np.any(baseline_voltage < MIN_VOLTAGE_PU))
+        voltage_trigger = bool(
+            np.any(baseline_voltage[BUS_INDICES] < MODE2_VOLTAGE_TRIGGER_PU)
+        )
         mode2 = load_trigger or voltage_trigger
         soc_start = state.soc
         h2_start = sum(state.h2_kg)
         h2_by_truck_start = tuple(state.h2_kg)
         idle = None
+        mode1_bus: int | None = None
+        mode1_mw = pv_charging_mw = grid_charging_mw = 0.0
         if mode2:
             dispatch = dispatch_hour(
                 support_net,
@@ -200,6 +241,19 @@ def simulate(alpha: float) -> SeverityResult:
             vehicles = dispatch.trucks
         else:
             idle = advance_idle(state, hour, high_lcoe, low_smp)
+            if idle.phase1_ess_kwh > 0:
+                # Prices are common to all residential buses; lowest voltage
+                # resolves the otherwise equal spatial economic choice.
+                mode1_bus = min(
+                    residential_bus_numbers,
+                    key=lambda bus: (baseline_voltage[bus - 1], bus),
+                )
+                mode1_mw = idle.phase1_ess_kwh * mw_per_raw_kwh
+                support_net.sgen.at[mode1_generators[mode1_bus], "p_mw"] = mode1_mw
+            pv_charging_mw = (idle.pv_ess_charge_kwh + idle.pv_p2g_kwh) * mw_per_raw_kwh
+            grid_charging_mw = idle.grid_ess_charge_kwh * mw_per_raw_kwh
+            support_net.load.at[pv_charge_load, "p_mw"] = pv_charging_mw
+            support_net.load.at[grid_charge_load, "p_mw"] = grid_charging_mw
             supported_voltage, supported_loss = solve_network(support_net)
             injections = np.zeros(len(INDUSTRIAL_BUS_NUMBERS))
             residual = demand.copy()
@@ -219,7 +273,17 @@ def simulate(alpha: float) -> SeverityResult:
                 "mode2_trigger": mode2,
                 "load_excess_trigger": load_trigger,
                 "voltage_trigger": voltage_trigger,
+                "industrial_vmin_baseline": float(baseline_voltage[BUS_INDICES].min()),
                 "supply_active": supply_active,
+                "mode1_active": mode1_bus is not None,
+                "mode1_bus": mode1_bus,
+                "mode1_supply_mw": mode1_mw,
+                "pv_charging_mw": pv_charging_mw,
+                "grid_charging_mw": grid_charging_mw,
+                "net_hbmps_mw": float(injections.sum())
+                + mode1_mw
+                - pv_charging_mw
+                - grid_charging_mw,
                 "load_dispatch_active": supply_active and load_trigger,
                 "voltage_only_dispatch_active": supply_active
                 and not load_trigger
@@ -261,11 +325,18 @@ def simulate(alpha: float) -> SeverityResult:
         )
         for bus in range(1, 34):
             index = industrial_by_bus.get(bus)
+            mode1_injection = mode1_mw if bus == mode1_bus else 0.0
+            charging = pv_charging_mw * (bus == PV_BUS_NUMBER) + grid_charging_mw * (
+                bus == grid_charge_bus
+            )
             bus_rows.append(
                 {
                     "alpha": alpha,
                     "t": t,
                     "bus": bus,
+                    "bus_type": "Slack"
+                    if bus == 1
+                    else ("Industrial" if index is not None else "Residential"),
                     "industrial_candidate": index is not None,
                     "industrial_load_mw": float(bus_loads[t, index])
                     if index is not None
@@ -277,9 +348,20 @@ def simulate(alpha: float) -> SeverityResult:
                     "initial_severity": float(scores[index])
                     if index is not None
                     else 0.0,
-                    "injection_mw": float(injections[index])
+                    "mode2_injection_mw": float(injections[index])
                     if index is not None
                     else 0.0,
+                    "mode1_injection_mw": mode1_injection,
+                    "injection_mw": (
+                        float(injections[index]) if index is not None else 0.0
+                    )
+                    + mode1_injection,
+                    "charging_mw": charging,
+                    "net_hbmps_mw": (
+                        float(injections[index]) if index is not None else 0.0
+                    )
+                    + mode1_injection
+                    - charging,
                     "residual_excess_mw": float(residual[index])
                     if index is not None
                     else 0.0,
@@ -289,14 +371,41 @@ def simulate(alpha: float) -> SeverityResult:
             )
         for truck in range(FLEET_SIZE):
             vehicle = vehicles[truck] if vehicles else None
+            idle_bus = (
+                (
+                    mode1_bus
+                    if mode1_bus is not None
+                    else PV_BUS_NUMBER
+                    if pv_charging_mw > 0
+                    else grid_charge_bus
+                    if grid_charging_mw > 0
+                    else None
+                )
+                if truck == 0
+                else None
+            )
             truck_rows.append(
                 {
                     "alpha": alpha,
                     "t": t,
                     "truck": truck,
-                    "bus": vehicle.bus if vehicle else None,
+                    "bus": vehicle.bus if vehicle else idle_bus,
+                    "mode": (
+                        "Mode 2"
+                        if vehicle and vehicle.bus is not None
+                        else "Mode 1"
+                        if mode1_bus is not None and truck == 0
+                        else "PV charging"
+                        if pv_charging_mw > 0 and truck == 0
+                        else "Grid charging"
+                        if grid_charging_mw > 0 and truck == 0
+                        else "Standby"
+                    ),
                     "hfc_kwh": vehicle.hfc_kwh if vehicle else 0.0,
                     "ess_kwh": vehicle.ess_kwh if vehicle else 0.0,
+                    "mode1_ess_kwh": idle.phase1_ess_kwh
+                    if idle and truck == 0
+                    else 0.0,
                     "h2_start_kg": h2_by_truck_start[truck],
                     "h2_end_kg": state.h2_kg[truck],
                     "loh_end_pct": state.h2_kg[truck] / H2_CAPACITY_KG * 100,
