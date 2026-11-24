@@ -761,13 +761,13 @@ def create_financial_flow_figure(scenario_results):
         draw_financial_flow(ax, scenario_results[alpha], alpha)
 
     for ax, letter in zip(axes, "abc"):
-        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
-    axes[-1].set_xlabel("Time[h]\n(c)", fontsize=Config.FONT_LABEL)
+        ax.set_xlabel(f"Time (h)\n({letter})", fontsize=Config.FONT_LABEL)
+        ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, 0.0),
-               ncol=3, frameon=False, prop={"size": Config.FONT_LEGEND})
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.98),
+               ncol=3, frameon=True, prop={"size": Config.FONT_LEGEND})
     scale_figure_text(fig, 0.8)
-    fig.tight_layout(rect=[0, 0.08, 1, 1], h_pad=2.8)
+    fig.tight_layout(rect=[0, 0, 1, 0.92], h_pad=2.8)
     save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")
 
 
@@ -786,47 +786,10 @@ def create_economic_value_figure(scenario_results):
     save_figure(fig, "figure_economic_value_all_cases")
 
 
-def create_mode_distribution_figure(scenario_results):
-    from matplotlib.patches import Patch
+def create_mode_distribution_figure():
+    from figure7_operation_summary import main as save_mode_figure
 
-    colors = {
-        "STANDBY": "lightgray",
-        "GRID_CHARGE": "mediumseagreen",
-        "SOLAR_CHARGE": "cyan",
-        "PHASE 1": "gold",
-        "PHASE 2": "red",
-        "H2_MAINTENANCE": "orange"
-    }
-
-    labels = (
-        "Standby", "Grid charging", "Surplus PV charging",
-        "Economic ESS discharging", "Emergency power supply", "Hydrogen refueling",
-    )
-    fig, axes = plt.subplots(1, 3, figsize=(22, 8), dpi=300)
-
-    for ax, alpha, letter in zip(axes, Config.SCENARIO_MULTIPLIERS, "abc"):
-        draw_mode_distribution(ax, scenario_results[alpha], alpha)
-        ax.set_xlim(-1.4, 1.6)
-        ax.set_xlabel(f"({letter})", fontsize=Config.FONT_LABEL)
-
-    fig.legend(
-        [Patch(facecolor=c) for c in colors.values()],
-        labels,
-        loc="lower center",
-        bbox_to_anchor=(0.5, 0.02),
-        ncol=3,
-        prop={"weight": "normal", "size": Config.FONT_LEGEND},
-        frameon=False
-    )
-
-    scale_figure_text(fig, 1.2)
-    fig.subplots_adjust(
-        left=0.03, right=0.97,
-        top=0.96, bottom=0.27,
-        wspace=0.00
-    )
-
-    save_figure(fig, "fig7_distribution_of_hb_mps_operating_modes")
+    save_mode_figure()
 
 
 # ---------------------------------------------------------
@@ -846,7 +809,7 @@ def main():
     create_grid_resilience_figure(scenario_results)
     create_asset_status_figure(scenario_results)
     create_financial_flow_figure(scenario_results)
-    create_mode_distribution_figure(scenario_results)
+    create_mode_distribution_figure()
 
     print("\nAll multi-scenario figures have been saved successfully.")
     print(f"Save directory: {Config.FIGURE_DIR}")

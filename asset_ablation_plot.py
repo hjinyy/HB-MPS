@@ -43,15 +43,19 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
             strict=True,
         ):
             values = np.array([float(row[field]) / 1000 for row in group])
+            hatch = r"\\" if field == "hfc_supply_kwh" else None
             ax.bar(
                 x, values, bottom=bottom, width=0.39,
-                label=label, color=color, edgecolor="black", linewidth=0.8,
+                label=label, facecolor="white" if hatch else color,
+                edgecolor=color if hatch else "black", linewidth=1.2,
+                hatch=hatch,
             )
             for x_position, start, value in zip(x, bottom, values, strict=True):
                 if value > 0:
                     ax.text(
                         x_position, start + value / 2, f"{value:.1f}",
-                        ha="center", va="center", color="white",
+                        ha="center", va="center",
+                        color="black" if hatch else "white",
                     )
             bottom += values
         ax.set_xticks(x, names)
@@ -65,12 +69,12 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         ax.spines[["top", "right"]].set_visible(False)
     fig.legend(
         *axes[0].get_legend_handles_labels(),
-        frameon=False,
+        frameon=True,
         ncol=2,
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.99),
+        bbox_to_anchor=(0.5, 0.98),
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.88), w_pad=1.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.93), w_pad=1.5)
     normalize_figure_text(fig)
     fig.savefig(OUT / "fig9_comparison_of_emergency_energy_delivery_and_residual_unserved_demand.png", bbox_inches="tight")
     fig.savefig(OUT / "fig9_comparison_of_emergency_energy_delivery_and_residual_unserved_demand.pdf", bbox_inches="tight")
@@ -78,16 +82,19 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
 
     fig, axes = plt.subplots(1, 2, figsize=(17.6, 8), dpi=200, sharey=True)
     for ax, group, letter in zip(axes, groups, "ab", strict=True):
-        for offset, field, label, color in zip(
+        for offset, field, label, color, hatch in zip(
             (-0.16, 0.0, 0.16),
             ("operating_net_krw", "avoided_outage_krw", "total_value_krw"),
             ("Operating net benefit", "Avoided interruption benefit", "Net societal benefit"),
             ("#1f77b4", "#ff7f0e", "#2ca02c"),
+            (None, r"\\", "xx"),
             strict=True,
         ):
             ax.bar(x + offset, [float(row[field]) / 1e6 for row in group],
-                   width=0.15, label=label, color=color,
-                   edgecolor="black", linewidth=0.8)
+                   width=0.15, label=label,
+                   facecolor="white" if hatch else color,
+                   edgecolor=color if hatch else "black", linewidth=1.2,
+                   hatch=hatch)
         ax.set_xticks(x, names)
         ax.set_xlim(-0.3425, 1.4425)
         ax.set_xlabel(f"Configuration\n({letter})")
@@ -99,12 +106,12 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         ax.spines[["top", "right"]].set_visible(False)
     fig.legend(
         *axes[0].get_legend_handles_labels(),
-        frameon=False,
+        frameon=True,
         ncol=3,
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.99),
+        bbox_to_anchor=(0.5, 0.98),
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.88), w_pad=1.5)
+    fig.tight_layout(rect=(0, 0, 1, 0.93), w_pad=1.5)
     normalize_figure_text(fig)
     fig.savefig(OUT / "fig10_comparison_of_operating_net_benefit_avoided_interruption_benefit_and_net_societal_benefit.png", bbox_inches="tight")
     fig.savefig(OUT / "fig10_comparison_of_operating_net_benefit_avoided_interruption_benefit_and_net_societal_benefit.pdf", bbox_inches="tight")

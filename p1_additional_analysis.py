@@ -21,6 +21,7 @@ from emergency_validation import validate_run
 from hb_inputs import INPUT, load_hours
 from paper_figure_style import (
     ANNOTATION_SIZE,
+    TICK_SIZE,
     apply_paper_typography,
     normalize_figure_text,
     scale_figure_text,
@@ -108,9 +109,8 @@ def main() -> None:
     break_even_rows = []
     apply_paper_typography()
     fig, axes = plt.subplots(
-        1, 3, figsize=(22, 9.5), sharey=True, constrained_layout=True
+        1, 3, figsize=(28, 9.5), sharey=True
     )
-    fig.set_constrained_layout_pads(wspace=0.08)
     for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
         p0 = runs[1.3, trucks, Strategy.P0]
         p1 = runs[1.3, trucks, Strategy.P1]
@@ -127,15 +127,16 @@ def main() -> None:
                 "break_even_voll_krw_per_kwh": break_even,
             }
         )
-        for strategy, color in (
-            (Strategy.P0, "#6C7890"),
-            (Strategy.P1, "#2775B6"),
-            (Strategy.P2, "#D9904A"),
+        for strategy, color, marker, linestyle in (
+            (Strategy.P0, "#6C7890", "o", "-"),
+            (Strategy.P1, "#2775B6", "^", "--"),
+            (Strategy.P2, "#D9904A", "s", ":"),
         ):
             run = runs[1.3, trucks, strategy]
             x = np.array(MULTIPLIERS) * VOLL_KRW_PER_KWH
             y = np.array([societal(run, voll) / 1e6 for voll in x])
-            axis.plot(x, y, color=color, marker="o", linewidth=3.5, label=strategy.value)
+            axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
+                      linewidth=3.5, label=strategy.value)
             for multiple, voll, value in zip(MULTIPLIERS, x, y, strict=True):
                 sensitivity.append(
                     {
@@ -150,17 +151,21 @@ def main() -> None:
         axis.axvline(break_even, color="black", linestyle=":", linewidth=1.3)
         axis.axvline(VOLL_KRW_PER_KWH, color="firebrick", linestyle="--", linewidth=1.3)
         axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
+        axis.set_ylabel("Net societal benefit (M KRW)")
+        axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
         axis.set_xticks((0, 5000, 10000))
         axis.grid(alpha=0.2)
-    axes[0].set_ylabel("Net societal benefit (M KRW)")
     fig.legend(
         *axes[0].get_legend_handles_labels(),
-        loc="outside lower center",
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.98),
         ncol=3,
-        frameon=False,
+        frameon=True,
+        prop={"size": TICK_SIZE},
     )
     scale_figure_text(fig, 1.2)
+    fig.tight_layout(rect=(0, 0, 1, 0.9), w_pad=2.0)
     save(fig, "fig12_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)
