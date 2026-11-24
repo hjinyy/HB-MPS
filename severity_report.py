@@ -1,4 +1,4 @@
-"""Reproducible three-strategy comparison for the additional Figure 13 cases."""
+"""Reproducible three-strategy comparison for the new Figures 13 and 14."""
 
 from __future__ import annotations
 
@@ -265,7 +265,7 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             "t"
         )
         if len(saved_alpha) != len(run.steps):
-            raise AssertionError("Saved original Figure 13 reference is incomplete")
+            raise AssertionError("Saved fig13_old reference is incomplete")
         for t, step in enumerate(run.steps):
             source = dynamic.hourly.iloc[t]
             industrial_scale = float(source.industrial_load_mw) / industrial_rating
@@ -306,9 +306,9 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
             fixed_voltage, fixed_loss = solve_network(reference_net)
             saved_row = saved_alpha.iloc[t]
             if not np.isclose(fixed_voltage.min(), saved_row.vmin_hbmps, atol=1e-8):
-                raise AssertionError("Original Figure 13 voltage comparison drifted")
+                raise AssertionError("fig13_old voltage comparison drifted")
             if not np.isclose(fixed_loss, saved_row.ploss_hbmps_mw, atol=1e-8):
-                raise AssertionError("Original Figure 13 loss comparison drifted")
+                raise AssertionError("fig13_old loss comparison drifted")
             fixed_profiles.append(fixed_voltage)
             fixed_losses.append(fixed_loss)
             rows = truck_rows[t * 5 : (t + 1) * 5]
@@ -445,7 +445,7 @@ def compare_strategies(results: tuple[SeverityResult, ...]) -> pd.DataFrame:
         )
         for label, profiles, losses, residual, positions in (
             (
-                "Existing Figure 13",
+                "fig13_old",
                 fixed_profiles,
                 fixed_losses,
                 fixed_residual,
@@ -562,16 +562,16 @@ def write_report(
     results: tuple[SeverityResult, ...], comparison: pd.DataFrame, path: Path
 ) -> None:
     """Document the binary feeder, dual-mode interfaces and honest comparisons."""
-    mixed = comparison.loc[comparison.strategy.eq("Existing Figure 13 (mixed)")].iloc[0]
+    mixed = comparison.loc[comparison.strategy.eq("fig13_old (mixed)")].iloc[0]
     dynamic = comparison.loc[comparison.strategy.eq("Dynamic bus-level")].sort_values(
         "alpha"
     )
     binary = dynamic.iloc[0]
     lines = [
-        "# Fig. 13(1)·(2): 산업·주거 모선별 HB-MPS 이중 운용",
+        "# Figs. 13–14: 산업·주거 모선별 HB-MPS 이중 운용",
         "",
-        "기존 Figure 13과 메인 P1 코드는 변경하지 않았다. 이 보고서는 추가 실험인 "
-        "Fig. 13(1)·(2)의 재계산 결과다.",
+        "기존 fig13_old와 메인 P1 코드는 변경하지 않았다. α=1.3 결과를 "
+        "운전·차량 배치 Fig. 13과 전압 효과 Fig. 14로 분리했다.",
         "",
         "## 모선 구성과 운용 규칙",
         "",
@@ -613,7 +613,7 @@ def write_report(
         f"p.u., 0.95 미만 {binary.violation_hours_baseline}시간, "
         f"누적 위반 {binary.cumulative_voltage_deficit_baseline_pu_bus_h:.3f} "
         "p.u.·bus·h.",
-        "기존 혼합부하 Figure 13과 새 이중 운용을 직접 비교하면 부하 구성의 "
+        "기존 혼합부하 fig13_old와 새 이중 운용을 직접 비교하면 부하 구성의 "
         "영향이 섞인다. 이를 분리하려고 같은 산업·주거 계통에 기존 P1 고정 "
         "배치와 직전 위치 재배치를 적용하고, 두 대조군 모두 Mode 1 공급과 "
         "충전도 AC에 반영했다. 기존 혼합부하 결과는 보존용 참고다. 표의 혼합부하 "
@@ -705,12 +705,12 @@ def write_report(
     lines.extend(
         [
             "",
-            "Fig. 13(1)의 α=1.3과 최종 Fig. 13(2)의 α=1.5를 동일한 "
-            "3행×2열 양식으로 생성했다. (a) 합산 산업부하·허용량, "
-            "(b) 기준 최악 시간의 모선별 전압·실제 접속 모선, "
-            "(c) 33개 모선의 전압 시계열, (d) 동일 실험의 지원 후−기준 "
-            "모선별 전압 변화, (e) Mode 1·2 운용 시간, (f) 차량별 실제 "
-            "접속 모선을 표시한다. 전압 변화의 음수는 충전 등으로 전압이 "
+            "α=1.3의 Fig. 13은 (a) 합산 산업부하·허용량, (b) Mode 1·2 운용 "
+            "시간, (c) 차량별 실제 접속 모선을 표시한다. Fig. 14는 "
+            "(a) 기준 최악 시간의 모선별 전압·접속 모선, (b) 33개 모선의 "
+            "전압 시계열, (c) 지원 후−기준 모선별 전압 변화를 표시한다. "
+            "α=1.5의 기존 6패널 결과는 fig13_2로 별도 보존한다. "
+            "전압 변화의 음수는 충전 등으로 전압이 "
             "낮아진 경우도 보여 준다. 0.95 p.u. 선은 출동 조건이 아닌 "
             "전압 평가 기준이다.",
             "전체 33개 모선의 0.95 p.u. 미만 시간은 Mode 1·2 지원 후에도 "

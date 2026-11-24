@@ -12,8 +12,9 @@
 
 """Independent bus-level dynamic HB-MPS dispatch and IEEE 33-bus validation.
 
-This replaces only the additional Fig. 13(1)/(2) experiment. The original
-Figure 13 and operational P1 simulation are read but never modified.
+The alpha=1.3 result supplies the new Figs. 13 and 14; the alpha=1.5
+six-panel result remains separate. The original fig13_old and operational P1
+simulation are read but never modified.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ import pandas as pd
 
 from hb_inputs import INPUT, load_hours
 from powerflow_plot_severity import save_severity_figure
+from powerflow_plot_split import save_operation_figure, save_voltage_figure
 from powerflow_validation import (
     INDUSTRIAL_BUS_NUMBERS,
     INDUSTRIAL_COLUMN,
@@ -427,11 +429,20 @@ def main() -> None:
     pd.concat([result.trucks for result in results], ignore_index=True).to_csv(
         TRUCK_PATH, index=False
     )
-    for index, result in enumerate(results, start=1):
-        alpha_label = str(result.alpha).replace(".", "_")
-        stem = f"fig13_{index}_severity_dispatch_alpha_{alpha_label}"
-        for suffix in ("png", "pdf"):
-            save_severity_figure(result, OUTPUT_DIR / f"{stem}.{suffix}", final=True)
+    for suffix in ("png", "pdf"):
+        save_operation_figure(
+            results[0],
+            OUTPUT_DIR / f"fig13_operational_scheduling_and_nodal_deployment_of_hb_mps.{suffix}",
+        )
+        save_voltage_figure(
+            results[0],
+            OUTPUT_DIR / f"fig14_voltage_improvement_of_hb_mps.{suffix}",
+        )
+        save_severity_figure(
+            results[1],
+            OUTPUT_DIR / f"fig13_2_severity_dispatch_alpha_1_5.{suffix}",
+            final=True,
+        )
     comparison = compare_strategies(results)
     comparison.to_csv(COMPARISON_PATH, index=False)
     write_report(results, comparison, SUMMARY_PATH)

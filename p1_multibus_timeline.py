@@ -86,7 +86,7 @@ def save_fleet_timeline(
     output_dir.mkdir(exist_ok=True)
     for extension in ("png", "pdf"):
         fig.savefig(
-            output_dir / f"fig15_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.{extension}",
+            output_dir / f"fig16_hourly_deployment_of_the_main_ess_hfc_truck_and_four_auxiliary_hfc_trucks.{extension}",
             bbox_inches="tight",
         )
     plt.close(fig)
