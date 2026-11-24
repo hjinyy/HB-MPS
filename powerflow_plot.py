@@ -94,7 +94,8 @@ def save_figure(
         left.legend(
             handles + load_handles, labels + load_labels,
             loc="lower center", bbox_to_anchor=(0.5, 1.02),
-            ncol=3, frameon=False, fontsize=10,
+            ncol=3, frameon=True, fancybox=False, edgecolor="black",
+            facecolor="white", framealpha=1.0, fontsize=10,
         )
 
         right.plot(
@@ -114,7 +115,8 @@ def save_figure(
         right.grid(alpha=0.3)
         right.legend(
             loc="lower center", bbox_to_anchor=(0.5, 1.02),
-            ncol=2, frameon=False,
+            ncol=2, frameon=True, fancybox=False, edgecolor="black",
+            facecolor="white", framealpha=1.0,
         )
         right.set_xlabel(f"IEEE bus number\n({'abcdef'[2 * row + 1]})")
 

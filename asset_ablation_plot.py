@@ -44,8 +44,9 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
         ):
             values = np.array([float(row[field]) / 1000 for row in group])
             hatch = r"\\" if field == "hfc_supply_kwh" else None
+            visible = values > 0
             ax.bar(
-                x, values, bottom=bottom, width=0.39,
+                x[visible], values[visible], bottom=bottom[visible], width=0.39,
                 label=label, facecolor="white" if hatch else color,
                 edgecolor=color if hatch else "black", linewidth=1.2,
                 hatch=hatch,
@@ -70,6 +71,10 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
         ncol=2,
         loc="upper center",
         bbox_to_anchor=(0.5, 0.98),
@@ -107,6 +112,10 @@ def plot_results(summaries: list[dict[str, str | float]]) -> None:
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
         ncol=3,
         loc="upper center",
         bbox_to_anchor=(0.5, 0.98),

@@ -718,7 +718,9 @@ def create_grid_resilience_figure(scenario_results):
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = legends[0]
     fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=4, frameon=False, columnspacing=0.8, handletextpad=0.6,
+               ncol=4, frameon=True, fancybox=False, edgecolor="black",
+               facecolor="white", framealpha=1.0,
+               columnspacing=0.8, handletextpad=0.6,
                prop={"size": 28})
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=3.0)
@@ -742,7 +744,9 @@ def create_asset_status_figure(scenario_results):
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.99),
-               ncol=4, frameon=False, columnspacing=0.8, handletextpad=0.6,
+               ncol=4, frameon=True, fancybox=False, edgecolor="black",
+               facecolor="white", framealpha=1.0,
+               columnspacing=0.8, handletextpad=0.6,
                prop={"size": 28})
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.88], h_pad=2.8)
@@ -765,7 +769,9 @@ def create_financial_flow_figure(scenario_results):
         ax.tick_params(axis="x", labelbottom=True)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.98),
-               ncol=3, frameon=True, prop={"size": Config.FONT_LEGEND})
+               ncol=3, frameon=True, fancybox=False, edgecolor="black",
+               facecolor="white", framealpha=1.0,
+               prop={"size": Config.FONT_LEGEND})
     scale_figure_text(fig, 0.8)
     fig.tight_layout(rect=[0, 0, 1, 0.92], h_pad=2.8)
     save_figure(fig, "fig8_cumulative_financial_flow_of_hb_mps")

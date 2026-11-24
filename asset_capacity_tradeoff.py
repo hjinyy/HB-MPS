@@ -182,7 +182,11 @@ def plot_results(results: list[AllocationResult]) -> None:
         loc="upper center",
         bbox_to_anchor=(0.5, 1.17),
         ncol=2,
-        frameon=False,
+        frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
     )
 
     tradeoff_ax.plot(operating, emergency, color="0.65", linestyle="--", linewidth=1.6)

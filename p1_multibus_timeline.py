@@ -75,7 +75,11 @@ def save_fleet_timeline(
         loc="upper center",
         bbox_to_anchor=(0.5, 0.98),
         ncol=3,
-        frameon=False,
+        frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
     )
     fig.tight_layout(rect=(0, 0, 1, 0.86))
     normalize_figure_text(fig)

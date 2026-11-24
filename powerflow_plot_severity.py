@@ -107,7 +107,9 @@ def save_severity_figure(
         if final:
             load_axis.set_xlabel("Time (h)\n(a)")
         load_axis.legend(
-            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=2, frameon=False
+            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=2,
+            frameon=True, fancybox=False, edgecolor="black",
+            facecolor="white", framealpha=1.0,
         )
 
         minimum_bus = int(np.argmin(np.mean(result.baseline_profiles, axis=0)))
@@ -153,7 +155,11 @@ def save_severity_figure(
             loc="lower left",
             bbox_to_anchor=(0, 1.01),
             ncol=4,
-            frameon=False,
+            frameon=True,
+            fancybox=False,
+            edgecolor="black",
+            facecolor="white",
+            framealpha=1.0,
             columnspacing=1.3,
             handlelength=1.6,
         )
@@ -244,7 +250,9 @@ def save_severity_figure(
         nodal_axis.set_ylabel("Voltage (p.u.)")
         nodal_axis.grid(color="#dedede", linewidth=0.6)
         nodal_axis.legend(
-            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=3, frameon=False
+            loc="lower left", bbox_to_anchor=(0, 1.01), ncol=3,
+            frameon=True, fancybox=False, edgecolor="black",
+            facecolor="white", framealpha=1.0,
         )
         if final:
             gain = (result.supported_profiles - result.baseline_profiles).T
@@ -312,7 +320,11 @@ def save_severity_figure(
                 loc="lower left",
                 bbox_to_anchor=(0, 1.01),
                 ncol=max(1, len(deployed.bus.unique())),
-                frameon=False,
+                frameon=True,
+                fancybox=False,
+                edgecolor="black",
+                facecolor="white",
+                framealpha=1.0,
                 columnspacing=0.8,
             )
             fig.subplots_adjust(left=0.17, right=0.965, bottom=0.08, top=0.91)

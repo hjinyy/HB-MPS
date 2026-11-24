@@ -162,10 +162,14 @@ def main() -> None:
         bbox_to_anchor=(0.5, 0.98),
         ncol=3,
         frameon=True,
+        fancybox=False,
+        edgecolor="black",
+        facecolor="white",
+        framealpha=1.0,
         prop={"size": TICK_SIZE},
     )
     scale_figure_text(fig, 1.2)
-    fig.tight_layout(rect=(0, 0, 1, 0.9), w_pad=2.0)
+    fig.tight_layout(rect=(0, 0, 1, 0.76), w_pad=2.0)
     save(fig, "fig12_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)

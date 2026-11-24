@@ -1,0 +1,10 @@
+alpha,grid_condition,mode,hours,share_percent
+1.3,Tight,Mode 1,68,40.476190476190474
+1.3,Tight,Mode 2,39,23.214285714285715
+1.3,Tight,Standby,61,36.30952380952381
+1.5,Standard,Mode 1,91,54.166666666666664
+1.5,Standard,Mode 2,8,4.761904761904762
+1.5,Standard,Standby,69,41.07142857142857
+1.8,Robust,Mode 1,95,56.547619047619044
+1.8,Robust,Mode 2,0,0.0
+1.8,Robust,Standby,73,43.452380952380956
