@@ -50,15 +50,11 @@ CONFIGURATIONS: Final = (
 
 
 def run_configuration(
-    hours: list[Hour],
-    configuration: Configuration,
-    policy: Policy = DEFAULT_POLICY,
-    *,
-    alpha: float = ALPHA,
+    hours: list[Hour], configuration: Configuration, policy: Policy = DEFAULT_POLICY
 ) -> tuple[list[dict[str, str | float]], dict[str, str | float]]:
     """Use the same P1 state transition and purchase accounting as the main case."""
     scenario = Scenario(
-        alpha,
+        ALPHA,
         1,
         Strategy.P1,
         phase1_soc_gate=policy.phase1_soc_threshold,

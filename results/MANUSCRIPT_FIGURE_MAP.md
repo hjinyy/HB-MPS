@@ -14,7 +14,7 @@ Source: `v2-ACCESS-manuscript.pdf` supplied on 2026-11-23. Filenames use the man
 | Fig. 8 | Cumulative financial flow of HB-MPS | `fig8_cumulative_financial_flow_of_hb_mps` |
 | Fig. 9 | Comparison of emergency energy delivery and residual unserved demand | `fig9_comparison_of_emergency_energy_delivery_and_residual_unserved_demand` |
 | Fig. 10 | Comparison of operating net benefit, avoided interruption benefit, and net societal benefit | `fig10_comparison_of_operating_net_benefit_avoided_interruption_benefit_and_net_societal_benefit` |
-| Fig. 10_1 (proposed insertion) | Asset configuration performance across grid margin factors at equal total storage (3 MWh) | `fig10_1_asset_configuration_performance_across_grid_margin_factors` |
+| Fig. 10_1 (proposed insertion) | Trade-off between economic performance and emergency power supply under different ESS–HFC capacity allocations with an identical total energy storage capacity | `fig10_1_economic_resilience_trade_off_by_ess_hfc_capacity_allocation` |
 | Fig. 11 | Sensitivity of residual unserved energy and operating net benefit | `fig11_sensitivity_of_residual_unserved_energy_and_operating_net_benefit` |
 | Fig. 12 | VOLL sensitivity of net societal benefit | `fig12_voll_sensitivity_of_net_societal_benefit` |
 | Fig. 13 | Decomposition of economic opportunity costs and avoided interruption benefits | `fig13_decomposition_of_economic_opportunity_costs_and_avoided_interruption_benefits` |

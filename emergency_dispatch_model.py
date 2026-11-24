@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Final
+
+ALLOWED_ASSET_CAPACITIES_KWH: Final = tuple(float(300 * share) for share in range(11))
 
 
 class Strategy(StrEnum):
@@ -33,11 +36,10 @@ class Scenario:
             or not 0 <= self.phase1_lcoe_quantile <= 1
         ):
             raise InvalidScenario(self)
-        if self.ess_capacity_kwh not in (
-            0.0,
-            1500.0,
-            3000.0,
-        ) or self.hfc_capacity_kwh not in (0.0, 1500.0, 3000.0):
+        if (
+            self.ess_capacity_kwh not in ALLOWED_ASSET_CAPACITIES_KWH
+            or self.hfc_capacity_kwh not in ALLOWED_ASSET_CAPACITIES_KWH
+        ):
             raise InvalidScenario(self)
         if self.ess_capacity_kwh + self.hfc_capacity_kwh == 0:
             raise InvalidScenario(self)
