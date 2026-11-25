@@ -151,13 +151,16 @@ def main() -> None:
                         "net_societal_million_krw": value,
                     }
                 )
-        axis.axvline(break_even, color="black", linestyle=":", linewidth=1.3)
-        axis.axvline(VOLL_KRW_PER_KWH, color="firebrick", linestyle="--", linewidth=1.3)
+        axis.axvline(break_even, color="#d62728", linestyle="--", linewidth=1.3)
         axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
-        axis.set_xticks((0, 5000, 10000))
+        axis.set_xlim(0, 500)
+        axis.set_xticks((0, break_even, 500), ("0", f"{break_even:.3f}", "500"))
+        axis.get_xticklabels()[1].set_color("#d62728")
+        axis.set_ylim(-20, 2)
+        axis.set_yticks((-20, -15, -10, -5, 0))
         axis.grid(alpha=0.2)
     fig.legend(
         *axes[0].get_legend_handles_labels(),
