@@ -137,7 +137,7 @@ def main() -> None:
             run = runs[1.3, trucks, strategy]
             x = np.array(MULTIPLIERS) * VOLL_KRW_PER_KWH
             y = np.array([societal(run, voll) / 1e6 for voll in x])
-            visible_values.extend((societal(run, 0) / 1e6, societal(run, 500) / 1e6))
+            visible_values.extend((societal(run, 0) / 1e6, societal(run, 5000) / 1e6))
             axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
                       linewidth=3.5, label=label)
             for multiple, voll, value in zip(MULTIPLIERS, x, y, strict=True):
@@ -152,13 +152,20 @@ def main() -> None:
                     }
                 )
         axis.axvline(break_even, color="#d62728", linestyle="--", linewidth=1.3)
+        axis.axvline(VOLL_KRW_PER_KWH, color="#228b22", linestyle="--", linewidth=1.3)
         axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
-        axis.set_xlim(0, 500)
-        axis.set_xticks((0, break_even, 500), ("0", f"{break_even:.3f}", "500"))
-        axis.get_xticklabels()[1].set_color("#d62728")
+        axis.set_xlim(0, 5000)
+        axis.set_xticks(
+            (break_even, VOLL_KRW_PER_KWH),
+            (f"{break_even:.3f}", f"{VOLL_KRW_PER_KWH:,.3f}"),
+        )
+        axis.get_xticklabels()[0].set_color("#d62728")
+        axis.get_xticklabels()[0].set_ha("left")
+        axis.get_xticklabels()[-1].set_color("#228b22")
+        axis.get_xticklabels()[-1].set_ha("right")
         lower, upper = min(visible_values), max(visible_values)
         padding = (upper - lower) * 0.08
         axis.set_ylim(lower - padding, upper + padding)
