@@ -108,9 +108,7 @@ def main() -> None:
     sensitivity = []
     break_even_rows = []
     apply_paper_typography()
-    fig, axes = plt.subplots(
-        1, 3, figsize=(28, 9.5), sharey=True
-    )
+    fig, axes = plt.subplots(1, 3, figsize=(28, 9.5))
     for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
         p0 = runs[1.3, trucks, Strategy.P0]
         proposed = runs[1.3, trucks, Strategy.P1]
@@ -130,6 +128,7 @@ def main() -> None:
             }
         )
         # Manuscript P1 is the former P2; proposed P2 is the former P1.
+        visible_values = []
         for label, strategy, color, marker, linestyle in (
             ("P0", Strategy.P0, "#6C7890", "o", "-"),
             ("P1", Strategy.P2, "#2775B6", "^", "--"),
@@ -138,6 +137,7 @@ def main() -> None:
             run = runs[1.3, trucks, strategy]
             x = np.array(MULTIPLIERS) * VOLL_KRW_PER_KWH
             y = np.array([societal(run, voll) / 1e6 for voll in x])
+            visible_values.extend((societal(run, 0) / 1e6, societal(run, 500) / 1e6))
             axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
                       linewidth=3.5, label=label)
             for multiple, voll, value in zip(MULTIPLIERS, x, y, strict=True):
@@ -159,8 +159,10 @@ def main() -> None:
         axis.set_xlim(0, 500)
         axis.set_xticks((0, break_even, 500), ("0", f"{break_even:.3f}", "500"))
         axis.get_xticklabels()[1].set_color("#d62728")
-        axis.set_ylim(-20, 2)
-        axis.set_yticks((-20, -15, -10, -5, 0))
+        lower, upper = min(visible_values), max(visible_values)
+        padding = (upper - lower) * 0.08
+        axis.set_ylim(lower - padding, upper + padding)
+        axis.locator_params(axis="y", nbins=5)
         axis.grid(alpha=0.2)
     fig.legend(
         *axes[0].get_legend_handles_labels(),
