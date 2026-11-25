@@ -123,6 +123,7 @@ def _enrich(
     frame: pd.DataFrame,
     ratings: tuple[float, float, float],
     scale: float,
+    pv_generation_profile_mw: np.ndarray | None = None,
 ) -> CaseRun:
     """Record the network PV balance without changing the dispatch policy."""
     benchmark = nw.case33bw()
@@ -154,18 +155,30 @@ def _enrich(
             total_load += float(row.p_mw) * fraction
     else:
         total_load = ratings[0] * industrial_fraction + ratings[1] * residential_fraction
-    pv_generation = pv_fraction * ratings[2] * PV_PENETRATION
+    pv_generation = (
+        pv_fraction * ratings[2] * PV_PENETRATION
+        if pv_generation_profile_mw is None else pv_generation_profile_mw
+    )
     raw_surplus = np.maximum(
         frame[PV_COLUMN].to_numpy(dtype=float)
         - frame[INDUSTRIAL_COLUMN].to_numpy(dtype=float)
         - frame[RESIDENTIAL_COLUMN].to_numpy(dtype=float),
         0.0,
     ) * scale
-    network_surplus = np.maximum(pv_generation - total_load, 0.0)
+    if pv_generation_profile_mw is None:
+        network_surplus = np.maximum(pv_generation - total_load, 0.0)
+    else:
+        network_surplus = np.maximum(
+            pv_generation - total_load
+            - result.hourly.line_loss_baseline_mw.to_numpy(dtype=float), 0.0
+        )
     hourly = result.hourly.copy()
     hourly.insert(0, "case_id", case.name)
     hourly["total_grid_load_mw"] = total_load
     hourly["pv_generation_mw"] = pv_generation
+    if pv_generation_profile_mw is not None:
+        hourly["pv_potential_mw"] = frame[PV_COLUMN].to_numpy(dtype=float) * scale
+        hourly["pv_curtailed_mw"] = hourly.pv_potential_mw - pv_generation
     hourly["raw_pv_surplus_scaled_mw"] = raw_surplus
     hourly["network_pv_surplus_mw"] = network_surplus
     hourly["pv_use_mw"] = (
@@ -187,11 +200,18 @@ def _enrich(
     )
 
 
-def simulate(case: Case, alpha: float, frame: pd.DataFrame | None = None) -> CaseRun:
+def simulate(
+    case: Case, alpha: float, frame: pd.DataFrame | None = None,
+    *, pv_generation_profile_mw: np.ndarray | None = None,
+) -> CaseRun:
     """Run one 168-hour case and apply its chosen raw-to-grid conversion."""
     if alpha not in ALPHAS:
         raise ValueError(f"Unsupported alpha: {alpha}")
     frame = load_profiles(INPUT_PATH) if frame is None else frame
+    if pv_generation_profile_mw is not None:
+        pv_generation_profile_mw = np.asarray(pv_generation_profile_mw, dtype=float)
+        if pv_generation_profile_mw.shape != (168,) or not np.isfinite(pv_generation_profile_mw).all() or (pv_generation_profile_mw < 0).any():
+            raise ValueError("PV dispatch must contain 168 finite nonnegative hourly values")
     hours = load_hours(INPUT)
     if len(frame) != 168 or len(hours) != 168:
         raise AssertionError("Nodal redesign requires 168 aligned hours")
@@ -202,7 +222,14 @@ def simulate(case: Case, alpha: float, frame: pd.DataFrame | None = None) -> Cas
 
     ratings = _ratings(case, nw.case33bw())
     scale = _scale(case, frame, ratings)
+    if pv_generation_profile_mw is not None and (
+        pv_generation_profile_mw
+        > frame[PV_COLUMN].to_numpy(dtype=float) * scale + 1e-8
+    ).any():
+        raise ValueError("PV dispatch cannot exceed scaled raw generation")
     if case.legacy_load_scaling:
+        if pv_generation_profile_mw is not None:
+            raise ValueError("Legacy C1 must preserve its original PV dispatch")
         return _enrich(case, legacy_simulate(alpha), frame, ratings, scale)
 
     industrial_fraction = profile_fraction(frame[INDUSTRIAL_COLUMN])
@@ -246,7 +273,10 @@ def simulate(case: Case, alpha: float, frame: pd.DataFrame | None = None) -> Cas
     pv_rating = ratings[2] * PV_PENETRATION
 
     for t, hour in enumerate(hours):
-        pv_mw = pv_fraction[t] * pv_rating
+        pv_mw = (
+            pv_fraction[t] * pv_rating if pv_generation_profile_mw is None
+            else float(pv_generation_profile_mw[t])
+        )
         for net in (baseline_net, support_net):
             _set_loads(
                 net, base_load_indices, case.industrial_buses,
@@ -281,7 +311,22 @@ def simulate(case: Case, alpha: float, frame: pd.DataFrame | None = None) -> Cas
             ess_withdrawal = dispatched.ess_withdrawal_kwh
             vehicles = dispatched.trucks
         else:
-            idle = advance_idle(state, hour, high_lcoe, low_smp)
+            if pv_generation_profile_mw is None:
+                idle_hour = hour
+            else:
+                total_grid_load_mw = (
+                    ratings[0] * industrial_fraction[t]
+                    + ratings[1] * residential_fraction[t]
+                )
+                network_surplus_mw = max(
+                    pv_mw - total_grid_load_mw - baseline_loss, 0.0
+                )
+                idle_hour = replace(
+                    hour,
+                    solar=hour.industrial + hour.residential
+                    + network_surplus_mw / scale,
+                )
+            idle = advance_idle(state, idle_hour, high_lcoe, low_smp)
             if idle.phase1_ess_kwh > 0:
                 mode1_bus = min(
                     case.residential_buses,
@@ -405,4 +450,4 @@ def simulate(case: Case, alpha: float, frame: pd.DataFrame | None = None) -> Cas
         supported_profiles=np.stack(supported_profiles),
         worst_hour=int(np.argmin(baseline_array.min(axis=1))),
     )
-    return _enrich(case, result, frame, ratings, scale)
+    return _enrich(case, result, frame, ratings, scale, pv_generation_profile_mw)

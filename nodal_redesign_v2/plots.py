@@ -193,6 +193,12 @@ def _draw_nodal_profile(axis: plt.Axes, run: CaseRun) -> None:
     voltage_floor = min(float(result.baseline_profiles[worst].min()),
                         float(result.supported_profiles[worst].min()))
     axis.set_ylim(min(0.915, voltage_floor - 0.005), 1.005)
+    if "pv_potential_mw" in result.hourly:
+        axis.set_ylim(
+            min(0.915, voltage_floor - 0.005),
+            max(1.005, float(result.baseline_profiles[worst].max()) + 0.005,
+                float(result.supported_profiles[worst].max()) + 0.005),
+        )
     axis.set_xlabel("IEEE bus number\n(a)")
     axis.set_ylabel("Voltage (p.u.)")
     axis.grid(color="#dedede", linewidth=0.6)
@@ -210,9 +216,22 @@ def save_voltage(run: CaseRun, directory: Path) -> None:
         )
         _draw_nodal_profile(nodal_axis, run)
         _draw_minimum_voltage(minimum_axis, result)
-        minimum_axis.set_ylim(
-            min(0.915, float(result.baseline_profiles.min()) - 0.005), 1.005
-        )
+        voltage_floor = min(0.915, float(result.baseline_profiles.min()) - 0.005)
+        if "pv_potential_mw" in result.hourly:
+            voltage_ceiling = max(
+                1.055, float(result.baseline_profiles.max()) + 0.005,
+                float(result.supported_profiles.max()) + 0.005,
+            )
+            minimum_axis.set_ylim(voltage_floor, voltage_ceiling)
+            minimum_axis.set_yticks((0.92, 0.95, 1.00, 1.05))
+            minimum_axis.axhline(1.05, color="#228b22", linestyle=":",
+                                 linewidth=1.1)
+            minimum_axis.text(
+                166, 1.0505, "PV ceiling", ha="right", va="bottom",
+                color="#228b22", fontsize=18,
+            )
+        else:
+            minimum_axis.set_ylim(voltage_floor, 1.005)
         gain = (result.supported_profiles - result.baseline_profiles).T
         limit = max(float(np.abs(gain).max()), 1e-8)
         image = gain_axis.imshow(
