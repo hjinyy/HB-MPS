@@ -158,6 +158,9 @@ def plot_results(results: list[AllocationResult]) -> None:
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
     emergency = [row.emergency_energy_mwh for row in results]
+    emergency_energy_label = (
+        r"$E^{\mathrm{emg}}_{\mathrm{ESS}} + E^{\mathrm{gen}}_{\mathrm{HFC}}$ (MWh)"
+    )
     supply_ax = allocation_ax.twinx()
     operating_line = allocation_ax.plot(
         shares,
@@ -181,7 +184,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.set_xlim(-3, 103)
     allocation_ax.set_xlabel("ESS share (%)\n(a)")
     allocation_ax.set_ylabel(r"$\Pi_{\mathrm{op}}$ (M KRW)")
-    supply_ax.set_ylabel(r"$E_{\mathrm{emg}}$ (MWh)")
+    supply_ax.set_ylabel(emergency_energy_label)
     allocation_ax.grid(alpha=0.25)
     allocation_ax.spines["top"].set_visible(False)
     supply_ax.spines["top"].set_visible(False)
@@ -214,7 +217,7 @@ def plot_results(results: list[AllocationResult]) -> None:
             fontsize=plt.rcParams["font.size"],
         )
     tradeoff_ax.set_xlabel("$\\Pi_{\\mathrm{op}}$ (M KRW)\n(b)")
-    tradeoff_ax.set_ylabel(r"$E_{\mathrm{emg}}$ (MWh)")
+    tradeoff_ax.set_ylabel(emergency_energy_label)
     tradeoff_ax.grid(alpha=0.25)
     tradeoff_ax.spines[["top", "right"]].set_visible(False)
     colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
