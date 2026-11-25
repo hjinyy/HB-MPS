@@ -134,7 +134,7 @@ def plot_usage(summaries: tuple[ScenarioModeSummary, ...]) -> None:
     axis.set_xticks(x, labels)
     axis.set_ylim(0, 103)
     axis.set_ylabel("Time share (%)")
-    axis.set_xlabel("Grid condition\n(a)", labelpad=20)
+    axis.set_xlabel("Grid condition", labelpad=20)
     axis.grid(axis="y", alpha=0.2)
     axis.set_axisbelow(True)
     axis.spines[["top", "right"]].set_visible(False)
