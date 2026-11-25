@@ -144,7 +144,7 @@ def is_non_dominated(row: AllocationResult, results: list[AllocationResult]) -> 
 
 
 def plot_results(results: list[AllocationResult]) -> None:
-    """Show allocation sensitivity and the observed economic–resilience plane."""
+    """Show capacity-allocation sensitivity."""
     apply_paper_typography(text_scale=0.78 * 1.3, legend_scale=1.3)
     plt.rcParams.update(
         {
@@ -154,7 +154,7 @@ def plot_results(results: list[AllocationResult]) -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, (allocation_ax, tradeoff_ax) = plt.subplots(1, 2, figsize=(20, 8.8), dpi=220)
+    fig, allocation_ax = plt.subplots(figsize=(10, 8.8), dpi=220)
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
     emergency = [row.emergency_energy_mwh for row in results]
@@ -188,41 +188,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     allocation_ax.grid(alpha=0.25)
     allocation_ax.spines["top"].set_visible(False)
     supply_ax.spines["top"].set_visible(False)
-    tradeoff_ax.plot(operating, emergency, color="0.65", linestyle="--", linewidth=1.6)
-    scatter = tradeoff_ax.scatter(
-        operating,
-        emergency,
-        c=shares,
-        cmap="viridis",
-        vmin=0,
-        vmax=100,
-        s=105,
-        edgecolors="black",
-        linewidths=0.6,
-        zorder=3,
-    )
-    for share, label, offset, alignment, color in (
-        (0, "HFC-only", (10, 12), "left", "black"),
-        (50, "50% Hybrid", (9, 10), "left", scatter.cmap(scatter.norm(50))),
-        (100, "ESS-only", (-8, 12), "right", "black"),
-    ):
-        row = results[share // 10]
-        tradeoff_ax.annotate(
-            label,
-            (row.operating_net_benefit_mkrw, row.emergency_energy_mwh),
-            xytext=offset,
-            textcoords="offset points",
-            ha=alignment,
-            color=color,
-            fontsize=plt.rcParams["font.size"],
-        )
-    tradeoff_ax.set_xlabel("$\\Pi_{\\mathrm{op}}$ (M KRW)\n(b)")
-    tradeoff_ax.set_ylabel(emergency_energy_label)
-    tradeoff_ax.grid(alpha=0.25)
-    tradeoff_ax.spines[["top", "right"]].set_visible(False)
-    colorbar = fig.colorbar(scatter, ax=tradeoff_ax, pad=0.02, shrink=0.82)
-    colorbar.set_label("ESS share (%)")
-    fig.tight_layout(rect=(0, 0, 1, 0.9), pad=0.7, w_pad=1.6)
+    fig.tight_layout(rect=(0, 0, 1, 0.9), pad=0.7)
     fig.legend(
         handles=(operating_line, supply_line),
         loc="upper left",
