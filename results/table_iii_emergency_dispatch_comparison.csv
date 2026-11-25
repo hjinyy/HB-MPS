@@ -1,0 +1,8 @@
+Indicator,P0,P1,P2
+Emergency SOC floor,-,0.3,0.1
+HFC supply (MWh),5.516,5.518,5.523
+ESS emergency supply (MWh),0,3.420,4.560
+Residual unserved (MWh),55.440,52.018,50.873
+Operating net benefit (M KRW),-3.161,-3.863,-4.094
+Avoided interruption benefit (M KRW),27.044,43.821,49.432
+Net societal benefit (M KRW),23.883,39.958,45.338
