@@ -128,7 +128,7 @@ def _draw_operation_timeline(axis: plt.Axes, run: CaseRun) -> None:
     ]
     unavailable = (hourly.mode2_trigger & ~hourly.supply_active).to_numpy(dtype=bool)
     if unavailable.any():
-        states.append(("Requested\nbut unavailable", unavailable, "#777777"))
+        states.append(("Unavailable", unavailable, "#777777"))
     for row, (_, mask, color) in enumerate(states):
         axis.broken_barh(
             [(start, stop - start) for start, stop in _intervals(mask)],
