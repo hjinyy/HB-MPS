@@ -118,7 +118,7 @@ def main() -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, axis = plt.subplots(figsize=(22, 6.84))
+    fig, axis = plt.subplots(figsize=(22, 4.9248))
     for trucks in (1, 2, 5):
         p0 = runs[1.3, trucks, Strategy.P0]
         proposed = runs[1.3, trucks, Strategy.P1]
@@ -186,7 +186,7 @@ def main() -> None:
         axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
-        axis.set_box_aspect(0.36)
+        axis.set_box_aspect(0.2592)
         axis.set_xlim(0, 2000)
         axis.set_xticks(np.arange(0, 2001, 250))
         axis.get_xticklabels()[4].set_color("#228b22")
@@ -198,7 +198,7 @@ def main() -> None:
     fig.legend(
         *axis.get_legend_handles_labels(),
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.98),
+        bbox_to_anchor=(0.5, 1.04),
         ncol=3,
         frameon=True,
         fancybox=False,
@@ -207,7 +207,7 @@ def main() -> None:
         framealpha=1.0,
         prop={"size": TICK_SIZE},
     )
-    scale_figure_text(fig, 0.918)
+    scale_figure_text(fig, 0.5508)
     fig.tight_layout(rect=(0, 0, 1, 0.89))
     save(fig, "fig11_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
