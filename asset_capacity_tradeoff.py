@@ -154,7 +154,7 @@ def plot_results(results: list[AllocationResult]) -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, allocation_ax = plt.subplots(figsize=(20, 8.8), dpi=220)
+    fig, allocation_ax = plt.subplots(figsize=(18, 8.8), dpi=220)
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
     emergency = [row.emergency_energy_mwh for row in results]
