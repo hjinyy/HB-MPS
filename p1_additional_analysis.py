@@ -28,7 +28,9 @@ from paper_figure_style import (
 )
 
 OUT: Final = Path(__file__).resolve().parent / "results"
-MULTIPLIERS: Final = (0.0, 0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 1.5, 2.0)
+S_SCALE_BASELINE: Final = 1000.0
+S_SCALE_VALUES: Final = (0.0, 25.0, 50.0, 100.0, 250.0, 500.0, 1000.0, 1500.0, 2000.0)
+VOLL_PER_SCALE_UNIT: Final = VOLL_KRW_PER_KWH / S_SCALE_BASELINE
 
 
 def write_rows(name: str, rows: list[dict[str, str | float | int]]) -> None:
@@ -108,6 +110,14 @@ def main() -> None:
     sensitivity = []
     break_even_rows = []
     apply_paper_typography()
+    plt.rcParams.update(
+        {
+            "mathtext.fontset": "custom",
+            "mathtext.rm": "Times New Roman",
+            "mathtext.it": "Times New Roman:italic",
+            "mathtext.bf": "Times New Roman:bold",
+        }
+    )
     fig, axes = plt.subplots(1, 3, figsize=(28, 9.5))
     for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
         p0 = runs[1.3, trucks, Strategy.P0]
@@ -120,11 +130,14 @@ def main() -> None:
             - p0.total("hfc_kwh")
         )
         break_even = (op0 - op_proposed) / extra_supply
+        break_even_scale = break_even / VOLL_PER_SCALE_UNIT
         break_even_rows.append(
             {
                 "alpha": 1.3,
                 "available_trucks": trucks,
+                "comparison": "P0-P2",
                 "break_even_voll_krw_per_kwh": break_even,
+                "break_even_s_scale_krw_per_kwh": break_even_scale,
             }
         )
         # Manuscript P1 is the former P2; proposed P2 is the former P1.
@@ -135,37 +148,59 @@ def main() -> None:
             ("P2", Strategy.P1, "#D9904A", "s", ":"),
         ):
             run = runs[1.3, trucks, strategy]
-            x = np.array(MULTIPLIERS) * VOLL_KRW_PER_KWH
-            y = np.array([societal(run, voll) / 1e6 for voll in x])
-            visible_values.extend((societal(run, 0) / 1e6, societal(run, 5000) / 1e6))
+            x = np.array(S_SCALE_VALUES)
+            voll_values = x * VOLL_PER_SCALE_UNIT
+            y = np.array([societal(run, voll) / 1e6 for voll in voll_values])
+            visible_values.extend((y[0], y[-1]))
             axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
                       linewidth=3.5, label=label)
-            for multiple, voll, value in zip(MULTIPLIERS, x, y, strict=True):
+            for scale, voll, value in zip(x, voll_values, y, strict=True):
                 sensitivity.append(
                     {
                         "alpha": 1.3,
                         "available_trucks": trucks,
                         "strategy": label,
-                        "voll_multiplier": multiple,
+                        "voll_multiplier": scale / S_SCALE_BASELINE,
+                        "s_scale_krw_per_kwh": scale,
                         "voll_krw_per_kwh": voll,
                         "net_societal_million_krw": value,
                     }
                 )
-        axis.axvline(break_even, color="#d62728", linestyle="--", linewidth=1.3)
-        axis.axvline(VOLL_KRW_PER_KWH, color="#228b22", linestyle="--", linewidth=1.3)
-        axis.set_xlabel(f"VOLL (KRW/kWh)\n({letter})")
+        axis.axvline(break_even_scale, color="#d62728", linestyle="--", linewidth=1.3)
+        axis.axvline(S_SCALE_BASELINE, color="#228b22", linestyle="--", linewidth=1.3)
+        cross_value = societal(p0, break_even) / 1e6
+        axis.plot(break_even_scale, cross_value, "o", color="#d62728", markersize=6, zorder=5)
+        axis.text(
+            break_even_scale + 25, 0.98, f"P0–P2\n{break_even_scale:.2f}",
+            transform=axis.get_xaxis_transform(), va="top", color="#d62728",
+            fontsize=ANNOTATION_SIZE,
+        )
+        axis.text(
+            S_SCALE_BASELINE + 25, 0.98, "Baseline",
+            transform=axis.get_xaxis_transform(), va="top", color="#228b22",
+            fontsize=ANNOTATION_SIZE,
+        )
+        if trucks == 1:
+            baseline_p0 = societal(p0, VOLL_KRW_PER_KWH) / 1e6
+            baseline_proposed = societal(proposed, VOLL_KRW_PER_KWH) / 1e6
+            improvement = baseline_proposed - baseline_p0
+            axis.annotate(
+                "", xy=(1100, baseline_proposed), xytext=(1100, baseline_p0),
+                arrowprops={"arrowstyle": "<->", "color": "#222222", "lw": 1.5},
+            )
+            axis.text(
+                1150, (baseline_p0 + baseline_proposed) / 2,
+                f"+{improvement:.3f}\nM KRW", va="center",
+                fontsize=ANNOTATION_SIZE * 0.8,
+                bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.15},
+            )
+        axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)" + f"\n({letter})")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
-        axis.set_xlim(0, 5000)
-        axis.set_xticks(
-            (break_even, VOLL_KRW_PER_KWH),
-            (f"{break_even:.3f}", f"{VOLL_KRW_PER_KWH:,.3f}"),
-        )
-        axis.get_xticklabels()[0].set_color("#d62728")
-        axis.get_xticklabels()[0].set_ha("left")
-        axis.get_xticklabels()[-1].set_color("#228b22")
-        axis.get_xticklabels()[-1].set_ha("right")
+        axis.set_xlim(0, 2000)
+        axis.set_xticks((0, 500, 1000, 1500, 2000))
+        axis.get_xticklabels()[2].set_color("#228b22")
         lower, upper = min(visible_values), max(visible_values)
         padding = (upper - lower) * 0.08
         axis.set_ylim(lower - padding, upper + padding)
