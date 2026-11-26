@@ -210,7 +210,7 @@ def save_voltage(run: CaseRun, directory: Path) -> None:
     result = run.result
     with plt.rc_context(_STYLE):
         fig = plt.figure(figsize=(13.5, 13.5), dpi=220)
-        grid = fig.add_gridspec(3, 1, height_ratios=(1.15, 1.45, 1.35), hspace=1.1)
+        grid = fig.add_gridspec(3, 1, height_ratios=(1.45, 1.45, 1.35), hspace=1.1)
         nodal_axis, minimum_axis, gain_axis = (
             fig.add_subplot(grid[index]) for index in range(3)
         )
@@ -244,11 +244,17 @@ def save_voltage(run: CaseRun, directory: Path) -> None:
         gain_axis.set_yticks((1, 9, 18, 25, 33))
         gain_axis.set_xlabel("Time (h)\n(c)")
         gain_axis.set_ylabel("Bus number")
-        fig.colorbar(image, ax=gain_axis, pad=0.015, fraction=0.035).set_label(
-            "Nodal voltage difference (p.u.)"
+        colorbar = fig.colorbar(image, ax=gain_axis, pad=0.015, fraction=0.035)
+        colorbar.set_label(
+            "Voltage difference (p.u.)"
         )
         fig.subplots_adjust(left=0.12, right=0.94, bottom=0.07, top=0.91)
         _align_panel_gaps(fig, nodal_axis, minimum_axis, gain_axis)
+        fig.canvas.draw()
+        right_edge = colorbar.ax.get_tightbbox(fig.canvas.get_renderer()).x1 / fig.bbox.width
+        for axis in (nodal_axis, minimum_axis):
+            position = axis.get_position()
+            axis.set_position((position.x0, position.y0, right_edge - position.x0, position.height))
         _save(fig, directory, "fig14_nodal_voltage_analysis")
 
 
