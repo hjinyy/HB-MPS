@@ -174,7 +174,7 @@ def main() -> None:
         cross_value = societal(p0, break_even) / 1e6
         axis.plot(break_even_scale, cross_value, "o", color="#d62728", markersize=6, zorder=5)
         axis.text(
-            break_even_scale + 25, 0.98, f"Break-even\n{break_even_scale:.2f}",
+            break_even_scale + 25, 0.98, f"Crossover point\n{break_even_scale:.2f}",
             transform=axis.get_xaxis_transform(), va="top", color="#d62728",
             fontsize=ANNOTATION_SIZE,
         )
