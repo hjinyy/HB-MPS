@@ -154,7 +154,7 @@ def plot_results(results: list[AllocationResult]) -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, allocation_ax = plt.subplots(figsize=(10, 8.8), dpi=220)
+    fig, allocation_ax = plt.subplots(figsize=(20, 8.8), dpi=220)
     shares = [row.ess_share_percent for row in results]
     operating = [row.operating_net_benefit_mkrw for row in results]
     emergency = [row.emergency_energy_mwh for row in results]
@@ -180,7 +180,7 @@ def plot_results(results: list[AllocationResult]) -> None:
         markersize=8,
         label="Emergency energy supply",
     )[0]
-    allocation_ax.set_xticks(range(0, 101, 20))
+    allocation_ax.set_xticks(range(0, 101, 10))
     allocation_ax.set_xlim(-3, 103)
     allocation_ax.set_xlabel("ESS share (%)")
     allocation_ax.set_ylabel(r"$\Pi_{\mathrm{op}}$ (M KRW)")
