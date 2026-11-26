@@ -174,7 +174,7 @@ def main() -> None:
         cross_value = societal(p0, break_even) / 1e6
         axis.plot(break_even_scale, cross_value, "o", color="#d62728", markersize=6, zorder=5)
         axis.text(
-            break_even_scale + 25, 0.98, f"P0–P2\n{break_even_scale:.2f}",
+            break_even_scale + 25, 0.98, f"Break-even\n{break_even_scale:.2f}",
             transform=axis.get_xaxis_transform(), va="top", color="#d62728",
             fontsize=ANNOTATION_SIZE,
         )
@@ -182,19 +182,6 @@ def main() -> None:
             S_SCALE_BASELINE + 25, 0.98, "Baseline",
             transform=axis.get_xaxis_transform(), va="top", color="#228b22",
             fontsize=ANNOTATION_SIZE,
-        )
-        baseline_p0 = societal(p0, VOLL_KRW_PER_KWH) / 1e6
-        baseline_proposed = societal(proposed, VOLL_KRW_PER_KWH) / 1e6
-        improvement = baseline_proposed - baseline_p0
-        axis.annotate(
-            "", xy=(1100, baseline_proposed), xytext=(1100, baseline_p0),
-            arrowprops={"arrowstyle": "<->", "color": "#222222", "lw": 1.5},
-        )
-        axis.text(
-            1150, (baseline_p0 + baseline_proposed) / 2,
-            f"+{improvement:.3f}\nM KRW", va="center",
-            fontsize=ANNOTATION_SIZE * 0.8,
-            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.15},
         )
         axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
