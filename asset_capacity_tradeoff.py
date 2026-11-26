@@ -182,7 +182,7 @@ def plot_results(results: list[AllocationResult]) -> None:
     )[0]
     allocation_ax.set_xticks(range(0, 101, 20))
     allocation_ax.set_xlim(-3, 103)
-    allocation_ax.set_xlabel("ESS share (%)\n(a)")
+    allocation_ax.set_xlabel("ESS share (%)")
     allocation_ax.set_ylabel(r"$\Pi_{\mathrm{op}}$ (M KRW)")
     supply_ax.set_ylabel(emergency_energy_label)
     allocation_ax.grid(alpha=0.25)
