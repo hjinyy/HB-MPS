@@ -118,7 +118,7 @@ def main() -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, axis = plt.subplots(figsize=(11, 9.5))
+    fig, axis = plt.subplots(figsize=(22, 9.5))
     for trucks in (1, 2, 5):
         p0 = runs[1.3, trucks, Strategy.P0]
         proposed = runs[1.3, trucks, Strategy.P1]
@@ -186,7 +186,7 @@ def main() -> None:
         axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
-        axis.set_box_aspect(1)
+        axis.set_box_aspect(0.5)
         axis.set_xlim(0, 2000)
         axis.set_xticks((0, 500, 1000, 1500, 2000))
         axis.get_xticklabels()[2].set_color("#228b22")
