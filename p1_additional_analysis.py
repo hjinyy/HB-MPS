@@ -118,7 +118,7 @@ def main() -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, axis = plt.subplots(figsize=(22, 5.90976))
+    fig, axis = plt.subplots(figsize=(22, 7.091712))
     for trucks in (1, 2, 5):
         p0 = runs[1.3, trucks, Strategy.P0]
         proposed = runs[1.3, trucks, Strategy.P1]
@@ -176,17 +176,17 @@ def main() -> None:
         axis.text(
             break_even_scale + 25, 0.98, f"Crossover point\n{break_even_scale:.2f}",
             transform=axis.get_xaxis_transform(), va="top", color="#d62728",
-            fontsize=ANNOTATION_SIZE,
+            fontsize=TICK_SIZE,
         )
         axis.text(
             S_SCALE_BASELINE + 25, 0.98, "Baseline",
             transform=axis.get_xaxis_transform(), va="top", color="#228b22",
-            fontsize=ANNOTATION_SIZE,
+            fontsize=TICK_SIZE,
         )
         axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
-        axis.set_box_aspect(0.31104)
+        axis.set_box_aspect(0.373248)
         axis.set_xlim(0, 2000)
         axis.set_xticks(np.arange(0, 2001, 250))
         axis.get_xticklabels()[4].set_color("#228b22")
@@ -207,7 +207,7 @@ def main() -> None:
         framealpha=1.0,
         prop={"size": TICK_SIZE},
     )
-    scale_figure_text(fig, 0.66096)
+    scale_figure_text(fig, 0.8262)
     fig.tight_layout(rect=(0, 0, 1, 0.89))
     save(fig, "fig11_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
