@@ -188,8 +188,8 @@ def main() -> None:
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(0.5)
         axis.set_xlim(0, 2000)
-        axis.set_xticks((0, 500, 1000, 1500, 2000))
-        axis.get_xticklabels()[2].set_color("#228b22")
+        axis.set_xticks(np.arange(0, 2001, 250))
+        axis.get_xticklabels()[4].set_color("#228b22")
         lower, upper = min(visible_values), max(visible_values)
         padding = (upper - lower) * 0.08
         axis.set_ylim(lower - padding, upper + padding)
