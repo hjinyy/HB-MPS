@@ -118,8 +118,8 @@ def main() -> None:
             "mathtext.bf": "Times New Roman:bold",
         }
     )
-    fig, axes = plt.subplots(1, 3, figsize=(28, 9.5))
-    for axis, trucks, letter in zip(axes, (1, 2, 5), "abc", strict=True):
+    fig, axis = plt.subplots(figsize=(11, 9.5))
+    for trucks in (1, 2, 5):
         p0 = runs[1.3, trucks, Strategy.P0]
         proposed = runs[1.3, trucks, Strategy.P1]
         op0 = sum(step.operating_net_krw for step in p0.steps)
@@ -152,8 +152,9 @@ def main() -> None:
             voll_values = x * VOLL_PER_SCALE_UNIT
             y = np.array([societal(run, voll) / 1e6 for voll in voll_values])
             visible_values.extend((y[0], y[-1]))
-            axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
-                      linewidth=3.5, label=label)
+            if trucks == 1:
+                axis.plot(x, y, color=color, marker=marker, linestyle=linestyle,
+                          linewidth=3.5, label=label)
             for scale, voll, value in zip(x, voll_values, y, strict=True):
                 sensitivity.append(
                     {
@@ -166,6 +167,8 @@ def main() -> None:
                         "net_societal_million_krw": value,
                     }
                 )
+        if trucks != 1:
+            continue
         axis.axvline(break_even_scale, color="#d62728", linestyle="--", linewidth=1.3)
         axis.axvline(S_SCALE_BASELINE, color="#228b22", linestyle="--", linewidth=1.3)
         cross_value = societal(p0, break_even) / 1e6
@@ -180,21 +183,20 @@ def main() -> None:
             transform=axis.get_xaxis_transform(), va="top", color="#228b22",
             fontsize=ANNOTATION_SIZE,
         )
-        if trucks == 1:
-            baseline_p0 = societal(p0, VOLL_KRW_PER_KWH) / 1e6
-            baseline_proposed = societal(proposed, VOLL_KRW_PER_KWH) / 1e6
-            improvement = baseline_proposed - baseline_p0
-            axis.annotate(
-                "", xy=(1100, baseline_proposed), xytext=(1100, baseline_p0),
-                arrowprops={"arrowstyle": "<->", "color": "#222222", "lw": 1.5},
-            )
-            axis.text(
-                1150, (baseline_p0 + baseline_proposed) / 2,
-                f"+{improvement:.3f}\nM KRW", va="center",
-                fontsize=ANNOTATION_SIZE * 0.8,
-                bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.15},
-            )
-        axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)" + f"\n({letter})")
+        baseline_p0 = societal(p0, VOLL_KRW_PER_KWH) / 1e6
+        baseline_proposed = societal(proposed, VOLL_KRW_PER_KWH) / 1e6
+        improvement = baseline_proposed - baseline_p0
+        axis.annotate(
+            "", xy=(1100, baseline_proposed), xytext=(1100, baseline_p0),
+            arrowprops={"arrowstyle": "<->", "color": "#222222", "lw": 1.5},
+        )
+        axis.text(
+            1150, (baseline_p0 + baseline_proposed) / 2,
+            f"+{improvement:.3f}\nM KRW", va="center",
+            fontsize=ANNOTATION_SIZE * 0.8,
+            bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.9, "pad": 0.15},
+        )
+        axis.set_xlabel(r"$S_{\mathrm{scale}}$ (KRW/kWh)")
         axis.set_ylabel(r"$V_{\mathrm{societal}}$ (M KRW)")
         axis.tick_params(axis="y", labelleft=True)
         axis.set_box_aspect(1)
@@ -207,9 +209,9 @@ def main() -> None:
         axis.locator_params(axis="y", nbins=5)
         axis.grid(alpha=0.2)
     fig.legend(
-        *axes[0].get_legend_handles_labels(),
+        *axis.get_legend_handles_labels(),
         loc="upper center",
-        bbox_to_anchor=(0.5, 0.94),
+        bbox_to_anchor=(0.5, 0.98),
         ncol=3,
         frameon=True,
         fancybox=False,
@@ -219,13 +221,7 @@ def main() -> None:
         prop={"size": TICK_SIZE},
     )
     scale_figure_text(fig, 1.2)
-    fig.tight_layout(rect=(0, 0, 1, 0.76), w_pad=2.0)
-    positions = [axis.get_position() for axis in axes]
-    reduced_gap = (positions[1].x0 - positions[0].x1) * 0.75
-    left = (1 - sum(position.width for position in positions) - 2 * reduced_gap) / 2
-    for axis, position in zip(axes, positions, strict=True):
-        axis.set_position((left, position.y0, position.width, position.height))
-        left += position.width + reduced_gap
+    fig.tight_layout(rect=(0, 0, 1, 0.89))
     save(fig, "fig11_voll_sensitivity_of_net_societal_benefit")
     write_rows("p1_voll_sensitivity.csv", sensitivity)
     write_rows("p1_voll_break_even.csv", break_even_rows)
